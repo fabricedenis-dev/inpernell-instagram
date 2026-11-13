@@ -1,0 +1,38 @@
+name: Top Job des Tages
+
+on:
+  schedule:
+    # GitHub rechnet in Weltzeit (UTC). Zwei Zeiten, damit es im Winter (11:50 UTC) und im
+    # Sommer (10:50 UTC) jeweils 12:50 Uhr in Deutschland ist. Das Programm prüft die Uhrzeit selbst.
+    - cron: "50 10 * * 1-5"
+    - cron: "50 11 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      probelauf:
+        description: "Probelauf: nur Bild und Text erzeugen, NICHT veröffentlichen"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: top-job
+  cancel-in-progress: false
+
+jobs:
+  posten:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet -r requirements.txt
+      - name: Top Job erstellen und veröffentlichen
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.probelauf || 'false' }}
+          ERZWINGEN: ${{ github.event_name == 'workflow_dispatch' }}
+        run: python agent.py
