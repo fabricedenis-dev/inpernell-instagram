@@ -13,6 +13,7 @@ Umgebungsvariablen:
   GITHUB_REF_NAME    Zweig, Standard "main"
   DRY_RUN            "true" = alles vorbereiten, aber NICHT veröffentlichen
   ERZWINGEN          "true" = auch außerhalb der Mittagsstunde laufen (Handstart)
+  FORMAT             "bild" oder "reel" erzwingen (sonst Vorgabe bzw. WOCHENPLAN)
   OFFERS_FILE        nur für Tests: Stellen aus lokaler JSON-Datei statt aus dem Netz
   KEIN_GIT           nur für Tests: nichts committen/pushen
 """
@@ -30,7 +31,8 @@ import urllib.request
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
-from bild import erzeuge_bild
+import kategorien
+from bild import erzeuge_bild, erzeuge_reel
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 RECRUITEE = "https://inpernellgmbh.recruitee.com/api/offers/"
@@ -38,7 +40,25 @@ GRAPH = "https://graph.instagram.com/v26.0"
 PROTOKOLL = os.path.join(HIER, "data", "protokoll.csv")
 SPERRFRIST = 30          # so viele letzte Posts werden nicht wiederholt
 POSTSTUNDE = 12          # veröffentlicht wird in der Stunde ab 12 Uhr (Europe/Berlin)
+# Format je Wochentag (0 = Montag): "bild" = Feed-Beitrag 4:5, "reel" = 10-Sekunden-Video 9:16.
+# Eine Vorgabe von Claude ("format": "reel") oder die Variable FORMAT haben Vorrang.
+WOCHENPLAN = {0: "bild", 1: "reel", 2: "bild", 3: "reel", 4: "bild", 5: "bild", 6: "bild"}
 HASHTAGS_FEST = ["#TopJobDesTages", "#Inpernell", "#Jobs", "#Karriere", "#Stellenangebot", "#Direktvermittlung"]
+HASHTAGS_FELD = {
+    "zerspanung": ["#Zerspanung", "#CNC", "#Metallbearbeitung"],
+    "konstruktion": ["#Konstruktion", "#Engineering", "#CAD"],
+    "projektleitung": ["#Projektmanagement", "#Führungskraft"],
+    "qualitaet": ["#Qualitätsmanagement", "#Qualitätssicherung"],
+    "technik": ["#Instandhaltung", "#Mechatronik", "#Technik"],
+    "it": ["#ITJobs", "#ERP", "#Digitalisierung"],
+    "banking": ["#Banking", "#Finanzberatung", "#Bankjobs"],
+    "finanzen": ["#Finanzen", "#Buchhaltung", "#Controlling"],
+    "personal": ["#HR", "#Personalwesen"],
+    "einkauf": ["#Einkauf", "#Beschaffung"],
+    "logistik": ["#Logistik", "#SupplyChain"],
+    "vertrieb": ["#Vertrieb", "#Sales"],
+    "produktion": ["#Produktion", "#Industrie", "#Fertigung"],
+}
 
 
 def wahr(name):
@@ -93,7 +113,7 @@ def protokoll_lesen():
 def protokoll_schreiben(zeile):
     neu = not os.path.exists(PROTOKOLL)
     with open(PROTOKOLL, "a", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["datum", "job_id", "titel", "media_id", "quelle"], delimiter=";")
+        w = csv.DictWriter(f, fieldnames=["datum", "job_id", "titel", "media_id", "quelle", "format"], delimiter=";")
         if neu:
             w.writeheader()
         w.writerow(zeile)
@@ -134,34 +154,89 @@ def stelle_waehlen(stellen, protokoll):
     return frei[0]
 
 
+FUELLWOERTER = {"und", "oder", "sowie", "von", "der", "die", "das", "des", "den", "dem", "für", "mit", "in", "im",
+               "bei", "zur", "zum", "auf", "aus", "an", "am", "eine", "einer", "einem", "eines", "ein", "zu"}
+
+
+def kurzpunkt(s, n=60):
+    """Macht aus einem langen Anzeigen-Punkt eine knappe Zeile fürs Bild (max. n Zeichen)."""
+    s = re.sub(r"\s+", " ", s.replace("\xad", "")).strip().rstrip(".;,")
+    if ":" in s and 10 <= len(s.split(":")[0]) <= n:
+        return s.split(":")[0].strip()
+    for trenner in (" sowie ", "; ", " – ", " - ", " (", " inkl. ", " unter Berücksichtigung"):
+        if len(s) > n and len(s.split(trenner)[0].strip()) >= 18:
+            s = s.split(trenner)[0].strip()
+    if len(s) <= n:
+        return s
+    woerter = s[:n].split(" ")[:-1]
+    while woerter and (woerter[-1].lower().strip(",") in FUELLWOERTER or woerter[-1].endswith("-")):
+        woerter.pop()
+    return " ".join(woerter).rstrip(",") + "…"
+
+
+SIE_FORM = re.compile(r"\b(Sie|Ihnen|Ihr\w*|Du|Dir|Dich|Wir|Uns)\b")
+
+
+def highlights(aufgaben, anforderungen):
+    """Bis zu drei knappe Punkte fürs Bild; Aufgaben bevorzugt, ganze Sätze ("Sie ...") meiden."""
+    for liste, titel in ((aufgaben, "Das erwartet dich"), (anforderungen, "Das bringst du mit")):
+        gut = [kurzpunkt(p) for p in liste if not SIE_FORM.search(p)]
+        gut = [p for p in gut if not p.endswith("…")] + [p for p in gut if p.endswith("…")]
+        if len(gut) >= 3:
+            return gut[:3], titel
+    alle = [kurzpunkt(p) for p in (aufgaben or anforderungen)]
+    return alle[:3], "Das erwartet dich" if aufgaben else "Das bringst du mit"
+
+
+ARBEITSZEIT = {"fulltime": "Vollzeit", "parttime": "Teilzeit", "freelance": "Freiberuflich",
+               "internship": "Praktikum", "temporary": "Befristet"}
+
+
+def fakten(s):
+    """Drei Eckdaten für die Kacheln: Gehalt, Arbeitszeit, Arbeitsmodell."""
+    g = gehalt(s)
+    g_label = {"Jahr": "Jahresgehalt", "Monat": "Monatsgehalt", "Stunde": "Stundenlohn"}.get(g.split(" / ")[-1], "Gehalt")
+    g = g.split(" / ")[0]
+    art = (s.get("employment_type_code") or "").split("_")[0]
+    zeit = ARBEITSZEIT.get(art, "Vollzeit")
+    stunden = s.get("min_hours_per_week") or s.get("max_hours_per_week")
+    if stunden and art in ("fulltime", "parttime", ""):
+        zeit += f" · {int(float(stunden))} h"
+    modell = "Remote möglich" if s.get("remote") else ("Hybrid / Homeoffice" if s.get("hybrid") else "Vor Ort")
+    return [[g_label if g else "Gehalt", g or "Attraktiv"], ["Arbeitszeit", zeit], ["Arbeitsmodell", modell]]
+
+
 def aus_stelle(s, datum):
     """Bildtexte und Beitragstext ohne KI direkt aus der Stellenanzeige bauen (Ersatzweg)."""
     titel = (s.get("title") or "").strip()
     ort = (s.get("city") or s.get("location") or "").split(",")[0].strip()
-    extras = [gehalt(s)]
-    if s.get("remote"):
-        extras.append("Remote möglich")
-    elif s.get("hybrid"):
-        extras.append("Homeoffice möglich")
-    extra = " · ".join(e for e in extras if e)
-    anforderungen = listenpunkte(s.get("requirements")) or listenpunkte(s.get("description"))
-    punkte = [kuerzen(p, 42) for p in anforderungen[:3]]
+    aufgaben = listenpunkte(s.get("description"))
+    anforderungen = listenpunkte(s.get("requirements"))
+    fk = fakten(s)
+    kat = kategorien.erkenne(titel, s.get("category_code"))
     url = s.get("careers_url") or "https://www.inpernell.de/jobboerse/"
 
-    zeilen = [f"TOP Job des Tages: {titel}" + (f" in {ort}" if ort else ""), ""]
-    if extra:
-        zeilen += [extra, ""]
-    if anforderungen:
-        zeilen.append("Das solltest du mitbringen:")
-        zeilen += [f"• {kuerzen(p, 110)}" for p in anforderungen[:3]]
-        zeilen.append("")
+    zeilen = [f"🔥 TOP Job des Tages: {titel}" + (f" in {ort}" if ort else ""), ""]
+    zeilen += [f"💶 {gehalt(s) or 'Attraktives Gehalt'}", f"🕒 {fk[1][1]}", f"🏠 {fk[2][1]}"]
+    if ort:
+        zeilen.append(f"📍 {ort}")
+    zeilen.append("")
+    for liste, ueberschrift in ((aufgaben, "Das erwartet dich:"), (anforderungen, "Das bringst du mit:")):
+        # Sätze in der Sie-Form passen nicht zur Du-Ansprache auf Instagram und werden ausgelassen
+        gut = [re.sub(r"\s+:", ":", p) for p in liste if not SIE_FORM.search(p)]
+        if len(gut) >= 2:
+            zeilen.append(ueberschrift)
+            zeilen += [f"✔️ {kuerzen(p, 110)}" for p in gut[:3]]
+            zeilen.append("")
     zeilen += ["Direktvermittlung in Festanstellung – keine Zeitarbeit, für dich als Bewerber kostenlos.", "",
-               "Jetzt bewerben über den Link in der Bio oder auf www.inpernell.de", ""]
-    tags = list(HASHTAGS_FEST)
+               "👉 Jetzt bewerben über den Link in der Bio oder auf www.inpernell.de", ""]
+    tags = list(HASHTAGS_FEST) + HASHTAGS_FELD.get(kat, [])
     if ort:
         tags.insert(0, "#" + re.sub(r"[^0-9A-Za-zÄÖÜäöüß]", "", ort))
     zeilen.append(" ".join(tags))
-    return {"job_id": str(s.get("id")), "titel": titel, "ort": ort, "extra": extra, "punkte": punkte,
+    return {"job_id": str(s.get("id")), "titel": titel, "ort": ort, "kategorie": kat, "fakten": fk,
+            "punkte": highlights(aufgaben, anforderungen)[0],
+            "punkte_titel": highlights(aufgaben, anforderungen)[1],
             "datum": datum, "caption": "\n".join(zeilen), "job_url": url}
 
 
@@ -195,18 +270,31 @@ def warte_auf_bild(url):
     raise RuntimeError("Das Bild ist unter seiner öffentlichen Adresse nicht erreichbar: " + url)
 
 
-def veroeffentlichen(token, bild_url, caption):
+def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_url=None):
+    """Bild oder Reel über die offizielle Instagram-Schnittstelle veröffentlichen; gibt die Beitrags-ID zurück."""
     ich = http(f"{GRAPH}/me?" + urllib.parse.urlencode({"fields": "user_id,username", "access_token": token}))
     ig_id = ich.get("user_id") or ich.get("id")
     print("Instagram-Konto:", ich.get("username"))
-    container = http(f"{GRAPH}/{ig_id}/media", {"image_url": bild_url, "caption": caption, "access_token": token})["id"]
-    for _ in range(15):
-        status = http(f"{GRAPH}/{container}?" + urllib.parse.urlencode({"fields": "status_code", "access_token": token}))
+    if video_url:
+        daten = {"media_type": "REELS", "video_url": video_url, "caption": caption, "share_to_feed": "true",
+                 "access_token": token}
+        if titelbild_url:
+            daten["cover_url"] = titelbild_url
+        runden, pause = 60, 6        # Videos brauchen bei Instagram bis zu einigen Minuten
+    else:
+        daten = {"image_url": bild_url, "caption": caption, "access_token": token}
+        runden, pause = 15, 4
+    container = http(f"{GRAPH}/{ig_id}/media", daten)["id"]
+    for _ in range(runden):
+        status = http(f"{GRAPH}/{container}?" + urllib.parse.urlencode({"fields": "status_code,status",
+                                                                      "access_token": token}))
         if status.get("status_code") == "FINISHED":
             break
         if status.get("status_code") == "ERROR":
-            raise RuntimeError("Instagram konnte das Bild nicht verarbeiten.")
-        time.sleep(4)
+            raise RuntimeError(f"Instagram konnte die Datei nicht verarbeiten: {status.get('status', '')}")
+        time.sleep(pause)
+    else:
+        raise RuntimeError("Instagram hat die Datei nicht rechtzeitig verarbeitet.")
     return http(f"{GRAPH}/{ig_id}/media_publish", {"creation_id": container, "access_token": token})["id"]
 
 
@@ -251,14 +339,25 @@ def main():
         quelle = "automatisch"
     print(f"Stelle ({quelle}): {post['titel']} – {post.get('ort', '')}")
 
+    post.setdefault("kategorie", kategorien.erkenne(post["titel"]))
+    fmt = (os.environ.get("FORMAT") or post.get("format") or WOCHENPLAN[jetzt.weekday()]).strip().lower()
+    if fmt not in ("bild", "reel"):
+        raise RuntimeError(f"Unbekanntes Format '{fmt}' – erlaubt sind 'bild' und 'reel'.")
+    print(f"Format: {fmt} · Berufsfeld: {post['kategorie']}")
+
     bild_rel = f"posts/{heute}.jpg"
     erzeuge_bild(post, os.path.join(HIER, bild_rel))
+    dateien = [bild_rel, f"posts/{heute}.txt"]
+    if fmt == "reel":
+        video_rel, titel_rel = f"posts/{heute}.mp4", f"posts/{heute}-reel.jpg"
+        erzeuge_reel(post, os.path.join(HIER, video_rel), titelbild=os.path.join(HIER, titel_rel))
+        dateien += [video_rel, titel_rel]
     with open(os.path.join(HIER, "posts", f"{heute}.txt"), "w", encoding="utf-8") as f:
         f.write(post["caption"] + "\n")
-    git_sichern(f"Top Job {heute}: Bild und Text", bild_rel, f"posts/{heute}.txt")
+    git_sichern(f"Top Job {heute}: {'Reel' if fmt == 'reel' else 'Bild'} und Text", *dateien)
 
     if probe:
-        print("PROBELAUF: Bild und Text liegen im Ordner posts/. Es wurde NICHTS veröffentlicht.")
+        print("PROBELAUF: Dateien liegen im Ordner posts/. Es wurde NICHTS veröffentlicht.")
         return
 
     token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
@@ -266,13 +365,19 @@ def main():
         raise RuntimeError("Das Secret IG_ACCESS_TOKEN fehlt (Einstellungen des Projekts > Secrets and variables > Actions).")
     repo = os.environ["GITHUB_REPOSITORY"]
     zweig = os.environ.get("GITHUB_REF_NAME", "main")
-    bild_url = f"https://raw.githubusercontent.com/{repo}/{zweig}/{bild_rel}"
-    warte_auf_bild(bild_url)
+    basis = f"https://raw.githubusercontent.com/{repo}/{zweig}/"
+    for rel in dateien:
+        if not rel.endswith(".txt"):
+            warte_auf_bild(basis + rel)
 
-    media_id = veroeffentlichen(token, bild_url, post["caption"][:2200])
+    if fmt == "reel":
+        media_id = veroeffentlichen(token, post["caption"][:2200], video_url=basis + video_rel,
+                                    titelbild_url=basis + titel_rel)
+    else:
+        media_id = veroeffentlichen(token, post["caption"][:2200], bild_url=basis + bild_rel)
     print("Veröffentlicht. Beitrags-ID:", media_id)
     protokoll_schreiben({"datum": heute, "job_id": post.get("job_id", ""), "titel": post["titel"],
-                         "media_id": media_id, "quelle": quelle})
+                         "media_id": media_id, "quelle": quelle, "format": fmt})
     git_sichern(f"Top Job {heute}: veröffentlicht", "data/protokoll.csv")
     schluessel_verlaengern(token)
 
