@@ -15,7 +15,7 @@ GitHub (GitHub Actions) und nutzt die offizielle Instagram-Schnittstelle von Met
 4. **Bild oder Reel:** `bild.py` erzeugt im Stil von www.inpernell.de
    - das **Bild** (1080 × 1350, JPEG): Foto, Titel, Ort, drei Eckdaten-Kacheln
      (Gehalt, Arbeitszeit, Arbeitsmodell), drei Highlights, Bewerben-Knopf;
-   - an Reel-Tagen zusätzlich ein **Reel** (1080 × 1920, 10 Sekunden, MP4): dieselben Inhalte
+   - an Reel-Tagen (derzeit keine, siehe unten) zusätzlich ein **Reel** (1080 × 1920, 10 Sekunden, MP4): dieselben Inhalte
      erscheinen nacheinander, das Foto zoomt langsam heran.
    Alles landet unter `posts/` und hat so die öffentliche Adresse, die Instagram verlangt.
 5. **Veröffentlichen:** `agent.py` schickt Bild bzw. Reel und Text an Instagram.
@@ -76,7 +76,8 @@ Im Projekt: **Actions > Top Job des Tages > Run workflow**
 
 ## Bild oder Reel
 
-In `agent.py` legt `WOCHENPLAN` fest, an welchem Tag was kommt (Standard: Di und Do Reel, sonst Bild).
+In `agent.py` legt `WOCHENPLAN` fest, an welchem Tag was kommt. Derzeit (Schritt 1) jeden Tag ein Bild;
+sobald die Veröffentlichung zuverlässig läuft, können z. B. Di und Do auf Reel gestellt werden.
 Beim Handstart kann man das Format im Feld "Format" wählen; in einer Vorgabe von Claude geht es mit
 `"format": "reel"`. Das Reel hat eine stille Tonspur – Musik lässt sich über die Schnittstelle nicht
 hinzufügen, auf Wunsch nachträglich in der Instagram-App.

@@ -42,7 +42,8 @@ SPERRFRIST = 30          # so viele letzte Posts werden nicht wiederholt
 POSTSTUNDE = 12          # veröffentlicht wird in der Stunde ab 12 Uhr (Europe/Berlin)
 # Format je Wochentag (0 = Montag): "bild" = Feed-Beitrag 4:5, "reel" = 10-Sekunden-Video 9:16.
 # Eine Vorgabe von Claude ("format": "reel") oder die Variable FORMAT haben Vorrang.
-WOCHENPLAN = {0: "bild", 1: "reel", 2: "bild", 3: "reel", 4: "bild", 5: "bild", 6: "bild"}
+# Schritt 1: nur Bilder. Wenn alles läuft, z. B. Di/Do auf "reel" stellen: {1: "reel", 3: "reel", ...}
+WOCHENPLAN = {0: "bild", 1: "bild", 2: "bild", 3: "bild", 4: "bild", 5: "bild", 6: "bild"}
 HASHTAGS_FEST = ["#TopJobDesTages", "#Inpernell", "#Jobs", "#Karriere", "#Stellenangebot", "#Direktvermittlung"]
 HASHTAGS_FELD = {
     "zerspanung": ["#Zerspanung", "#CNC", "#Metallbearbeitung"],
