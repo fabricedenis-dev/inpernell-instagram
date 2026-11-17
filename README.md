@@ -10,10 +10,16 @@ GitHub (GitHub Actions) und nutzt die offizielle Instagram-Schnittstelle von Met
    Text und legt beides als `overrides/JJJJ-MM-TT.json` in dieses Projekt.
 2. **Das Programm startet um 12:50 Uhr:** Liegt eine Vorgabe von Claude vor, nimmt es diese.
    Wenn nicht, wählt es selbst eine Stelle aus Recruitee und baut den Text aus der Anzeige.
-3. **Bild:** `bild.py` erzeugt das Bild (1080 × 1350, JPEG) im Stil von www.inpernell.de und
-   legt es unter `posts/` ab. Dadurch hat es die öffentliche Adresse, die Instagram verlangt.
-4. **Veröffentlichen:** `agent.py` schickt Bild und Text an Instagram.
-5. **Protokoll:** `data/protokoll.csv` merkt sich die Stelle; die letzten 30 werden nicht wiederholt.
+3. **Berufsfeld:** `kategorien.py` erkennt am Stellentitel das Berufsfeld (z. B. Zerspanung & CNC,
+   Konstruktion, IT & ERP, Banking & Finance …) und nimmt das passende Foto aus `assets/berufsfelder/`.
+4. **Bild oder Reel:** `bild.py` erzeugt im Stil von www.inpernell.de
+   - das **Bild** (1080 × 1350, JPEG): Foto, Titel, Ort, drei Eckdaten-Kacheln
+     (Gehalt, Arbeitszeit, Arbeitsmodell), drei Highlights, Bewerben-Knopf;
+   - an Reel-Tagen (derzeit keine, siehe unten) zusätzlich ein **Reel** (1080 × 1920, 10 Sekunden, MP4): dieselben Inhalte
+     erscheinen nacheinander, das Foto zoomt langsam heran.
+   Alles landet unter `posts/` und hat so die öffentliche Adresse, die Instagram verlangt.
+5. **Veröffentlichen:** `agent.py` schickt Bild bzw. Reel und Text an Instagram.
+6. **Protokoll:** `data/protokoll.csv` merkt sich die Stelle; die letzten 30 werden nicht wiederholt.
 
 ## Einmalige Einrichtung
 
@@ -46,6 +52,36 @@ Im Projekt: **Actions > Top Job des Tages > Run workflow**
 - Mit Haken bei "Probelauf": Es entstehen nur Bild und Text im Ordner `posts/`. Nichts wird veröffentlicht.
 - Ohne Haken: Der Beitrag wird sofort veröffentlicht.
 
+## Berufsfelder und Fotos
+
+| Schlüssel | Berufsfeld | erkannt z. B. an |
+|---|---|---|
+| zerspanung | Zerspanung & CNC | Zerspanung, CNC, Dreher, Fräser, Einrichter, Werkzeugmechaniker |
+| konstruktion | Konstruktion & Entwicklung | Konstrukteur, Entwickler, Technischer Zeichner |
+| projektleitung | Projektleitung & Management | Projektleiter, Produktmanager, Werksleiter |
+| qualitaet | Qualität & Arbeitssicherheit | Qualität, QS/QM, Messtechniker, Arbeitsschutz |
+| technik | Technik & Instandhaltung | Mechatroniker, Instandhaltung, Elektriker |
+| it | IT & ERP | IT, IFS, SAP, ERP, Software, Consultant |
+| banking | Banking & Finance | Kundenberater, Bank, Kredit, Wertpapier |
+| finanzen | Finanzen & Rechnungswesen | Buchhaltung, Controlling, Steuern, Lohn |
+| personal | Personal & HR | Personalreferent, HR, Recruiting |
+| einkauf | Einkauf | Einkauf, Beschaffung, Disponent |
+| logistik | Logistik & Lager | Logistik, Lager, Versand, Supply Chain |
+| vertrieb | Vertrieb | Vertrieb, Sales, Key Account, Außen-/Innendienst |
+| produktion | Produktion & Fertigung | Produktion, Fertigung, Kunststoff, Schichtleiter (auch Standard) |
+
+- **Eigene Fotos:** Einfach `assets/berufsfelder/<schlüssel>.jpg` ersetzen (Querformat, mind. 1600 px breit).
+  Die mitgelieferten Fotos sind von Unsplash (kostenlos, auch kommerziell, ohne Namensnennung).
+- **Neues Berufsfeld:** In `kategorien.py` einen Eintrag ergänzen und ein Foto mit dem Schlüssel ablegen.
+
+## Bild oder Reel
+
+In `agent.py` legt `WOCHENPLAN` fest, an welchem Tag was kommt. Derzeit (Schritt 1) jeden Tag ein Bild;
+sobald die Veröffentlichung zuverlässig läuft, können z. B. Di und Do auf Reel gestellt werden.
+Beim Handstart kann man das Format im Feld "Format" wählen; in einer Vorgabe von Claude geht es mit
+`"format": "reel"`. Das Reel hat eine stille Tonspur – Musik lässt sich über die Schnittstelle nicht
+hinzufügen, auf Wunsch nachträglich in der Instagram-App.
+
 ## Gut zu wissen
 
 - **Schlüssel läuft ab:** Er gilt 60 Tage. Das Programm verlängert ihn bei jedem Post selbst.
@@ -63,10 +99,15 @@ Im Projekt: **Actions > Top Job des Tages > Run workflow**
   "job_id": "2775026",
   "titel": "Teamleitung Buchhaltung (m/w/d)",
   "ort": "Titisee-Neustadt",
-  "extra": "65.000 – 80.000 € / Jahr",
-  "punkte": ["Punkt 1", "Punkt 2", "Punkt 3"],
+  "kategorie": "finanzen",
+  "format": "bild",
+  "fakten": [["Jahresgehalt", "65.000 – 80.000 €"], ["Arbeitszeit", "Vollzeit · 40 h"], ["Arbeitsmodell", "Hybrid"]],
+  "punkte_titel": "Das erwartet dich",
+  "punkte": ["Punkt 1 (max. ca. 60 Zeichen)", "Punkt 2", "Punkt 3"],
   "caption": "Fertiger Instagram-Text mit Hashtags"
 }
 ```
+
+`kategorie`, `format`, `fakten` und `punkte` sind freiwillig; fehlen sie, gelten Erkennung bzw. Wochenplan.
 
 Die Schriften Archivo und Lato im Ordner `fonts/` stehen unter der SIL Open Font License.
