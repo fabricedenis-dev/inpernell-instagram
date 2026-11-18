@@ -1,7 +1,6 @@
 # Inpernell – TOP Job des Tages auf Instagram
 
-Dieses Projekt veröffentlicht montags bis freitags gegen 13 Uhr automatisch einen Beitrag
-"TOP Job des Tages" auf dem Instagram-Konto der Inpernell GmbH. Es läuft kostenlos bei
+Dieses Projekt veröffentlicht automatisch einen Beitrag "TOP Job des Tages" (Zeitplan siehe unten) auf dem Instagram-Konto der Inpernell GmbH. Es läuft kostenlos bei
 GitHub (GitHub Actions) und nutzt die offizielle Instagram-Schnittstelle von Meta.
 
 ## So läuft ein Tag ab
@@ -85,6 +84,21 @@ Im Projekt: **Actions > Top Job des Tages > Run workflow**
 - **Eigene Fotos:** Einfach `assets/berufsfelder/<schlüssel>.jpg` ersetzen (Querformat, mind. 1600 px breit).
   Die mitgelieferten Fotos sind von Unsplash (kostenlos, auch kommerziell, ohne Namensnennung).
 - **Neues Berufsfeld:** In `kategorien.py` einen Eintrag ergänzen und ein Foto mit dem Schlüssel ablegen.
+
+## Umgesetzte Empfehlungen aus dem Reichweiten-Bericht (`reports/`)
+
+- **Karussell statt Einzelbild:** Seite 1 = Top-Job-Design, Seite 2 = Aufgaben, Seite 3 = Anforderungen,
+  Seite 4 = „So bewirbst du dich“ (Link in der Bio, Lebenslauf genügt, DM „Interesse“, Weiterleiten-Bitte).
+- **Bildtext:** erste Zeile als Suchzeile „Beruf (m/w/d) in Ort – Gehalt – Arbeitsmodell“, danach Eckdaten,
+  Bewerbungsweg, DM-Option und die Bitte, den Beitrag an passende Bekannte weiterzuschicken.
+- **Genau 5 Hashtags:** Beruf, #Jobs<Ort>, Region (z. B. #SchwarzwaldBaar), #Stellenangebot, #TopJobDesTages.
+- **Gehalt zuerst:** Stellen mit Gehaltsangabe kommen bevorzugt (schon nach 10 anderen Posts wieder).
+- **Zeitplan-Test:** Mo–Fr wochenweise abwechselnd 12:50 und 18:50 Uhr, Sonntag 18:50 Uhr, Samstag Pause.
+  Nach 4–8 Wochen in den Instagram-Statistiken vergleichen und in `poststunde()` (agent.py) festlegen.
+- **Link-Seite:** mit Impressum/Datenschutz und Hinweis „kein Anschreiben nötig“.
+
+Von Hand (nicht automatisierbar): Profilname/Bio mit Region und Berufsfeldern, Standort-Markierung,
+Link-Sticker in der Story, Direktnachrichten zügig beantworten, gelegentlich ein Berater-Reel mit Gesicht.
 
 ## Story
 

@@ -15,8 +15,10 @@ Umgebungsvariablen:
   GITHUB_REF_NAME    Zweig, Standard "main"
   DRY_RUN            "true" = alles vorbereiten, aber NICHT veröffentlichen
   ERZWINGEN          "true" = auch außerhalb der Mittagsstunde laufen (Handstart)
-  FORMAT             "bild" oder "reel" erzwingen (sonst Vorgabe bzw. WOCHENPLAN)
+  FORMAT             "bild", "karussell" oder "reel" erzwingen (sonst Vorgabe bzw. WOCHENPLAN)
   STORY              "false" = keine Story zusätzlich zum Beitrag (Standard: Story wird gepostet)
+  NEU_POSTEN         "true" = heutigen Beitrag ersetzen: alten Beitrag löschen, dann neu posten (Handstart)
+  JOB_ID             nur diese Recruitee-Stelle posten (Handstart)
   OFFERS_FILE        nur für Tests: Stellen aus lokaler JSON-Datei statt aus dem Netz
   KEIN_GIT           nur für Tests: nichts committen/pushen
 """
@@ -35,7 +37,8 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import kategorien
-from bild import erzeuge_bild, erzeuge_reel, erzeuge_story
+from bild import erzeuge_bild, erzeuge_folgeseiten, erzeuge_reel, erzeuge_story
+from seite import erzeuge_seite
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 RECRUITEE = "https://inpernellgmbh.recruitee.com/api/offers/"
@@ -43,13 +46,35 @@ GRAPH = "https://graph.instagram.com/v26.0"   # Schlüssel aus "Instagram-Login"
 GRAPH_FB = "https://graph.facebook.com"        # Schlüssel aus Facebook-/Unified-Login (beginnt mit EAA…)
 PROTOKOLL = os.path.join(HIER, "data", "protokoll.csv")
 SPERRFRIST = 30          # so viele letzte Posts werden nicht wiederholt
-POSTSTUNDE = 12          # veröffentlicht wird in der Stunde ab 12 Uhr (Europe/Berlin)
+POSTSTUNDE = 12          # Standard-Stunde (Europe/Berlin), wenn ZEITPLAN nichts anderes sagt
+# Zeitplan-Test (Empfehlung aus dem Reichweiten-Bericht): Mo–Fr wochenweise abwechselnd mittags (12:50) und
+# abends (18:50), Sonntag abends, Samstag Pause. Nach 4–8 Wochen in den Instagram-Statistiken vergleichen
+# und dann eine feste Zeit wählen. None = an diesem Tag kein neuer Top Job.
+def poststunde(jetzt):
+    if jetzt.weekday() == 5:
+        return None                                  # Samstag: schwächster Tag, kein neuer Top Job
+    if jetzt.weekday() == 6:
+        return 18                                    # Sonntagabend: Berufstätige suchen Jobs
+    return 12 if jetzt.isocalendar().week % 2 == 0 else 18   # gerade KW mittags, ungerade KW abends
 # Format je Wochentag (0 = Montag): "bild" = Feed-Beitrag 4:5, "reel" = 10-Sekunden-Video 9:16.
 # Eine Vorgabe von Claude ("format": "reel") oder die Variable FORMAT haben Vorrang.
-# Schritt 1: nur Bilder. Wenn alles läuft, z. B. Di/Do auf "reel" stellen: {1: "reel", 3: "reel", ...}
-WOCHENPLAN = {0: "bild", 1: "bild", 2: "bild", 3: "bild", 4: "bild", 5: "bild", 6: "bild"}
-HASHTAGS_FEST = ["#TopJobDesTages", "#Inpernell", "#Jobs", "#Karriere", "#Stellenangebot", "#Direktvermittlung"]
-HASHTAGS_FELD = {
+# "karussell" = 4 Seiten (Top Job, Aufgaben, Anforderungen, So bewirbst du dich) – laut Bericht stärker als
+# ein Einzelbild. Reel später z. B. an einzelnen Tagen: {1: "reel", ...}
+WOCHENPLAN = {0: "karussell", 1: "karussell", 2: "karussell", 3: "karussell", 4: "karussell", 5: "karussell",
+              6: "karussell"}
+# Instagram erlaubt seit Dez. 2025 höchstens 5 Hashtags. Satz: Beruf, Jobs<Ort>, Region, Absicht, Marke.
+HASHTAG_ABSICHT, HASHTAG_MARKE = "#Stellenangebot", "#TopJobDesTages"
+# Region je Ort (für den Regions-Hashtag); unbekannte Orte bekommen #Schwarzwald
+REGIONEN = {
+    "#SchwarzwaldBaar": ["villingen", "schwenningen", "donaueschingen", "blumberg", "mönchweiler", "bad dürrheim",
+                         "st. georgen", "furtwangen", "hüfingen", "bräunlingen", "königsfeld", "brigachtal"],
+    "#LandkreisTuttlingen": ["tuttlingen", "gosheim", "renquishausen", "kolbingen", "trossingen", "spaichingen",
+                             "wehingen", "mühlheim", "fridingen", "aldingen", "immendingen", "geisingen"],
+    "#LandkreisRottweil": ["rottweil", "schramberg", "wellendingen", "oberndorf", "sulz", "dunningen", "deißlingen"],
+    "#Hochschwarzwald": ["titisee", "neustadt", "löffingen", "lenzkirch", "hinterzarten", "schluchsee"],
+    "#Breisgau": ["freiburg", "bad krozingen", "staufen", "müllheim", "emmendingen", "breisach", "heitersheim"],
+}
+HASHTAGS_FELD = {   # erster Eintrag = Berufs-Hashtag im Beitrag
     "zerspanung": ["#Zerspanung", "#CNC", "#Metallbearbeitung"],
     "konstruktion": ["#Konstruktion", "#Engineering", "#CAD"],
     "projektleitung": ["#Projektmanagement", "#Führungskraft"],
@@ -154,14 +179,24 @@ def gehalt(s):
     return spanne + (f" / {periode}" if periode else "")
 
 
+SPERRFRIST_GEHALT = 10   # Stellen MIT Gehalt dürfen schon nach 10 anderen Posts wieder dran sein
+
+
 def stelle_waehlen(stellen, protokoll):
+    """Stellen mit Gehaltsangabe haben Vorrang (wichtigster Hebel laut Bericht); sonst die neueste freie Stelle."""
+    neueste = lambda liste: sorted(liste, key=lambda s: s.get("published_at") or s.get("created_at") or "",
+                                   reverse=True)
     gesperrt = {z["job_id"] for z in protokoll[-SPERRFRIST:]}
+    gesperrt_kurz = {z["job_id"] for z in protokoll[-SPERRFRIST_GEHALT:]}
+    mit_gehalt = [s for s in stellen if gehalt(s) and str(s.get("id")) not in gesperrt_kurz]
+    if mit_gehalt:
+        # unter den Gehalts-Stellen die am längsten nicht gezeigte nehmen, bei Gleichstand die neueste
+        zuletzt = {z["job_id"]: i for i, z in enumerate(protokoll)}
+        return sorted(neueste(mit_gehalt), key=lambda s: zuletzt.get(str(s.get("id")), -1))[0]
     frei = [s for s in stellen if str(s.get("id")) not in gesperrt] or stellen
     if not frei:
         raise RuntimeError("Keine offene Stelle gefunden.")
-    # Stellen mit Gehaltsangabe zuerst, dann die neuesten
-    frei.sort(key=lambda s: (bool(gehalt(s)), s.get("published_at") or s.get("created_at") or ""), reverse=True)
-    return frei[0]
+    return neueste(frei)[0]
 
 
 FUELLWOERTER = {"und", "oder", "sowie", "von", "der", "die", "das", "des", "den", "dem", "für", "mit", "in", "im",
@@ -216,18 +251,26 @@ def fakten(s):
     return [[g_label if g else "Gehalt", g or "Attraktiv"], ["Arbeitszeit", zeit], ["Arbeitsmodell", modell]]
 
 
-def aus_stelle(s, datum):
-    """Bildtexte und Beitragstext ohne KI direkt aus der Stellenanzeige bauen (Ersatzweg)."""
-    titel = (s.get("title") or "").strip()
-    ort = (s.get("city") or s.get("location") or "").split(",")[0].strip()
-    aufgaben = listenpunkte(s.get("description"))
-    anforderungen = listenpunkte(s.get("requirements"))
-    fk = fakten(s)
-    kat = kategorien.erkenne(titel, s.get("category_code"))
-    url = s.get("careers_url") or "https://www.inpernell.de/jobboerse/"
+def hashtags(kat, ort):
+    """Genau 5 Hashtags: Beruf, Jobs<Ort>, Region, Absicht, Marke."""
+    tags = [HASHTAGS_FELD.get(kat, ["#Jobs"])[0]]
+    if ort:
+        tags.append("#Jobs" + re.sub(r"[^0-9A-Za-zÄÖÜäöüß]", "", ort.title()))
+    region = next((r for r, orte in REGIONEN.items() if any(o in ort.lower() for o in orte)), "#Schwarzwald")
+    tags += [region, HASHTAG_ABSICHT, HASHTAG_MARKE]
+    return " ".join(dict.fromkeys(tags[:5]))
 
-    zeilen = [f"🔥 TOP Job des Tages: {titel}" + (f" in {ort}" if ort else ""), ""]
-    zeilen += [f"💶 {gehalt(s) or 'Attraktives Gehalt'}", f"🕒 {fk[1][1]}", f"🏠 {fk[2][1]}"]
+
+def bildtext(titel, ort, kat, gehalt_text, fk, aufgaben, anforderungen, ohne_anschreiben=True):
+    """Bildtext nach dem Reichweiten-Bericht: Suchzeile zuerst, dann Eckdaten, Weiterleiten, DM, 5 Hashtags."""
+    kopf = [titel + (f" in {ort}" if ort else "")]
+    if gehalt_text:
+        kopf.append(gehalt_text.replace(" / Jahr", " im Jahr").replace(" / Monat", " im Monat"))
+    kopf.append(fk[2][1])
+    zeilen = [" – ".join(kopf) + " 🔥", "",
+              "TOP Job des Tages bei Inpernell: Direktvermittlung in Festanstellung beim Arbeitgeber – "
+              "keine Zeitarbeit, für dich kostenlos.", ""]
+    zeilen += [f"💶 {gehalt_text or 'Gehalt auf Anfrage'}", f"🕒 {fk[1][1]}", f"🏠 {fk[2][1]}"]
     if ort:
         zeilen.append(f"📍 {ort}")
     zeilen.append("")
@@ -238,16 +281,40 @@ def aus_stelle(s, datum):
             zeilen.append(ueberschrift)
             zeilen += [f"✔️ {kuerzen(p, 110)}" for p in gut[:3]]
             zeilen.append("")
-    zeilen += ["Direktvermittlung in Festanstellung – keine Zeitarbeit, für dich als Bewerber kostenlos.", "",
-               "👉 Jetzt bewerben über den Link in der Bio oder auf www.inpernell.de", ""]
-    tags = list(HASHTAGS_FEST) + HASHTAGS_FELD.get(kat, [])
-    if ort:
-        tags.insert(0, "#" + re.sub(r"[^0-9A-Za-zÄÖÜäöüß]", "", ort))
-    zeilen.append(" ".join(tags))
+    zeilen += ["👉 Bewerben: Link in der Bio antippen" + (" – Lebenslauf genügt, kein Anschreiben nötig."
+                                                        if ohne_anschreiben else "."),
+               "💬 Oder schreib uns einfach „Interesse“ per Direktnachricht – wir melden uns.", "",
+               f"Kennst du jemanden{' in der Region ' + ort if ort else ''}, für den das passt? "
+               "Schick ihm den Beitrag weiter. 📩", "",
+               hashtags(kat, ort)]
+    return "\n".join(zeilen)
+
+
+def folienpunkte(liste, n=5):
+    """Bis zu n Punkte für die Karussell-Seiten; Du-taugliche Punkte zuerst, sonst alle."""
+    gut = [p for p in liste if not SIE_FORM.search(p)]
+    quelle = gut if len(gut) >= 2 else liste
+    return [kurzpunkt(p, 78) for p in quelle[:n]]
+
+
+def aus_stelle(s, datum):
+    """Bildtexte und Beitragstext ohne KI direkt aus der Stellenanzeige bauen (Ersatzweg)."""
+    titel = (s.get("title") or "").strip()
+    ort = (s.get("city") or s.get("location") or "").split(",")[0].strip()
+    aufgaben = listenpunkte(s.get("description"))
+    anforderungen = listenpunkte(s.get("requirements"))
+    fk = fakten(s)
+    kat = kategorien.erkenne(titel, s.get("category_code"))
+    url = s.get("careers_url") or "https://www.inpernell.de/jobboerse/"
+
+    caption = bildtext(titel, ort, kat, gehalt(s), fk, aufgaben, anforderungen,
+                       ohne_anschreiben=(s.get("options_cover_letter") or "optional") != "required")
     return {"job_id": str(s.get("id")), "titel": titel, "ort": ort, "kategorie": kat, "fakten": fk,
             "punkte": highlights(aufgaben, anforderungen)[0],
             "punkte_titel": highlights(aufgaben, anforderungen)[1],
-            "datum": datum, "caption": "\n".join(zeilen), "job_url": url}
+            "aufgaben": folienpunkte(aufgaben), "anforderungen": folienpunkte(anforderungen),
+            "ohne_anschreiben": (s.get("options_cover_letter") or "optional") != "required",
+            "datum": datum, "caption": caption, "job_url": url}
 
 
 def git(*args):
@@ -353,11 +420,33 @@ def facebook_diagnose(token):
     return " ".join(teile)
 
 
-def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_url=None, story_url=None):
+def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_url=None, story_url=None,
+                     bild_urls=None):
     """Bild, Reel oder Story über die offizielle Instagram-Schnittstelle veröffentlichen; gibt die ID zurück."""
     basis, ig_id, name = instagram_konto(token)
     print("Instagram-Konto:", name, "· Schnittstelle:", basis.split("//")[1].split("/")[0])
-    if story_url:
+    def warten(container, runden, pause):
+        for _ in range(runden):
+            status = http(f"{basis}/{container}?" + urllib.parse.urlencode({"fields": "status_code,status",
+                                                                          "access_token": token}))
+            if status.get("status_code") == "FINISHED":
+                return
+            if status.get("status_code") == "ERROR":
+                raise RuntimeError(f"Instagram konnte die Datei nicht verarbeiten: {status.get('status', '')}")
+            time.sleep(pause)
+        raise RuntimeError("Instagram hat die Datei nicht rechtzeitig verarbeitet.")
+
+    if bild_urls:
+        # Karussell: erst jede Seite einzeln anlegen, dann das Karussell daraus
+        kinder = []
+        for url in bild_urls[:10]:
+            kind = http(f"{basis}/{ig_id}/media", {"image_url": url, "is_carousel_item": "true",
+                                                   "access_token": token})["id"]
+            warten(kind, 15, 3)
+            kinder.append(kind)
+        daten = {"media_type": "CAROUSEL", "children": ",".join(kinder), "caption": caption, "access_token": token}
+        runden, pause = 20, 4
+    elif story_url:
         # Hinweis: Link-Sticker kann die Schnittstelle nicht setzen; der Link steht deshalb lesbar im Bild.
         daten = {"media_type": "STORIES", "image_url": story_url, "access_token": token}
         runden, pause = 15, 4
@@ -371,17 +460,16 @@ def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_ur
         daten = {"image_url": bild_url, "caption": caption, "access_token": token}
         runden, pause = 15, 4
     container = http(f"{basis}/{ig_id}/media", daten)["id"]
-    for _ in range(runden):
-        status = http(f"{basis}/{container}?" + urllib.parse.urlencode({"fields": "status_code,status",
-                                                                      "access_token": token}))
-        if status.get("status_code") == "FINISHED":
-            break
-        if status.get("status_code") == "ERROR":
-            raise RuntimeError(f"Instagram konnte die Datei nicht verarbeiten: {status.get('status', '')}")
-        time.sleep(pause)
-    else:
-        raise RuntimeError("Instagram hat die Datei nicht rechtzeitig verarbeitet.")
+    warten(container, runden, pause)
     return http(f"{basis}/{ig_id}/media_publish", {"creation_id": container, "access_token": token})["id"]
+
+
+def beitrag_loeschen(token, media_id):
+    """Löscht einen eigenen Beitrag über die Schnittstelle. Wirft einen Fehler, wenn Instagram das ablehnt."""
+    basis, _, _ = instagram_konto(token)
+    r = http(f"{basis}/{media_id}?" + urllib.parse.urlencode({"access_token": token}), methode="DELETE", versuche=1)
+    if not (r is True or r.get("success")):
+        raise RuntimeError(f"Löschen nicht bestätigt: {r}")
 
 
 def facebook_schluessel_pruefen(token):
@@ -469,12 +557,39 @@ def main():
     heute = jetzt.strftime("%Y-%m-%d")
     probe = wahr("DRY_RUN")
 
-    if not wahr("ERZWINGEN") and jetzt.hour != POSTSTUNDE:
-        print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – gepostet wird nur in der Stunde ab {POSTSTUNDE} Uhr. Ende.")
+    stunde = poststunde(jetzt)
+    if not wahr("ERZWINGEN") and jetzt.hour != stunde:
+        if stunde is None:
+            print("Heute (Samstag) ist laut Zeitplan Pause. Ende.")
+        else:
+            print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – heute wird in der Stunde ab {stunde} Uhr gepostet. Ende.")
         return
     protokoll = protokoll_lesen()
     mit_story = os.environ.get("STORY", "true").strip().lower() not in ("0", "false", "nein", "no")
-    heute_gepostet = [z for z in protokoll if z["datum"] == heute and z.get("media_id")]
+    heute_gepostet = [z for z in protokoll if z["datum"] == heute and z.get("media_id")
+                      and not z["media_id"].startswith("geloescht")]
+    if not probe and heute_gepostet and wahr("NEU_POSTEN"):
+        alt = heute_gepostet[-1]
+        token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
+        print(f"Heutigen Beitrag ersetzen: {alt['titel']} (Beitrags-ID {alt['media_id']}) wird gelöscht …")
+        try:
+            beitrag_loeschen(token, alt["media_id"])
+            print("Alter Beitrag gelöscht.")
+        except Exception as e:
+            if not wahr("TROTZDEM_POSTEN"):
+                raise RuntimeError(f"Der alte Beitrag konnte nicht über die Schnittstelle gelöscht werden ({e}). "
+                                   "Bitte in der Instagram-App löschen und den Lauf mit 'trotzdem posten' "
+                                   "wiederholen. Es wurde nichts Neues veröffentlicht.")
+            print(f"::warning::Alter Beitrag nicht gelöscht ({e}) – laut Vorgabe wird trotzdem neu gepostet.")
+        alt["media_id"] = "geloescht:" + alt["media_id"]
+        protokoll_speichern(protokoll)
+        git_sichern(f"Top Job {heute}: alter Beitrag ersetzt", "data/protokoll.csv")
+        protokoll = protokoll_lesen()
+        heute_gepostet = []
+        if not os.environ.get("JOB_ID"):
+            os.environ["JOB_ID"] = alt["job_id"]          # dieselbe Stelle neu posten
+        if alt.get("story_id"):
+            mit_story = False                             # Story von heute bleibt stehen, keine zweite
     if not probe and heute_gepostet:
         if mit_story and not heute_gepostet[-1].get("story_id"):
             return story_nachholen(heute_gepostet[-1], protokoll, jetzt, heute)
@@ -490,19 +605,35 @@ def main():
             if not post.get(feld):
                 raise RuntimeError(f"In {vorgabe} fehlt das Feld '{feld}'.")
     else:
-        post = aus_stelle(stelle_waehlen(stellen_laden(), protokoll), jetzt.strftime("%d.%m.%Y"))
+        stellen = stellen_laden()
+        wunsch = os.environ.get("JOB_ID", "").strip()
+        if wunsch:
+            stelle = next((s for s in stellen if str(s.get("id")) == wunsch), None)
+            if not stelle:
+                raise RuntimeError(f"Stelle {wunsch} ist in Recruitee nicht (mehr) veröffentlicht.")
+        else:
+            stelle = stelle_waehlen(stellen, protokoll)
+        post = aus_stelle(stelle, jetzt.strftime("%d.%m.%Y"))
         quelle = "automatisch"
     print(f"Stelle ({quelle}): {post['titel']} – {post.get('ort', '')}")
 
     post.setdefault("kategorie", kategorien.erkenne(post["titel"]))
     fmt = (os.environ.get("FORMAT") or post.get("format") or WOCHENPLAN[jetzt.weekday()]).strip().lower()
-    if fmt not in ("bild", "reel"):
-        raise RuntimeError(f"Unbekanntes Format '{fmt}' – erlaubt sind 'bild' und 'reel'.")
+    if fmt not in ("bild", "karussell", "reel"):
+        raise RuntimeError(f"Unbekanntes Format '{fmt}' – erlaubt sind 'bild', 'karussell' und 'reel'.")
     print(f"Format: {fmt} · Berufsfeld: {post['kategorie']}")
 
     bild_rel = f"posts/{heute}.jpg"
     erzeuge_bild(post, os.path.join(HIER, bild_rel))
     dateien = [bild_rel, f"posts/{heute}.txt"]
+    seiten_rel = [bild_rel]
+    if fmt == "karussell":
+        for pfad in erzeuge_folgeseiten(post, os.path.join(HIER, "posts"), heute):
+            seiten_rel.append(os.path.relpath(pfad, HIER))
+        dateien += seiten_rel[1:]
+    # "Link in der Bio"-Seite mit dem aktuellen Top Job (ausgeliefert über GitHub Pages aus dem Ordner docs/)
+    erzeuge_seite(post, os.path.join(HIER, "docs", "index.html"))
+    dateien.append("docs/index.html")
     story_rel = f"posts/{heute}-story.jpg"
     if mit_story:
         erzeuge_story(post, os.path.join(HIER, story_rel))
@@ -513,7 +644,7 @@ def main():
         dateien += [video_rel, titel_rel]
     with open(os.path.join(HIER, "posts", f"{heute}.txt"), "w", encoding="utf-8") as f:
         f.write(post["caption"] + "\n")
-    git_sichern(f"Top Job {heute}: {'Reel' if fmt == 'reel' else 'Bild'} und Text", *dateien)
+    git_sichern(f"Top Job {heute}: {fmt.capitalize()} und Text", *dateien)
 
     if probe:
         token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
@@ -541,6 +672,8 @@ def main():
     if fmt == "reel":
         media_id = veroeffentlichen(token, post["caption"][:2200], video_url=basis + video_rel,
                                     titelbild_url=basis + titel_rel)
+    elif fmt == "karussell" and len(seiten_rel) > 1:
+        media_id = veroeffentlichen(token, post["caption"][:2200], bild_urls=[basis + r for r in seiten_rel])
     else:
         media_id = veroeffentlichen(token, post["caption"][:2200], bild_url=basis + bild_rel)
     print("Veröffentlicht. Beitrags-ID:", media_id)
