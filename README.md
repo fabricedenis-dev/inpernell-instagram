@@ -104,7 +104,7 @@ Link-Sticker in der Story, Direktnachrichten zügig beantworten, gelegentlich ei
 
 Nach jedem Beitrag wird zusätzlich eine **Story** (1080 × 1920) gepostet: gleiches Design wie der Beitrag,
 mit „Jetzt bewerben – Link in der Bio“. Der Bio-Link führt auf die Top-Job-Seite
-https://fabricedenis-dev.github.io/inpernell-instagram/ (GitHub Pages, Ordner `docs/`, täglich aktualisiert).
+https://topjob.inpernell.de (GitHub Pages, Ordner `docs/`, eigene Adresse über `docs/CNAME` und einen CNAME-Eintrag bei Strato, täglich aktualisiert).
 
 **Wichtig:** Einen anklickbaren Link-Sticker kann die Instagram-Schnittstelle nicht setzen. Wer den Link
 anklickbar haben möchte, öffnet die Story in der Instagram-App und fügt über „Sticker > Link“ den Link
