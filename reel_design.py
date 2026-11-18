@@ -187,12 +187,28 @@ class Stufe:
         return self.i == self.nur if self.nur else self.i <= self.bis
 
 
-def _start(kat, foto_hoehe, szene, anzahl, mit_kopf, variante="oben", basis="grund"):
+_LOGO = {}
+LOGO_XY, LOGO_BREITE = (M - 6, 1420), 260
+
+
+def logo_marke(img):
+    """Kleines Logo unten links (Variante B, vom Inhaber freigegeben): über Kontoname/Bildtext von Instagram,
+    innerhalb des Feed-Ausschnitts, frei von Kopfzeile und Knopfleiste. Nicht auf der Abschlussfolie."""
+    if "b" not in _LOGO:
+        lg = Image.open(os.path.join(HIER, "assets", "logo.png")).convert("RGBA")
+        _LOGO["b"] = lg.resize((LOGO_BREITE, round(lg.height * LOGO_BREITE / lg.width)), Image.LANCZOS)
+    img.alpha_composite(_LOGO["b"], LOGO_XY)
+    return img
+
+
+def _start(kat, foto_hoehe, szene, anzahl, mit_kopf, variante="oben", basis="grund", logo=True):
     if basis in ("schwarz", "weiss"):
         return Image.new("RGBA", (W, H), (0, 0, 0, 255) if basis == "schwarz" else (255, 255, 255, 255))
     img = grund(kat, foto_hoehe, variante)
     if mit_kopf:
         kopf(img, szene, anzahl)
+        if logo:
+            logo_marke(img)
     return img
 
 
@@ -319,7 +335,7 @@ def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=
 
 def folie_ende(kat, titel_zeilen, markiert, zusatz, szene, anzahl=5, bis=99, mit_kopf=True, nur=None, basis="grund"):
     g = Stufe(bis, nur)
-    img = _start(kat, 900, szene, anzahl, mit_kopf, variante="unten", basis=basis)
+    img = _start(kat, 900, szene, anzahl, mit_kopf, variante="unten", basis=basis, logo=False)
     if g():
         icon_lesezeichen(ImageDraw.Draw(img), M, 320, 80, 110, ORANGE)
     f = font("h800", 104)

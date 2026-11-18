@@ -124,6 +124,8 @@ def erzeuge_reel(szenen, ziel, bpm=118, variante=0, titelbild=None):
                 dauer_eff = 0.7 if effekt == "wisch" else 0.4
                 _zeige(frame, ebene, effekt, (t - takt_schlag * schlag) / dauer_eff)
             _fortschritt(frame, si, anzahl, t / dauer)
+            if sz["fn"] is not rd.folie_ende:      # Logo fest stehend (nicht mitzoomen), Abschluss hat es groß
+                rd.logo_marke(frame)
             if si == 0 and titel is None and t >= 2.6:
                 titel = frame.copy()
             proc.stdin.write(frame.convert("RGB").tobytes())
