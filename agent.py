@@ -16,6 +16,7 @@ Umgebungsvariablen:
   DRY_RUN            "true" = alles vorbereiten, aber NICHT veröffentlichen
   ERZWINGEN          "true" = auch außerhalb der Mittagsstunde laufen (Handstart)
   FORMAT             "bild" oder "reel" erzwingen (sonst Vorgabe bzw. WOCHENPLAN)
+  STORY              "false" = keine Story zusätzlich zum Beitrag (Standard: Story wird gepostet)
   OFFERS_FILE        nur für Tests: Stellen aus lokaler JSON-Datei statt aus dem Netz
   KEIN_GIT           nur für Tests: nichts committen/pushen
 """
@@ -34,7 +35,7 @@ from datetime import datetime
 from zoneinfo import ZoneInfo
 
 import kategorien
-from bild import erzeuge_bild, erzeuge_reel
+from bild import erzeuge_bild, erzeuge_reel, erzeuge_story
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 RECRUITEE = "https://inpernellgmbh.recruitee.com/api/offers/"
@@ -114,13 +115,18 @@ def protokoll_lesen():
         return list(csv.DictReader(f, delimiter=";"))
 
 
+PROTOKOLL_SPALTEN = ["datum", "job_id", "titel", "media_id", "quelle", "format", "story_id"]
+
+
+def protokoll_speichern(zeilen):
+    with open(PROTOKOLL, "w", encoding="utf-8", newline="") as f:
+        w = csv.DictWriter(f, fieldnames=PROTOKOLL_SPALTEN, delimiter=";", extrasaction="ignore", restval="")
+        w.writeheader()
+        w.writerows(zeilen)
+
+
 def protokoll_schreiben(zeile):
-    neu = not os.path.exists(PROTOKOLL)
-    with open(PROTOKOLL, "a", encoding="utf-8", newline="") as f:
-        w = csv.DictWriter(f, fieldnames=["datum", "job_id", "titel", "media_id", "quelle", "format"], delimiter=";")
-        if neu:
-            w.writeheader()
-        w.writerow(zeile)
+    protokoll_speichern(protokoll_lesen() + [zeile])
 
 
 def stellen_laden():
@@ -347,11 +353,15 @@ def facebook_diagnose(token):
     return " ".join(teile)
 
 
-def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_url=None):
-    """Bild oder Reel über die offizielle Instagram-Schnittstelle veröffentlichen; gibt die Beitrags-ID zurück."""
+def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_url=None, story_url=None):
+    """Bild, Reel oder Story über die offizielle Instagram-Schnittstelle veröffentlichen; gibt die ID zurück."""
     basis, ig_id, name = instagram_konto(token)
     print("Instagram-Konto:", name, "· Schnittstelle:", basis.split("//")[1].split("/")[0])
-    if video_url:
+    if story_url:
+        # Hinweis: Link-Sticker kann die Schnittstelle nicht setzen; der Link steht deshalb lesbar im Bild.
+        daten = {"media_type": "STORIES", "image_url": story_url, "access_token": token}
+        runden, pause = 15, 4
+    elif video_url:
         daten = {"media_type": "REELS", "video_url": video_url, "caption": caption, "share_to_feed": "true",
                  "access_token": token}
         if titelbild_url:
@@ -410,6 +420,50 @@ def schluessel_verlaengern(token):
               "Spätestens nach 60 Tagen im Meta-Dashboard einen neuen erzeugen.")
 
 
+def story_posten(token, story_url, heute):
+    """Story veröffentlichen und im Protokoll vermerken. Ein Fehler hier stoppt den (schon geposteten) Beitrag nicht."""
+    try:
+        story_id = veroeffentlichen(token, "", story_url=story_url)
+    except Exception as e:
+        print(f"::warning::Story konnte nicht veröffentlicht werden: {e}")
+        return None
+    print("Story veröffentlicht. ID:", story_id)
+    zeilen = protokoll_lesen()
+    for z in reversed(zeilen):
+        if z["datum"] == heute and z.get("media_id"):
+            z["story_id"] = story_id
+            break
+    protokoll_speichern(zeilen)
+    git_sichern(f"Top Job {heute}: Story veröffentlicht", "data/protokoll.csv")
+    return story_id
+
+
+def story_nachholen(zeile, protokoll, jetzt, heute):
+    """Der Beitrag ist heute schon online, die Story fehlt noch: Story zur selben Stelle erzeugen und posten."""
+    vorgabe = os.path.join(HIER, "overrides", f"{heute}.json")
+    if os.path.exists(vorgabe):
+        post = json.load(open(vorgabe, encoding="utf-8"))
+        post.setdefault("datum", jetzt.strftime("%d.%m.%Y"))
+    else:
+        stelle = next((s for s in stellen_laden() if str(s.get("id")) == zeile["job_id"]), None)
+        if not stelle:
+            print(f"::warning::Stelle {zeile['job_id']} ist nicht mehr online – keine Story.")
+            return
+        post = aus_stelle(stelle, jetzt.strftime("%d.%m.%Y"))
+    post.setdefault("kategorie", kategorien.erkenne(post["titel"]))
+    print(f"Beitrag ist schon online, Story wird nachgeholt: {post['titel']}")
+    story_rel = f"posts/{heute}-story.jpg"
+    erzeuge_story(post, os.path.join(HIER, story_rel))
+    git_sichern(f"Top Job {heute}: Story", story_rel)
+    token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
+    if not token:
+        raise RuntimeError("Das Secret IG_ACCESS_TOKEN fehlt.")
+    basis = f"https://raw.githubusercontent.com/{os.environ['GITHUB_REPOSITORY']}/{os.environ.get('GITHUB_REF_NAME', 'main')}/"
+    warte_auf_bild(basis + story_rel)
+    if not story_posten(token, basis + story_rel, heute):
+        raise RuntimeError("Story konnte nicht veröffentlicht werden (Details siehe Warnung oben).")
+
+
 def main():
     jetzt = datetime.now(ZoneInfo("Europe/Berlin"))
     heute = jetzt.strftime("%Y-%m-%d")
@@ -419,7 +473,11 @@ def main():
         print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – gepostet wird nur in der Stunde ab {POSTSTUNDE} Uhr. Ende.")
         return
     protokoll = protokoll_lesen()
-    if not probe and any(z["datum"] == heute and z.get("media_id") for z in protokoll):
+    mit_story = os.environ.get("STORY", "true").strip().lower() not in ("0", "false", "nein", "no")
+    heute_gepostet = [z for z in protokoll if z["datum"] == heute and z.get("media_id")]
+    if not probe and heute_gepostet:
+        if mit_story and not heute_gepostet[-1].get("story_id"):
+            return story_nachholen(heute_gepostet[-1], protokoll, jetzt, heute)
         print("Für heute wurde bereits gepostet. Ende.")
         return
 
@@ -445,6 +503,10 @@ def main():
     bild_rel = f"posts/{heute}.jpg"
     erzeuge_bild(post, os.path.join(HIER, bild_rel))
     dateien = [bild_rel, f"posts/{heute}.txt"]
+    story_rel = f"posts/{heute}-story.jpg"
+    if mit_story:
+        erzeuge_story(post, os.path.join(HIER, story_rel))
+        dateien.append(story_rel)
     if fmt == "reel":
         video_rel, titel_rel = f"posts/{heute}.mp4", f"posts/{heute}-reel.jpg"
         erzeuge_reel(post, os.path.join(HIER, video_rel), titelbild=os.path.join(HIER, titel_rel))
@@ -482,9 +544,12 @@ def main():
     else:
         media_id = veroeffentlichen(token, post["caption"][:2200], bild_url=basis + bild_rel)
     print("Veröffentlicht. Beitrags-ID:", media_id)
-    protokoll_schreiben({"datum": heute, "job_id": post.get("job_id", ""), "titel": post["titel"],
-                         "media_id": media_id, "quelle": quelle, "format": fmt})
+    zeile = {"datum": heute, "job_id": post.get("job_id", ""), "titel": post["titel"],
+             "media_id": media_id, "quelle": quelle, "format": fmt, "story_id": ""}
+    protokoll_schreiben(zeile)
     git_sichern(f"Top Job {heute}: veröffentlicht", "data/protokoll.csv")
+    if mit_story:
+        story_posten(token, basis + story_rel, heute)
     schluessel_verlaengern(token)
 
 
