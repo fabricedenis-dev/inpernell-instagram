@@ -297,13 +297,14 @@ def instagram_konto(token):
         pass
     # Seiten-Schlüssel: /me ist dann die Seite selbst
     if not konten:
-        ich = http(f"{GRAPH_FB}/me?" + q(fields=f"name,{feld}"))
-        if ich.get("instagram_business_account"):
-            konten.append(ich["instagram_business_account"])
+        try:
+            ich = http(f"{GRAPH_FB}/me?" + q(fields=f"name,{feld}"), versuche=1)
+            if ich.get("instagram_business_account"):
+                konten.append(ich["instagram_business_account"])
+        except RuntimeError:
+            pass
     if not konten:
-        raise RuntimeError("Zum Schlüssel wurde kein Instagram-Business-Konto gefunden. Das Instagram-Konto muss mit "
-                           "einer Facebook-Seite verknüpft sein, und der Schlüssel braucht die Rechte instagram_basic, "
-                           "instagram_content_publish, pages_show_list und pages_read_engagement.")
+        raise RuntimeError("Zum Schlüssel wurde kein Instagram-Business-Konto gefunden. " + facebook_diagnose(token))
     if len(konten) > 1:
         namen = ", ".join(f"{k.get('username')} ({k['id']})" for k in konten)
         wahl = [k for k in konten if "inpernell" in (k.get("username") or "").lower()]
@@ -312,6 +313,34 @@ def instagram_konto(token):
                                "Secret IG_USER_ID hinterlegen.")
         konten = wahl
     return GRAPH_FB, konten[0]["id"], konten[0].get("username")
+
+
+def facebook_diagnose(token):
+    """Erklärt, warum zum EAA-Schlüssel kein Instagram-Konto gefunden wurde (ohne den Schlüssel zu zeigen)."""
+    q = lambda **kw: urllib.parse.urlencode({**kw, "access_token": token})
+    teile = []
+    try:
+        ich = http(f"{GRAPH_FB}/me?" + q(fields="id,name"), versuche=1)
+        teile.append(f"Schlüssel gehört zu: {ich.get('name')}.")
+    except RuntimeError as e:
+        teile.append(f"/me nicht lesbar ({e}).")
+    try:
+        rechte = http(f"{GRAPH_FB}/me/permissions?" + q(), versuche=1).get("data", [])
+        erteilt = sorted(r["permission"] for r in rechte if r.get("status") == "granted")
+        noetig = ["instagram_basic", "instagram_content_publish", "pages_show_list", "pages_read_engagement"]
+        fehlt = [r for r in noetig if r not in erteilt]
+        teile.append("Erteilte Rechte: " + (", ".join(erteilt) or "keine") + ".")
+        if fehlt:
+            teile.append("FEHLENDE Rechte: " + ", ".join(fehlt) + ".")
+    except RuntimeError as e:
+        teile.append(f"Rechte nicht lesbar ({e}).")
+    try:
+        seiten = http(f"{GRAPH_FB}/me/accounts?" + q(fields="name"), versuche=1).get("data", [])
+        teile.append("Facebook-Seiten: " + (", ".join(x.get("name", "?") for x in seiten) or "keine gefunden") + ".")
+    except RuntimeError as e:
+        teile.append(f"Seiten nicht lesbar ({e}).")
+    teile.append("Nötig: Instagram-Konto mit einer Facebook-Seite verknüpft und die genannten Rechte im Schlüssel.")
+    return " ".join(teile)
 
 
 def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_url=None):
