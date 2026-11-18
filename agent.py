@@ -285,7 +285,9 @@ def instagram_konto(token):
         ich = http(f"{GRAPH}/me?" + q(fields="user_id,username"))
         return GRAPH, ich.get("user_id") or ich.get("id"), ich.get("username")
     if os.environ.get("IG_USER_ID", "").strip():
-        return GRAPH_FB, os.environ["IG_USER_ID"].strip(), "(IG_USER_ID)"
+        ig_id = os.environ["IG_USER_ID"].strip()
+        konto = http(f"{GRAPH_FB}/{ig_id}?" + q(fields="id,username"), versuche=1)
+        return GRAPH_FB, ig_id, konto.get("username")
     feld = "instagram_business_account{id,username}"
     # Benutzer-Schlüssel: Instagram-Konto über die verknüpfte Facebook-Seite finden
     konten = []
@@ -339,7 +341,9 @@ def facebook_diagnose(token):
         teile.append("Facebook-Seiten: " + (", ".join(x.get("name", "?") for x in seiten) or "keine gefunden") + ".")
     except RuntimeError as e:
         teile.append(f"Seiten nicht lesbar ({e}).")
-    teile.append("Nötig: Instagram-Konto mit einer Facebook-Seite verknüpft und die genannten Rechte im Schlüssel.")
+    teile.append("Lösung: entweder die ID des Instagram-Kontos als Secret IG_USER_ID hinterlegen (bei einem "
+                 "Systembenutzer-Schlüssel der einfachste Weg) oder das Instagram-Konto mit einer Facebook-Seite "
+                 "verknüpfen und die fehlenden Rechte in den Schlüssel aufnehmen.")
     return " ".join(teile)
 
 
