@@ -16,6 +16,8 @@ Diese Regeln gelten für alle Beiträge, Stories, Reels und die Top-Job-Seite.
 - Inpernell-Stil beibehalten: Navy/Orange, Schriften Archivo und Lato.
 - **Kein Logo oben links in Reels/Stories** – dort blendet Instagram Profilbild und Kontonamen ein.
   Logo nur im Abschluss bzw. in sicheren Bereichen.
+- Logo in Reels (freigegeben, Variante B): klein unten links (x ≈ 74, y ≈ 1420, 260 px breit) auf jeder Folie,
+  über Kontoname und Bildtext. Auf der Abschlussfolie steht es stattdessen groß mit „Direktvermittlung“.
 - Sichere Zonen in 1080 × 1920: oben ca. 190 px frei (Instagram-Kopfzeile), unten ab ca. 1520 px frei
   (Kontoname, Bildtext), rechts ab x ≈ 940 zwischen y ≈ 1000–1700 frei (Knöpfe). Wichtige Inhalte für den
   Feed-Ausschnitt zwischen y ≈ 285 und 1635.
