@@ -27,7 +27,7 @@ GRUEN = (52, 199, 123)
 
 # ---------------------------------------------------------------- Grundbausteine
 
-def korn(img, staerke=14, seed=1):
+def korn(img, staerke=8, seed=1):
     rng = np.random.default_rng(seed)
     n = rng.normal(0, staerke, (img.height, img.width, 1)).astype(np.int16)
     a = np.asarray(img.convert("RGB")).astype(np.int16) + n
@@ -109,7 +109,7 @@ def kopf(img, szene, anzahl):
     for i in range(anzahl):
         x0 = M + i * (breite + luecke)
         d.rounded_rectangle([x0, y, x0 + breite, y + 8], radius=4,
-                            fill=ORANGE if i <= szene else (255, 255, 255, 70))
+                            fill=ORANGE if i <= szene else (88, 104, 136))
 
 
 def icon_x(d, cx, cy, r, farbe=ROT):
@@ -172,25 +172,28 @@ def sprechblase(img, text, xy, maxw, eigen=True):
 # ---------------------------------------------------------------- Folientypen
 
 class Stufe:
-    """Zählt Bausteine einer Folie. Mit bis=k werden nur die ersten k gezeichnet (für die Animation)."""
-    def __init__(self, bis):
-        self.bis, self.i = bis, 0
+    """Zählt Bausteine einer Folie. bis=k: nur die ersten k zeichnen; nur=k: ausschließlich Baustein k
+    (für die Animation, dann auf schwarzem und weißem Grund, um echte Transparenz zu gewinnen)."""
+    def __init__(self, bis, nur=None):
+        self.bis, self.nur, self.i = bis, nur, 0
 
     def __call__(self):
         self.i += 1
-        return self.i <= self.bis
+        return self.i == self.nur if self.nur else self.i <= self.bis
 
 
-def _start(kat, foto_hoehe, szene, anzahl, mit_kopf, variante="oben"):
+def _start(kat, foto_hoehe, szene, anzahl, mit_kopf, variante="oben", basis="grund"):
+    if basis in ("schwarz", "weiss"):
+        return Image.new("RGBA", (W, H), (0, 0, 0, 255) if basis == "schwarz" else (255, 255, 255, 255))
     img = grund(kat, foto_hoehe, variante)
     if mit_kopf:
         kopf(img, szene, anzahl)
     return img
 
 
-def folie_hook(kat, rubrik, zeilen, markiert, unterzeile, szene=0, anzahl=5, bis=99, mit_kopf=True):
-    g = Stufe(bis)
-    img = _start(kat, 1250, szene, anzahl, mit_kopf)
+def folie_hook(kat, rubrik, zeilen, markiert, unterzeile, szene=0, anzahl=5, bis=99, mit_kopf=True, nur=None, basis="grund"):
+    g = Stufe(bis, nur)
+    img = _start(kat, 1250, szene, anzahl, mit_kopf, basis=basis)
     if g():
         sticker(img, rubrik.upper(), (M - 6, 300), winkel=-4)
     f = font("h800", 124)
@@ -208,9 +211,9 @@ def folie_hook(kat, rubrik, zeilen, markiert, unterzeile, szene=0, anzahl=5, bis
     return img
 
 
-def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mit_kopf=True):
-    g = Stufe(bis)
-    img = _start(kat, 700, szene, anzahl, mit_kopf)
+def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mit_kopf=True, nur=None, basis="grund"):
+    g = Stufe(bis, nur)
+    img = _start(kat, 700, szene, anzahl, mit_kopf, basis=basis)
     breite = W - M - R
     if g():                                      # große Umriss-Nummer
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
@@ -226,27 +229,24 @@ def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mi
         icon_x(d, M + 70, y + 74, 34)
         gesperrt(d, (M + 126, y + 58), "FEHLER", font("h800", 28), (255, 200, 200), 4)
         for i, z in enumerate(zz):
-            d.text((M + 40, y + 124 + i * 62), z, font=ff, fill=(255, 255, 255, 190))
+            d.text((M + 40, y + 124 + i * 62), z, font=ff, fill=(214, 218, 228))
     if g():                                      # Durchstreichen
         d = ImageDraw.Draw(img)
         for i, z in enumerate(zz):
             yy = y + 124 + i * 62 + 32
             d.line([(M + 40, yy), (M + 40 + d.textlength(z, font=ff), yy)], fill=(226, 75, 74), width=5)
     y = 820
+    fb = font("h800", 64)
+    zb = wrap(ImageDraw.Draw(img), besser, fb, breite - 80)[:3]
+    _detail_y = y + 124 + 72 * len(zb) + 14
     if g():                                      # Besser-Karte
         glas(img, [M, y, W - R, y + 410], fuell=(52, 199, 123, 34), rand=(52, 199, 123, 170))
         d = ImageDraw.Draw(img)
         icon_haken(d, M + 70, y + 74, 34)
         gesperrt(d, (M + 126, y + 58), "BESSER", font("h800", 28), (190, 245, 215), 4)
-        fb = font("h800", 64)
-        yy = y + 124
-        for z in wrap(d, besser, fb, breite - 80)[:3]:
-            d.text((M + 40, yy), z, font=fb, fill=WEISS)
-            yy += 72
-        _detail_y = yy + 14
-    else:
-        _detail_y = None
-    if g() and _detail_y:
+        for i, z in enumerate(zb):
+            d.text((M + 40, y + 124 + i * 72), z, font=fb, fill=WEISS)
+    if g():
         d = ImageDraw.Draw(img)
         fd = font("t400", 38)
         for i, z in enumerate(wrap(d, detail, fd, breite - 80)[:3]):
@@ -254,10 +254,10 @@ def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mi
     return img
 
 
-def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=5, bis=99, mit_kopf=True):
+def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=5, bis=99, mit_kopf=True, nur=None, basis="grund"):
     """balken: Liste (Text, Wert, hervorheben?)"""
-    g = Stufe(bis)
-    img = _start(kat, 600, szene, anzahl, mit_kopf)
+    g = Stufe(bis, nur)
+    img = _start(kat, 600, szene, anzahl, mit_kopf, basis=basis)
     d = ImageDraw.Draw(img)
     if g():
         sticker(img, rubrik.upper(), (M - 6, 290), winkel=3, fuell=WEISS, schrift=NAVY)
@@ -281,8 +281,8 @@ def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=
             d = ImageDraw.Draw(img)
             d.text((M, y), text, font=font("t700", 34), fill=WEISS if hervor else HELL)
             lang = max(14, int(breite * wert / maxwert))
-            d.rounded_rectangle([M, y + 48, M + breite, y + 78], radius=15, fill=(255, 255, 255, 30))
-            d.rounded_rectangle([M, y + 48, M + lang, y + 78], radius=15, fill=ORANGE if hervor else (255, 255, 255, 170))
+            d.rounded_rectangle([M, y + 48, M + breite, y + 78], radius=15, fill=(40, 58, 92))
+            d.rounded_rectangle([M, y + 48, M + lang, y + 78], radius=15, fill=ORANGE if hervor else (196, 205, 222))
             d.text((M + breite + 24, y + 40), f"{wert:g}".replace(".", ","), font=font("h800", 40), fill=WEISS)
         y += 118
     if g():
@@ -290,9 +290,9 @@ def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=
     return img
 
 
-def folie_ende(kat, titel_zeilen, markiert, zusatz, szene, anzahl=5, bis=99, mit_kopf=True):
-    g = Stufe(bis)
-    img = _start(kat, 900, szene, anzahl, mit_kopf, variante="unten")
+def folie_ende(kat, titel_zeilen, markiert, zusatz, szene, anzahl=5, bis=99, mit_kopf=True, nur=None, basis="grund"):
+    g = Stufe(bis, nur)
+    img = _start(kat, 900, szene, anzahl, mit_kopf, variante="unten", basis=basis)
     if g():
         icon_lesezeichen(ImageDraw.Draw(img), M, 320, 80, 110, ORANGE)
     f = font("h800", 104)
@@ -320,10 +320,10 @@ def folie_ende(kat, titel_zeilen, markiert, zusatz, szene, anzahl=5, bis=99, mit
     return img
 
 
-def folie_formulierung(kat, ueberschrift, frage, antwort, tipp, szene, anzahl=5, bis=99, mit_kopf=True):
+def folie_formulierung(kat, ueberschrift, frage, antwort, tipp, szene, anzahl=5, bis=99, mit_kopf=True, nur=None, basis="grund"):
     """'So sagst du's': Chatverlauf Recruiter/Kandidat als Formulierungshilfe."""
-    g = Stufe(bis)
-    img = _start(kat, 600, szene, anzahl, mit_kopf)
+    g = Stufe(bis, nur)
+    img = _start(kat, 600, szene, anzahl, mit_kopf, basis=basis)
     d = ImageDraw.Draw(img)
     if g():
         sticker(img, "SO SAGST DU'S", (M - 6, 290), winkel=-3)

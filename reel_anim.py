@@ -30,15 +30,17 @@ def _ueber(p):
 
 
 def _ebenen(fn, kwargs, schritte):
-    """Grundbild (Schritt 0) und je Baustein eine zugeschnittene RGBA-Ebene."""
-    bilder = [np.asarray(fn(**kwargs, bis=k, mit_kopf=False).convert("RGB")).astype(np.int16)
-              for k in range(schritte + 1)]
-    grund = Image.fromarray(bilder[0].astype(np.uint8)).convert("RGBA")
+    """Grundbild und je Baustein eine RGBA-Ebene mit echter, weicher Transparenz.
+    Jeder Baustein wird allein auf Schwarz und auf Weiß gezeichnet; aus beiden Bildern ergeben sich
+    Deckkraft und Farbe exakt (keine harten, pixeligen Kanten)."""
+    grund = fn(**kwargs, bis=0, mit_kopf=False).convert("RGBA")
     ebenen = []
     for k in range(1, schritte + 1):
-        diff = np.abs(bilder[k] - bilder[k - 1]).max(axis=2)
-        maske = (np.clip(diff * 18, 0, 255)).astype(np.uint8)
-        rgba = np.dstack([bilder[k].astype(np.uint8), maske])
+        s = np.asarray(fn(**kwargs, nur=k, mit_kopf=False, basis="schwarz").convert("RGB")).astype(np.float32)
+        w = np.asarray(fn(**kwargs, nur=k, mit_kopf=False, basis="weiss").convert("RGB")).astype(np.float32)
+        alpha = np.clip(255.0 - (w - s).mean(axis=2), 0, 255)
+        farbe = np.where(alpha[..., None] > 0, s * 255.0 / np.maximum(alpha[..., None], 1), 0)
+        rgba = np.dstack([np.clip(farbe, 0, 255), alpha]).astype(np.uint8)
         ebene = Image.fromarray(rgba, "RGBA")
         box = ebene.getbbox()
         if not box:
@@ -60,7 +62,7 @@ def _zeige(frame, ebene, effekt, p):
     if effekt in ("punch", "pop"):
         s = (1.25 - 0.25 * _ueber(p)) if effekt == "punch" else (0.4 + 0.6 * _ueber(p))
         s = max(0.05, s)
-        neu = img.resize((max(1, int(w * s)), max(1, int(h * s))), Image.BILINEAR)
+        neu = img.resize((max(1, int(w * s)), max(1, int(h * s))), Image.LANCZOS)
         x, y = int(x0 + w / 2 - neu.width / 2), int(y0 + h / 2 - neu.height / 2)
         img, x0, y0 = neu, x, y
     elif effekt == "hoch":
@@ -87,7 +89,7 @@ def _fortschritt(frame, szene, anzahl, p):
     breite = (W - rd.M - rd.R - luecke * (anzahl - 1)) / anzahl
     for i in range(anzahl):
         x0 = rd.M + i * (breite + luecke)
-        d.rounded_rectangle([x0, y, x0 + breite, y + 8], radius=4, fill=(255, 255, 255, 70))
+        d.rounded_rectangle([x0, y, x0 + breite, y + 8], radius=4, fill=(88, 104, 136))
         f = 1.0 if i < szene else (p if i == szene else 0)
         if f > 0:
             d.rounded_rectangle([x0, y, x0 + max(8, breite * f), y + 8], radius=4, fill=ORANGE)
@@ -103,7 +105,8 @@ def erzeuge_reel(szenen, ziel, bpm=118, variante=0, titelbild=None):
     erzeuge_track(gesamt, ton, bpm=bpm, variante=variante)
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
            "-r", str(FPS), "-i", "-", "-i", ton, "-map", "0:v", "-map", "1:a", "-shortest",
-           "-c:v", "libx264", "-preset", "medium", "-crf", "21", "-g", "60", "-maxrate", "12M", "-bufsize", "24M",
+           "-c:v", "libx264", "-preset", "slow", "-crf", "19", "-g", "60", "-maxrate", "9M", "-bufsize", "18M",
+           "-profile:v", "high", "-tune", "film",
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k", "-ar", "48000", "-movflags", "+faststart", ziel]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
     titel = None
@@ -114,10 +117,10 @@ def erzeuge_reel(szenen, ziel, bpm=118, variante=0, titelbild=None):
         for i in range(int(round(dauer * FPS))):
             t = i / FPS
             # langsamer Zoom auf das Grundbild + kurzer "Punch" beim Szenenwechsel
-            z = 1.0 + 0.035 * (t / dauer) + 0.05 * (1 - _ease(t / 0.3))
+            z = 1.0 + 0.025 * (t / dauer) + 0.04 * (1 - _ease(t / 0.3))
             cw, ch = int(W / z), int(H / z)
             x, y = (W - cw) // 2, (H - ch) // 2
-            frame = grund.crop((x, y, x + cw, y + ch)).resize((W, H), Image.BILINEAR)
+            frame = grund.crop((x, y, x + cw, y + ch)).resize((W, H), Image.LANCZOS)
             for (effekt, takt_schlag), ebene in zip(sz["effekte"], ebenen):
                 dauer_eff = 0.7 if effekt == "wisch" else 0.4
                 _zeige(frame, ebene, effekt, (t - takt_schlag * schlag) / dauer_eff)
@@ -141,7 +144,7 @@ def gehalt_beispiel(ziel, titelbild=None):
         {"fn": rd.folie_hook, "takte": 2,
          "kwargs": dict(kat=k, rubrik="Gehalts-Check", zeilen=["3 Fehler,", "die dich", "Geld kosten"],
                         markiert={"geld", "kosten"}, unterzeile="in der Gehaltsverhandlung"),
-         "effekte": [("pop", 0.5), ("punch", 1), ("punch", 2), ("punch", 3), ("hoch", 4.5), ("hoch", 6)]},
+         "effekte": [("pop", 1.5), ("punch", -0.4), ("punch", 0.5), ("punch", 1.0), ("hoch", 2.5), ("hoch", 4)]},
     ]
     for nr, fehler, besser, detail in [
         (1, "Ohne eigene Zahl ins Gespräch", "Marktgehalt vorher checken",
@@ -161,6 +164,6 @@ def gehalt_beispiel(ziel, titelbild=None):
                    "effekte": [("pop", 0), ("hoch", 1), ("links", 2.5), ("rechts", 5), ("pop", 8)]})
     szenen.append({"fn": rd.folie_ende, "takte": 2,
                    "kwargs": dict(kat=k, titel_zeilen=["Speicher", "dir das ab"], markiert={"speicher"},
-                                  zusatz="Für dein nächstes Gespräch."),
+                                  zusatz="Und schick's an jemanden, der bald verhandelt."),
                    "effekte": [("pop", 0), ("punch", 1), ("hoch", 2.5), ("hoch", 4)]})
     return erzeuge_reel(szenen, ziel, variante=0, titelbild=titelbild)
