@@ -93,8 +93,8 @@ Im Projekt: **Actions > Top Job des Tages > Run workflow**
   Bewerbungsweg, DM-Option und die Bitte, den Beitrag an passende Bekannte weiterzuschicken.
 - **Genau 5 Hashtags:** Beruf, #Jobs<Ort>, Region (z. B. #SchwarzwaldBaar), #Stellenangebot, #TopJobDesTages.
 - **Gehalt zuerst:** Stellen mit Gehaltsangabe kommen bevorzugt (schon nach 10 anderen Posts wieder).
-- **Zeitplan-Test:** Mo–Fr wochenweise abwechselnd 12:50 und 18:50 Uhr, Sonntag 18:50 Uhr, Samstag Pause.
-  Nach 4–8 Wochen in den Instagram-Statistiken vergleichen und in `poststunde()` (agent.py) festlegen.
+- **Zeitplan:** jeden Tag um 18:50 Uhr (änderbar in `poststunde()` in agent.py und in den `cron`-Zeilen
+  des Workflows).
 - **Link-Seite:** mit Impressum/Datenschutz und Hinweis „kein Anschreiben nötig“.
 
 Von Hand (nicht automatisierbar): Profilname/Bio mit Region und Berufsfeldern, Standort-Markierung,
