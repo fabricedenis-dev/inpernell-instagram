@@ -214,3 +214,122 @@ def erzeuge_synthwave(sekunden, ziel_wav, bpm=112, seed=7):
         w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
         w.writeframes((stereo * 32767).astype(np.int16).tobytes())
     return ziel_wav
+
+
+# ---------------------------------------------------------------- Chillige Miami-Stimmungen (eigene Kompositionen)
+
+def _rhodes(f, n):
+    """E-Piano-artiger Klang: Sinus mit Obertönen, weicher Anschlag, Tremolo."""
+    t = np.arange(n) / SR
+    s = np.sin(2 * np.pi * f * t) + 0.35 * np.sin(4 * np.pi * f * t) * np.exp(-t * 3) + 0.12 * np.sin(6 * np.pi * f * t) * np.exp(-t * 6)
+    return s * np.exp(-t * 1.2) * (1 + 0.15 * np.sin(2 * np.pi * 4.5 * t)) * np.minimum(1, t / 0.005)
+
+
+def _pluck(f, n):
+    t = np.arange(n) / SR
+    return (np.sin(2 * np.pi * f * t) + 0.4 * np.sin(2 * np.pi * 2 * f * t)) * np.exp(-t * 9) * np.minimum(1, t / 0.002)
+
+
+CHILL_STILE = {
+    # Name: bpm, Akkordfolge (Grundton MIDI, Moll/Dur, Septime), Instrumente
+    "sunset_drive": dict(bpm=96, folge=[(52, "m", 10), (48, "M", 11), (55, "M", 11), (50, "m", 10)],
+                         pad="saege", bass="achtel", arp="saege", lead=True, drums="synthwave", swing=0.0),
+    "ocean_lofi": dict(bpm=82, folge=[(50, "m", 10), (55, "M", 10), (48, "M", 11), (45, "m", 10)],
+                       pad="rhodes", bass="ganz", arp=None, lead=False, drums="lofi", swing=0.12, knistern=True),
+    "palm_breeze": dict(bpm=108, folge=[(53, "M", 11), (57, "m", 10), (50, "m", 10), (55, "M", 10)],
+                        pad="rhodes", bass="offbeat", arp="pluck", lead=False, drums="house", swing=0.05),
+    "neon_nights": dict(bpm=112, folge=[(54, "m", 10), (50, "M", 11), (57, "M", 11), (52, "M", 10)],
+                        pad="saege", bass="achtel", arp="saege", lead=True, drums="synthwave", swing=0.0),
+}
+
+
+def erzeuge_chill(sekunden, ziel_wav, stil="sunset_drive", seed=11):
+    c = CHILL_STILE[stil]
+    rng = np.random.default_rng(seed)
+    bpm = c["bpm"]; beat = 60.0 / bpm; takt = 4 * beat
+    n_ges = int((sekunden + 1) * SR)
+    sp = {k: np.zeros(n_ges) for k in ("drums", "bass", "pad", "arp", "lead")}
+
+    def setze(spur, sig, start, gain=1.0):
+        i = int(start * SR)
+        if 0 <= i < n_ges:
+            sig = sig[: n_ges - i]; sp[spur][i:i + len(sig)] += sig * gain
+
+    melodie = [(0, 14, 1.5), (1.5, 12, 0.5), (2, 10, 1), (3, 7, 1), (4, 9, 2), (6, 7, 1), (7, 5, 1)]
+    for tk in range(int(np.ceil(sekunden / takt)) + 1):
+        t0 = tk * takt
+        grund, art, sept = c["folge"][tk % len(c["folge"])]
+        noten = [grund, grund + (3 if art == "m" else 4), grund + 7, grund + sept]
+        nf = int(takt * SR)
+        if c["pad"] == "saege":
+            pad = sum(_saege(_hz(m), nf, (-0.08, 0.0, 0.08)) for m in noten) / 4
+            env = np.minimum(1, np.arange(nf) / (0.4 * SR)) * np.minimum(1, (nf - np.arange(nf)) / (0.15 * SR))
+            setze("pad", pad * env, t0, 0.32)
+        else:                                                  # E-Piano: Akkord auf 1 und auf die "Und" von 2
+            for ts, lg in ((0, 2.5), (1.5 + c["swing"], 2.5)):
+                n = int(lg * beat * SR)
+                setze("pad", sum(_rhodes(_hz(m + 12), n) for m in noten) / 4, t0 + ts * beat, 0.5)
+        intro = tk == 0
+        for b in range(4):
+            tb = t0 + b * beat
+            sw = c["swing"] * beat
+            if not intro:
+                if c["drums"] in ("synthwave", "house") or b in (0, 2):
+                    setze("drums", _kick(int(0.4 * SR)), tb, 0.8 if c["drums"] != "lofi" else 0.65)
+                if c["drums"] == "lofi" and b == 2:
+                    setze("drums", _kick(int(0.4 * SR)), tb + beat * 0.5 + sw, 0.45)
+                if b in (1, 3):
+                    n = int(0.3 * SR); t = np.arange(n) / SR
+                    if c["drums"] == "synthwave":
+                        rausch = rng.standard_normal(n) * np.where(t < 0.2, 1.0, np.exp(-(t - 0.2) * 80))
+                        snare = rausch * 0.45 + np.sin(2 * np.pi * 190 * t) * np.exp(-t * 30) * 0.5
+                    else:
+                        snare = _clap(n, rng) * (0.8 if c["drums"] == "house" else 0.6)
+                    setze("drums", snare * 0.5, tb)
+            for h in range(2):
+                setze("drums", _hat(int(0.05 * SR), rng), tb + h * beat / 2 + (sw if h else 0), 0.35 if h == 0 else 0.6)
+            f = _hz(grund - 24)
+            if c["bass"] == "achtel":
+                for a8 in range(2):
+                    n = int(beat / 2 * 0.9 * SR)
+                    setze("bass", _saege(f * (2 if a8 else 1), n) * np.exp(-np.arange(n) / SR * 6), tb + a8 * beat / 2, 0.42)
+            elif c["bass"] == "offbeat":
+                setze("bass", _bass(f * 2, int(beat * 0.45 * SR)), tb + beat / 2, 0.9)
+            elif c["bass"] == "ganz" and b in (0, 2) and not intro:
+                setze("bass", _bass(f * 2, int(beat * 1.8 * SR)), tb, 0.9)
+            if c["arp"]:
+                for s16 in range(2 if c["arp"] == "pluck" else 4):
+                    teil = 2 if c["arp"] == "pluck" else 4
+                    m = noten[(b * teil + s16) % 4] + 12
+                    n = int(beat / teil * 0.9 * SR)
+                    sig = _pluck(_hz(m + 12), n) if c["arp"] == "pluck" else _saege(_hz(m), n) * np.exp(-np.arange(n) / SR * 14)
+                    setze("arp", sig, tb + s16 * beat / teil, 0.3 if c["arp"] == "pluck" else 0.16)
+        if c["lead"] and tk >= 2:
+            for s, iv, lng in melodie:
+                if (tk % 2) * 4 <= s < (tk % 2) * 4 + 4:
+                    ts = t0 + (s - (tk % 2) * 4) * beat
+                    n = int(lng * beat * SR); t = np.arange(n) / SR
+                    vib = np.sin(2 * np.pi * 5 * t) * 0.12 * np.minimum(1, t / 0.3)
+                    ph = np.cumsum(_hz(c["folge"][0][0] + 12 + iv) * 2 ** (vib / 12)) / SR
+                    lead = np.sin(2 * np.pi * ph) * 0.6 + (2 * (ph % 1.0) - 1) * 0.25
+                    env = np.minimum(1, t / 0.04) * np.minimum(1, (n / SR - t) / 0.1)
+                    setze("lead", lead * env, ts, 0.25)
+
+    mix = (sp["drums"] + _tiefpass(sp["bass"], 700) + _tiefpass(sp["pad"], 1800 if c["pad"] == "saege" else 3000)
+           + _tiefpass(sp["arp"], 3200) + _tiefpass(sp["lead"], 3800))
+    if c.get("knistern"):                                      # leichtes Platten-Knistern
+        k = np.zeros(n_ges); idx = rng.integers(0, n_ges, int(n_ges / SR * 30)); k[idx] = rng.standard_normal(len(idx)) * 0.15
+        mix += k + rng.standard_normal(n_ges) * 0.004
+    echo = int(beat * 0.75 * SR)
+    hall = np.zeros_like(mix); hall[echo:] = mix[:-echo] * 0.22
+    mix = mix + _tiefpass(hall, 2500)
+    n = int(sekunden * SR); mix = mix[:n]
+    ein, aus = int(0.3 * SR), int(2.0 * SR)
+    mix[:ein] *= np.linspace(0, 1, ein); mix[-aus:] *= np.linspace(1, 0, aus)
+    mix = np.tanh(mix / max(1e-6, np.max(np.abs(mix))) * 1.4) / np.tanh(1.4) * 0.88
+    rechts = np.concatenate([np.zeros(int(0.015 * SR)), mix])[:n]
+    stereo = np.stack([mix, 0.8 * rechts + 0.2 * mix], axis=1)
+    with wave.open(ziel_wav, "wb") as w:
+        w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
+        w.writeframes((stereo * 32767).astype(np.int16).tobytes())
+    return ziel_wav

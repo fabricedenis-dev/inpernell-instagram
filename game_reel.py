@@ -17,12 +17,13 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
 
 import reel_design as rd
 from bild import ORANGE, WEISS, font
-from musik import erzeuge_synthwave
+from musik import erzeuge_chill, erzeuge_synthwave
 from reel_anim import _ease, _zeige
 
 W, H, FPS, M = rd.W, rd.H, 30, rd.M
 HIER = os.path.dirname(os.path.abspath(__file__))
-BPM = 112
+BPM = 82                      # Takt der Musik "Ocean Lofi" (musik.CHILL_STILE)
+MUSIK = "ocean_lofi"
 SCHLAG = 60.0 / BPM
 PINK, TUERKIS, GELB, ROT, TINTE = (255, 60, 170), (40, 230, 230), (255, 210, 70), (230, 30, 50), (20, 10, 36)
 NACHT = (14, 4, 40)
@@ -433,11 +434,11 @@ def v_hook():
     el = [(sticker("HEUTE IST RELEASE-TAG", (M - 6, 450)), "pop", -0.3), (l1, "punch", -0.2), (l2, "punch", 1),
           (ktext("Und wir?", (M, y + 30), 66), "hoch", 3),
           (ktext("Haben trotzdem offen.", (M, y + 112), 66, fill=TUERKIS), "pop", 4)]
-    return {"hg": _abdunkeln(_plakat(), 0.62), "schlaege": 8, "el": el, "ohne_logo": True}
+    return {"hg": _abdunkeln(_plakat(), 0.62), "schlaege": 6, "el": el, "ohne_logo": True}
 
 
 def v_crew():
-    return {"hg": _plakat(), "schlaege": 6, "el": [(sticker("DIE CREW IST DA", (M - 6, 230), fuell=TUERKIS), "pop", 0.5)],
+    return {"hg": _plakat(), "schlaege": 4, "el": [(sticker("DIE CREW IST DA", (M - 6, 230), fuell=TUERKIS), "pop", 0.5)],
             "ohne_logo": True, "blitz": True}
 
 
@@ -447,8 +448,8 @@ def v_gag():
     d = ImageDraw.Draw(knopf)
     d.rounded_rectangle([M, 940, W - M, 1060], radius=24, fill=TUERKIS + (255,), outline=TINTE, width=6)
     d.text((W // 2, 1000), "Respawn bei Inpernell", font=font("h800", 62), fill=TINTE, anchor="mm")
-    el = [(t, "punch", 0), (ktext("Kein Stress.", (W // 2, 860), 70, anchor="mm"), "hoch", 2.5), (knopf, "pop", 4)]
-    return {"hg": _abdunkeln(_grau(_plakat()), 0.35), "schlaege": 7, "el": el, "ohne_logo": True,
+    el = [(t, "punch", 0), (ktext("Kein Stress.", (W // 2, 860), 70, anchor="mm"), "hoch", 1.5), (knopf, "pop", 2.5)]
+    return {"hg": _abdunkeln(_grau(_plakat()), 0.35), "schlaege": 5, "el": el, "ohne_logo": True,
             "wackeln": (0, 0.9), "blitz": True}
 
 
@@ -466,7 +467,7 @@ def _v_held(name, anzeige, grund):
         d.text((M + 10, y + 74), "GESUCHT WEGEN", font=font("h800", 28), fill=(150, 40, 60))
         for z, zeile in enumerate(rd.wrap(d, grund, font("h800", 44), 620)):
             d.text((M + 10, y + 114 + z * 52), zeile, font=font("h800", 44), fill=TINTE)
-        return {"hg": hg, "schlaege": 8, "el": [(t, "punch", 0.5), (karte, "hoch", 2)]}
+        return {"hg": hg, "schlaege": 6, "el": [(t, "punch", 0.5), (karte, "hoch", 1.5)]}
     return szene
 
 
@@ -474,6 +475,7 @@ def v_cheat():
     s = szene_cheat()
     s["hg"] = _abdunkeln(_plakat(), 0.7)
     s["ohne_logo"] = True
+    s["schlaege"] = 8
     return s
 
 
@@ -485,7 +487,7 @@ def v_ende():
     d.rounded_rectangle([W // 2 - kw / 2 - 40, 215, W // 2 + kw / 2 + 40, 295], radius=40, fill=PINK, outline=TINTE,
                         width=6)
     d.text((W // 2, 255), kt, font=fk, fill=WEISS, anchor="mm")
-    return {"hg": _plakat(), "schlaege": 8, "el": [(cta, "pop", 1)], "ohne_logo": True}
+    return {"hg": _plakat(), "schlaege": 5, "el": [(cta, "pop", 1)], "ohne_logo": True}
 
 
 SZENEN = [v_hook, v_crew, v_gag,
@@ -517,7 +519,7 @@ def erzeuge(ziel, titelbild=None):
         s["ebenen"] = [(ebene(teil), eff, schlag) for teil, eff, schlag in s["el"]]
     gesamt = sum(s["schlaege"] for s in szenen) * SCHLAG
     ton = ziel + ".musik.wav"
-    erzeuge_synthwave(gesamt + 0.3, ton, bpm=BPM)
+    erzeuge_chill(gesamt + 0.3, ton, MUSIK)
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
            "-r", str(FPS), "-i", "-", "-i", ton, "-map", "0:v", "-map", "1:a", "-shortest",
            "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-g", "60", "-maxrate", "6M", "-bufsize", "12M",
