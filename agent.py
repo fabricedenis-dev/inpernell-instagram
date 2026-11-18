@@ -388,8 +388,9 @@ def facebook_schluessel_pruefen(token):
         if tage < 10:
             print(f"::warning::Der Zugangsschlüssel läuft in {tage:.0f} Tagen ab. Im Meta-Dashboard einen neuen "
                   "erzeugen (oder im Access Token Debugger verlängern) und das Secret IG_ACCESS_TOKEN ersetzen.")
-    except Exception as e:
-        print(f"::warning::Ablaufdatum des Zugangsschlüssels nicht lesbar ({e}).")
+    except Exception:
+        # z. B. bei Systembenutzer-Schlüsseln, die meist unbegrenzt gelten
+        print("Ablaufdatum des Zugangsschlüssels nicht abrufbar (bei Systembenutzer-Schlüsseln normal).")
 
 
 def schluessel_verlaengern(token):
