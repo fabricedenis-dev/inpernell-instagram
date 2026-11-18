@@ -70,11 +70,17 @@ AZURE_REGION = os.environ.get("AZURE_SPEECH_REGION", "germanywestcentral")
 AZURE_STIMME = os.environ.get("AZURE_SPEECH_VOICE", "de-DE-FlorianMultilingualNeural")
 
 
-def _azure_wav(text, ziel, stimme, tempo="-3%"):
-    """Ein Text als WAV über Azure Text-to-Speech (Schlüssel aus AZURE_SPEECH_KEY)."""
+def _azure_wav(text, ziel, stimme, tempo="+0%", stil=None, staerke=0.8):
+    """Ein Text als WAV über Azure Text-to-Speech (Schlüssel aus AZURE_SPEECH_KEY).
+    Im Text erzeugt " | " eine kurze natürliche Atempause."""
     from xml.sax.saxutils import escape
-    ssml = (f'<speak version="1.0" xml:lang="de-DE"><voice name="{stimme}">'
-            f'<prosody rate="{tempo}">{escape(text)}</prosody></voice></speak>')
+    inhalt = escape(text).replace(" | ", ' <break time="250ms"/> ')
+    inhalt = f'<prosody rate="{tempo}">{inhalt}</prosody>'
+    if stil:
+        inhalt = f'<mstts:express-as style="{stil}" styledegree="{staerke}">{inhalt}</mstts:express-as>'
+    ssml = ('<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" '
+            'xmlns:mstts="https://www.w3.org/2001/mstts" xml:lang="de-DE">'
+            f'<voice name="{stimme}">{inhalt}</voice></speak>')
     req = urllib.request.Request(
         f"https://{AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),
         headers={"Ocp-Apim-Subscription-Key": os.environ.get("AZURE_SPEECH_KEY", "proxy-injected"),
@@ -84,12 +90,12 @@ def _azure_wav(text, ziel, stimme, tempo="-3%"):
         f.write(r.read())
 
 
-def vertonen_azure(texte, ziel_wav, stimme=None):
+def vertonen_azure(texte, ziel_wav, stimme=None, tempo="+0%", stil=None):
     """Spricht jeden Text mit einer Azure-Neuralstimme und setzt die Tonspur zusammen."""
     with tempfile.TemporaryDirectory() as tmp:
         roh = []
         for i, text in enumerate(texte):
             pfad = os.path.join(tmp, f"{i}.wav")
-            _azure_wav(text, pfad, stimme or AZURE_STIMME)
+            _azure_wav(text, pfad, stimme or AZURE_STIMME, tempo=tempo, stil=stil)
             roh.append(pfad)
         return zusammensetzen(roh, ziel_wav)
