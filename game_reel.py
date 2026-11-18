@@ -13,7 +13,7 @@ import subprocess
 import sys
 
 import numpy as np
-from PIL import Image, ImageDraw, ImageEnhance, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageOps
 
 import reel_design as rd
 from bild import ORANGE, WEISS, font
@@ -402,6 +402,100 @@ SZENEN = [szene_lade, szene_hook, szene_gekuendigt,
           szene_cheat, szene_ende]
 
 
+# ---------------------------------------------------------------- Entwurf 7: nach Vorlage des Inhabers (Plakat + Einzelbilder)
+
+def _vorlage(name):
+    return Image.open(os.path.join(HIER, "assets", "team", name)).convert("RGB")
+
+
+def _plakat():
+    p = _vorlage("vorlage_poster.png")
+    oben = p.getpixel((540, 2))
+    img = verlauf([(0, oben), (0.1, oben), (0.8, NACHT), (1, NACHT)])
+    img.alpha_composite(p.resize((1002, 1336), Image.LANCZOS).convert("RGBA"), (39, 190))
+    return img
+
+
+def _abdunkeln(img, a):
+    img = img.copy()
+    img.alpha_composite(Image.new("RGBA", (W, H), NACHT + (int(255 * a),)))
+    return img
+
+
+def _grau(img):
+    g = ImageEnhance.Brightness(ImageOps.grayscale(img.convert("RGB"))).enhance(0.7)
+    return ImageOps.colorize(g, (10, 10, 16), (210, 210, 220)).convert("RGBA")
+
+
+def v_hook():
+    l1, y = titel("Heute zockt", (M - 10, 560), 110)
+    l2, y = titel("ganz Deutschland.", (M - 10, y - 10), 110)
+    el = [(sticker("HEUTE IST RELEASE-TAG", (M - 6, 450)), "pop", -0.3), (l1, "punch", -0.2), (l2, "punch", 1),
+          (ktext("Und wir?", (M, y + 30), 66), "hoch", 3),
+          (ktext("Haben trotzdem offen.", (M, y + 112), 66, fill=TUERKIS), "pop", 4)]
+    return {"hg": _abdunkeln(_plakat(), 0.62), "schlaege": 8, "el": el, "ohne_logo": True}
+
+
+def v_crew():
+    return {"hg": _plakat(), "schlaege": 6, "el": [(sticker("DIE CREW IST DA", (M - 6, 230), fuell=TUERKIS), "pop", 0.5)],
+            "ohne_logo": True, "blitz": True}
+
+
+def v_gag():
+    t, _ = titel("GEKÜNDIGT.", (W // 2, 560), 170, oben=(255, 70, 70), unten=ROT, mitte=True, schraeg=0.08)
+    knopf = neu()
+    d = ImageDraw.Draw(knopf)
+    d.rounded_rectangle([M, 940, W - M, 1060], radius=24, fill=TUERKIS + (255,), outline=TINTE, width=6)
+    d.text((W // 2, 1000), "Respawn bei Inpernell", font=font("h800", 62), fill=TINTE, anchor="mm")
+    el = [(t, "punch", 0), (ktext("Kein Stress.", (W // 2, 860), 70, anchor="mm"), "hoch", 2.5), (knopf, "pop", 4)]
+    return {"hg": _abdunkeln(_grau(_plakat()), 0.35), "schlaege": 7, "el": el, "ohne_logo": True,
+            "wackeln": (0, 0.9), "blitz": True}
+
+
+def _v_held(name, anzeige, grund):
+    def szene():
+        bild = _vorlage(f"{name}_vorlage.png").resize((W, H), Image.LANCZOS)
+        hg = bild.filter(ImageFilter.UnsharpMask(radius=2, percent=40, threshold=2)).convert("RGBA")
+        t, _ = titel(anzeige, (M - 10, 220), 130, oben=GELB, unten=KORALLE)
+        karte = neu()
+        d = ImageDraw.Draw(karte)
+        y = 1150
+        d.rounded_rectangle([M - 20, y, 740, y + 240], radius=22, fill=(236, 220, 190, 255), outline=TINTE, width=8)
+        for i in range(5):
+            stern(d, M + 22 + i * 56, y + 38, 22, GELB)
+        d.text((M + 10, y + 74), "GESUCHT WEGEN", font=font("h800", 28), fill=(150, 40, 60))
+        for z, zeile in enumerate(rd.wrap(d, grund, font("h800", 44), 620)):
+            d.text((M + 10, y + 114 + z * 52), zeile, font=font("h800", 44), fill=TINTE)
+        return {"hg": hg, "schlaege": 8, "el": [(t, "punch", 0.5), (karte, "hoch", 2)]}
+    return szene
+
+
+def v_cheat():
+    s = szene_cheat()
+    s["hg"] = _abdunkeln(_plakat(), 0.7)
+    s["ohne_logo"] = True
+    return s
+
+
+def v_ende():
+    cta = neu()
+    d = ImageDraw.Draw(cta)
+    fk, kt = font("h800", 42), "Neue Top Jobs: Link in der Bio"
+    kw = d.textlength(kt, font=fk)
+    d.rounded_rectangle([W // 2 - kw / 2 - 40, 215, W // 2 + kw / 2 + 40, 295], radius=40, fill=PINK, outline=TINTE,
+                        width=6)
+    d.text((W // 2, 255), kt, font=fk, fill=WEISS, anchor="mm")
+    return {"hg": _plakat(), "schlaege": 8, "el": [(cta, "pop", 1)], "ohne_logo": True}
+
+
+SZENEN = [v_hook, v_crew, v_gag,
+          _v_held("fabrice", "FABRICE", "schwerem Traumjob-Verdacht"),
+          _v_held("pascal", "PASCAL", "Gehaltserhöhung in Tateinheit"),
+          _v_held("waldemar", "WALDEMAR", "bandenmäßiger Ingenieur-Vermittlung"),
+          v_cheat, v_ende]
+TITEL_SZENE = 1
+
+
 # ---------------------------------------------------------------- Video
 
 def standbilder(ordner):
@@ -452,7 +546,7 @@ def erzeuge(ziel, titelbild=None):
                 frame = wack
             if s.get("blitz") and t < 2 / FPS:                                  # kurzer Blitz beim Schnitt
                 frame = Image.blend(frame, Image.new("RGBA", (W, H), (255, 255, 255, 255)), 0.7)
-            if si == 0 and titel_frame is None and t >= dauer - 0.2:
+            if si == TITEL_SZENE and titel_frame is None and t >= dauer - 0.2:
                 titel_frame = frame.copy()
             proc.stdin.write(frame.convert("RGB").tobytes())
     proc.stdin.close()
