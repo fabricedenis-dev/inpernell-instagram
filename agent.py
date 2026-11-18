@@ -459,6 +459,21 @@ def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_ur
     return http(f"{basis}/{ig_id}/media_publish", {"creation_id": container, "access_token": token})["id"]
 
 
+def profil_anzeigen(token):
+    """Zeigt, was im Instagram-Profil steht (Name, Bio, Website-Link) – zum Prüfen im Probelauf."""
+    try:
+        basis, ig_id, _ = instagram_konto(token)
+        p = http(f"{basis}/{ig_id}?" + urllib.parse.urlencode(
+            {"fields": "username,name,biography,website,followers_count,media_count", "access_token": token}),
+            versuche=1)
+        print("PROFIL Name:", p.get("name"))
+        print("PROFIL Bio:", (p.get("biography") or "").replace("\n", " | "))
+        print("PROFIL Website-Link:", p.get("website"))
+        print("PROFIL Follower:", p.get("followers_count"), "· Beiträge:", p.get("media_count"))
+    except Exception as e:
+        print(f"::warning::Profil nicht lesbar ({e}).")
+
+
 def beitrag_loeschen(token, media_id):
     """Löscht einen eigenen Beitrag über die Schnittstelle. Wirft einen Fehler, wenn Instagram das ablehnt."""
     basis, _, _ = instagram_konto(token)
@@ -629,8 +644,9 @@ def main():
             seiten_rel.append(os.path.relpath(pfad, HIER))
         dateien += seiten_rel[1:]
     # "Link in der Bio"-Seite mit dem aktuellen Top Job (ausgeliefert über GitHub Pages aus dem Ordner docs/)
-    erzeuge_seite(post, os.path.join(HIER, "docs", "index.html"))
-    dateien.append("docs/index.html")
+    if not probe:   # Probelauf darf die live geschaltete Top-Job-Seite nicht verändern
+        erzeuge_seite(post, os.path.join(HIER, "docs", "index.html"))
+        dateien.append("docs/index.html")
     story_rel = f"posts/{heute}-story.jpg"
     if mit_story:
         erzeuge_story(post, os.path.join(HIER, story_rel))
@@ -641,7 +657,8 @@ def main():
         dateien += [video_rel, titel_rel]
     with open(os.path.join(HIER, "posts", f"{heute}.txt"), "w", encoding="utf-8") as f:
         f.write(post["caption"] + "\n")
-    git_sichern(f"Top Job {heute}: {fmt.capitalize()} und Text", *dateien)
+    if not probe:   # Probelauf: nichts committen, damit die Dateien des echten Posts unverändert bleiben
+        git_sichern(f"Top Job {heute}: {fmt.capitalize()} und Text", *dateien)
 
     if probe:
         token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
@@ -649,6 +666,7 @@ def main():
             try:
                 _, ig_id, name = instagram_konto(token)
                 print(f"Zugangsschlüssel funktioniert: Instagram-Konto {name} (ID {ig_id}).")
+                profil_anzeigen(token)
                 if ist_facebook_schluessel(token):
                     facebook_schluessel_pruefen(token)
             except Exception as e:
