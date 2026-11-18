@@ -40,7 +40,7 @@ FORMATE = {
     "bild": dict(W=1080, H=1350, M=72, rechts=72, foto=720, oben=56, unten=1350 - 44, titel=84),
     "reel": dict(W=1080, H=1920, M=72, rechts=150, foto=940, oben=150, unten=1920 - 300, titel=92),
 }
-# Story: gleiches Hochformat wie das Reel, aber als Standbild mit Link zur Stellenanzeige
+# Story: gleiches Hochformat wie das Reel, als Standbild mit Hinweis "Link in der Bio" (Top-Job-Seite)
 FORMATE["story"] = dict(FORMATE["reel"], unten=1920 - 340)
 
 
@@ -286,12 +286,6 @@ def elemente(job, fmt):
         d.line([(ax, ky + kn_h / 2), (ax + 34, ky + kn_h / 2)], fill=KNOPFTEXT, width=4)
         d.line([(ax + 21, ky + kn_h / 2 - 13), (ax + 34, ky + kn_h / 2), (ax + 21, ky + kn_h / 2 + 13)],
                fill=KNOPFTEXT, width=4, joint="curve")
-        if fmt == "story":
-            link = (job.get("job_url") or "https://www.inpernell.de/jobboerse/").split("://", 1)[-1].rstrip("/")
-            gesperrt(d, (M, ky + kn_h + 30), "ZUR STELLENANZEIGE", font("h600", 18), PFIRSICH, 2.6)
-            fl, ll = fit(d, link, "t700", 30, 20, breite, 1)
-            d.text((M, ky + kn_h + 62), ll[0], font=fl, fill=WEISS)
-            return
         d.text((M + kw_ + 172, ky + kn_h / 2), "Link in der Bio", font=font("t700", 29), fill=WEISS, anchor="lm")
         if fmt == "bild":
             gesperrt(d, (M, F["H"] - 52), "KEINE ZEITARBEIT. DIREKTVERMITTLUNG.  ·  INPERNELL.DE",
