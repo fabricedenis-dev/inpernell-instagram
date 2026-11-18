@@ -100,6 +100,25 @@ Im Projekt: **Actions > Top Job des Tages > Run workflow**
 Von Hand (nicht automatisierbar): Profilname/Bio mit Region und Berufsfeldern, Standort-Markierung,
 Link-Sticker in der Story, Direktnachrichten zügig beantworten, gelegentlich ein Berater-Reel mit Gesicht.
 
+## Tägliche Vorgabe mit Stichpunkten (geplante Claude-Aufgabe)
+
+Damit die Karussell-Seiten kurze, vollständige Stichpunkte in Du-Form zeigen (statt der langen
+Recruitee-Texte), bereitet eine tägliche Claude-Aufgabe um 16:07 Uhr die Vorgabe
+`overrides/JJJJ-MM-TT.json` vor. Der 18:50-Lauf nimmt sie automatisch. Ohne Vorgabe postet er mit den
+(vollständigen) Originaltexten. Auftrag der Aufgabe:
+
+1. main holen; gibt es für heute schon eine Vorgabe oder einen veröffentlichten Beitrag → nichts tun.
+2. Stelle wählen wie der Lauf: `agent.stelle_waehlen(agent.stellen_laden(), agent.protokoll_lesen())`,
+   dann `post = agent.aus_stelle(stelle, "TT.MM.JJJJ")`.
+3. `aufgaben` und `anforderungen` je 4–5 Stichpunkte, `punkte` 3 sehr kurze fürs Titelbild,
+   `punkte_titel` passend. Regeln: kurze, sinnvolle Stichworte (max. ca. 50 Zeichen), vollständig und
+   grammatikalisch korrekt, nie abschneiden, kein „…“, Du-Form/neutral, nichts erfinden, Tippfehler der
+   Quelle korrigieren.
+4. `post["caption"] = agent.bildtext(...)` neu bauen, `post["format"] = "karussell"`.
+5. Seiten mit `bild.erzeuge_bild` / `bild.erzeuge_folgeseiten` in ein temporäres Verzeichnis rendern und
+   ansehen – nichts darf überlaufen.
+6. Nur `overrides/<heute>.json` schreiben, per Pull Request nach main bringen. Nichts veröffentlichen.
+
 ## Story
 
 Nach jedem Beitrag wird zusätzlich eine **Story** (1080 × 1920) gepostet: gleiches Design wie der Beitrag,
