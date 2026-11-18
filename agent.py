@@ -566,6 +566,7 @@ def main():
         return
     protokoll = protokoll_lesen()
     mit_story = os.environ.get("STORY", "true").strip().lower() not in ("0", "false", "nein", "no")
+    alte_story = ""
     heute_gepostet = [z for z in protokoll if z["datum"] == heute and z.get("media_id")
                       and not z["media_id"].startswith("geloescht")]
     if not probe and heute_gepostet and wahr("NEU_POSTEN"):
@@ -588,7 +589,8 @@ def main():
         heute_gepostet = []
         if not os.environ.get("JOB_ID"):
             os.environ["JOB_ID"] = alt["job_id"]          # dieselbe Stelle neu posten
-        if alt.get("story_id"):
+        alte_story = alt.get("story_id", "")
+        if alte_story:
             mit_story = False                             # Story von heute bleibt stehen, keine zweite
     if not probe and heute_gepostet:
         if mit_story and not heute_gepostet[-1].get("story_id"):
@@ -678,7 +680,7 @@ def main():
         media_id = veroeffentlichen(token, post["caption"][:2200], bild_url=basis + bild_rel)
     print("Veröffentlicht. Beitrags-ID:", media_id)
     zeile = {"datum": heute, "job_id": post.get("job_id", ""), "titel": post["titel"],
-             "media_id": media_id, "quelle": quelle, "format": fmt, "story_id": ""}
+             "media_id": media_id, "quelle": quelle, "format": fmt, "story_id": alte_story}
     protokoll_schreiben(zeile)
     git_sichern(f"Top Job {heute}: veröffentlicht", "data/protokoll.csv")
     if mit_story:
