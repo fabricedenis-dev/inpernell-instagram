@@ -84,8 +84,6 @@ def _zeige(frame, ebene, effekt, p):
 
 def _fortschritt(frame, szene, anzahl, p):
     d = ImageDraw.Draw(frame)
-    lg = Image.open(os.path.join(rd.HIER, "assets", "logo.png")).convert("RGBA")
-    frame.alpha_composite(lg, (rd.M - 10, 96))
     luecke, y = 10, 210
     breite = (W - rd.M - rd.R - luecke * (anzahl - 1)) / anzahl
     for i in range(anzahl):
