@@ -36,6 +36,7 @@ from zoneinfo import ZoneInfo
 
 import kategorien
 from bild import erzeuge_bild, erzeuge_reel, erzeuge_story
+from seite import erzeuge_seite
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 RECRUITEE = "https://inpernellgmbh.recruitee.com/api/offers/"
@@ -503,6 +504,9 @@ def main():
     bild_rel = f"posts/{heute}.jpg"
     erzeuge_bild(post, os.path.join(HIER, bild_rel))
     dateien = [bild_rel, f"posts/{heute}.txt"]
+    # "Link in der Bio"-Seite mit dem aktuellen Top Job (ausgeliefert über GitHub Pages aus dem Ordner docs/)
+    erzeuge_seite(post, os.path.join(HIER, "docs", "index.html"))
+    dateien.append("docs/index.html")
     story_rel = f"posts/{heute}-story.jpg"
     if mit_story:
         erzeuge_story(post, os.path.join(HIER, story_rel))
