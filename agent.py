@@ -17,6 +17,8 @@ Umgebungsvariablen:
   ERZWINGEN          "true" = auch außerhalb der Mittagsstunde laufen (Handstart)
   FORMAT             "bild", "karussell" oder "reel" erzwingen (sonst Vorgabe bzw. WOCHENPLAN)
   STORY              "false" = keine Story zusätzlich zum Beitrag (Standard: Story wird gepostet)
+  NEU_POSTEN         "true" = heutigen Beitrag ersetzen: alten Beitrag löschen, dann neu posten (Handstart)
+  JOB_ID             nur diese Recruitee-Stelle posten (Handstart)
   OFFERS_FILE        nur für Tests: Stellen aus lokaler JSON-Datei statt aus dem Netz
   KEIN_GIT           nur für Tests: nichts committen/pushen
 """
@@ -462,6 +464,14 @@ def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_ur
     return http(f"{basis}/{ig_id}/media_publish", {"creation_id": container, "access_token": token})["id"]
 
 
+def beitrag_loeschen(token, media_id):
+    """Löscht einen eigenen Beitrag über die Schnittstelle. Wirft einen Fehler, wenn Instagram das ablehnt."""
+    basis, _, _ = instagram_konto(token)
+    r = http(f"{basis}/{media_id}?" + urllib.parse.urlencode({"access_token": token}), methode="DELETE", versuche=1)
+    if not (r is True or r.get("success")):
+        raise RuntimeError(f"Löschen nicht bestätigt: {r}")
+
+
 def facebook_schluessel_pruefen(token):
     """Bei EAA-Schlüsseln: Ablaufdatum anzeigen und rechtzeitig warnen (verlängern geht nur im Meta-Dashboard)."""
     try:
@@ -556,7 +566,30 @@ def main():
         return
     protokoll = protokoll_lesen()
     mit_story = os.environ.get("STORY", "true").strip().lower() not in ("0", "false", "nein", "no")
-    heute_gepostet = [z for z in protokoll if z["datum"] == heute and z.get("media_id")]
+    heute_gepostet = [z for z in protokoll if z["datum"] == heute and z.get("media_id")
+                      and not z["media_id"].startswith("geloescht")]
+    if not probe and heute_gepostet and wahr("NEU_POSTEN"):
+        alt = heute_gepostet[-1]
+        token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
+        print(f"Heutigen Beitrag ersetzen: {alt['titel']} (Beitrags-ID {alt['media_id']}) wird gelöscht …")
+        try:
+            beitrag_loeschen(token, alt["media_id"])
+            print("Alter Beitrag gelöscht.")
+        except Exception as e:
+            if not wahr("TROTZDEM_POSTEN"):
+                raise RuntimeError(f"Der alte Beitrag konnte nicht über die Schnittstelle gelöscht werden ({e}). "
+                                   "Bitte in der Instagram-App löschen und den Lauf mit 'trotzdem posten' "
+                                   "wiederholen. Es wurde nichts Neues veröffentlicht.")
+            print(f"::warning::Alter Beitrag nicht gelöscht ({e}) – laut Vorgabe wird trotzdem neu gepostet.")
+        alt["media_id"] = "geloescht:" + alt["media_id"]
+        protokoll_speichern(protokoll)
+        git_sichern(f"Top Job {heute}: alter Beitrag ersetzt", "data/protokoll.csv")
+        protokoll = protokoll_lesen()
+        heute_gepostet = []
+        if not os.environ.get("JOB_ID"):
+            os.environ["JOB_ID"] = alt["job_id"]          # dieselbe Stelle neu posten
+        if alt.get("story_id"):
+            mit_story = False                             # Story von heute bleibt stehen, keine zweite
     if not probe and heute_gepostet:
         if mit_story and not heute_gepostet[-1].get("story_id"):
             return story_nachholen(heute_gepostet[-1], protokoll, jetzt, heute)
@@ -572,7 +605,15 @@ def main():
             if not post.get(feld):
                 raise RuntimeError(f"In {vorgabe} fehlt das Feld '{feld}'.")
     else:
-        post = aus_stelle(stelle_waehlen(stellen_laden(), protokoll), jetzt.strftime("%d.%m.%Y"))
+        stellen = stellen_laden()
+        wunsch = os.environ.get("JOB_ID", "").strip()
+        if wunsch:
+            stelle = next((s for s in stellen if str(s.get("id")) == wunsch), None)
+            if not stelle:
+                raise RuntimeError(f"Stelle {wunsch} ist in Recruitee nicht (mehr) veröffentlicht.")
+        else:
+            stelle = stelle_waehlen(stellen, protokoll)
+        post = aus_stelle(stelle, jetzt.strftime("%d.%m.%Y"))
         quelle = "automatisch"
     print(f"Stelle ({quelle}): {post['titel']} – {post.get('ort', '')}")
 

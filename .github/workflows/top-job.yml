@@ -19,6 +19,18 @@ on:
         type: choice
         options: ["", "karussell", "bild", "reel"]
         default: ""
+      neu_posten:
+        description: "Heutigen Beitrag ersetzen (alten löschen, neu posten)"
+        type: boolean
+        default: false
+      trotzdem_posten:
+        description: "Beim Ersetzen auch posten, wenn Löschen per Schnittstelle nicht geht (vorher in der App löschen!)"
+        type: boolean
+        default: false
+      job_id:
+        description: "Nur diese Recruitee-Stellen-ID posten (leer = automatisch)"
+        type: string
+        default: ""
 
 permissions:
   contents: write
@@ -49,4 +61,7 @@ jobs:
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.probelauf || 'false' }}
           ERZWINGEN: ${{ github.event_name == 'workflow_dispatch' }}
           FORMAT: ${{ inputs.format }}
+          NEU_POSTEN: ${{ inputs.neu_posten }}
+          TROTZDEM_POSTEN: ${{ inputs.trotzdem_posten }}
+          JOB_ID: ${{ inputs.job_id }}
         run: python agent.py
