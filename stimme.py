@@ -27,21 +27,17 @@ def _modell():
     return pfad
 
 
-def vertonen(texte, ziel_wav):
-    from piper import PiperVoice
-    stimme = PiperVoice.load(_modell())
+def zusammensetzen(wav_dateien, ziel_wav):
+    """Fügt fertige Sprach-WAVs (eine je Szene) mit Pausen zu einer Tonspur zusammen; gibt Szenenlängen zurück."""
     dauern, teile = [], []
     with tempfile.TemporaryDirectory() as tmp:
-        for i, text in enumerate(texte):
-            roh = os.path.join(tmp, f"{i}.wav")
-            with wave.open(roh, "wb") as w:
-                stimme.synthesize_wav(text, w)
+        for i, roh in enumerate(wav_dateien):
             with wave.open(roh) as w:
                 laenge = w.getnframes() / w.getframerate()
             szene = PAUSE_VOR + laenge + PAUSE_NACH
             dauern.append(szene)
             teil = os.path.join(tmp, f"t{i}.wav")
-            # Pause davor und auffüllen bis zur Szenenlänge, einheitlich 48 kHz stereo
+            # Pause davor, auffüllen bis zur Szenenlänge, einheitlich 48 kHz stereo, gleiche Lautheit
             subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", roh, "-af",
                             f"adelay={int(PAUSE_VOR * 1000)}:all=1,apad=whole_dur={szene},"
                             "aresample=48000,loudnorm=I=-16:TP=-1.5", "-ac", "2", teil], check=True)
@@ -52,3 +48,17 @@ def vertonen(texte, ziel_wav):
         subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-f", "concat", "-safe", "0", "-i", liste,
                         "-c", "pcm_s16le", ziel_wav], check=True)
     return dauern
+
+
+def vertonen(texte, ziel_wav):
+    """Spricht jeden Text mit der Piper-Stimme "Thorsten" und setzt die Tonspur zusammen."""
+    from piper import PiperVoice
+    stimme = PiperVoice.load(_modell())
+    with tempfile.TemporaryDirectory() as tmp:
+        roh = []
+        for i, text in enumerate(texte):
+            pfad = os.path.join(tmp, f"{i}.wav")
+            with wave.open(pfad, "wb") as w:
+                stimme.synthesize_wav(text, w)
+            roh.append(pfad)
+        return zusammensetzen(roh, ziel_wav)
