@@ -33,7 +33,7 @@ def _ease(p):
     return 1 - (1 - p) ** 3
 
 
-def _hintergrund(foto, t, dauer, staerke=190):
+def _hintergrund(foto, t, dauer, staerke=210):
     """Foto bildfüllend, langsamer Zoom, dunkler Navy-Schleier für Lesbarkeit."""
     z = 1.0 + 0.10 * (t / dauer)
     cw, ch = int(foto.width / z), int(foto.height / z)
@@ -93,10 +93,12 @@ def _kopf(ebene, rubrik):
 
 def erzeuge_wissensreel(reel, ziel, titelbild=None):
     kat = reel.get("kategorie", "personal")
-    # leicht weichgezeichnet: Stimmung bleibt, Details (z. B. Schrift im Foto) lenken nicht ab
-    foto = _foto_vorbereiten(kat, W, H, reserve=1.12).filter(ImageFilter.GaussianBlur(6))
+    # nicht weichzeichnen (Instagram empfiehlt unscharfe Videos seltener) – stattdessen stärker abdunkeln
+    foto = _foto_vorbereiten(kat, W, H, reserve=1.12)
     punkte = reel["punkte"][:3]
     szenen = [("hook", 3.0)] + [("punkt", 4.2)] * len(punkte) + [("ende", 3.6)]
+    if reel.get("dauern"):            # bei Sprecherstimme: Szene so lang wie der gesprochene Satz
+        szenen = [(art, max(d, reel["dauern"][i])) for i, (art, d) in enumerate(szenen)]
     gesamt = sum(s[1] for s in szenen)
     mess = ImageDraw.Draw(Image.new("RGB", (10, 10)))
 
