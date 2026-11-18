@@ -121,13 +121,6 @@ def listenpunkte(s):
     return [p for p in (text_aus_html(m) for m in re.findall(r"<li[^>]*>(.*?)</li>", s or "", flags=re.S | re.I)) if p]
 
 
-def kuerzen(s, n):
-    s = s.strip().rstrip(".;,")
-    if len(s) <= n:
-        return s
-    return s[:n].rsplit(" ", 1)[0].rstrip(" ,;:-–") + " …"
-
-
 def protokoll_lesen():
     if not os.path.exists(PROTOKOLL):
         return []
@@ -194,38 +187,40 @@ def stelle_waehlen(stellen, protokoll):
     return neueste(frei)[0]
 
 
-FUELLWOERTER = {"und", "oder", "sowie", "von", "der", "die", "das", "des", "den", "dem", "für", "mit", "in", "im",
-               "bei", "zur", "zum", "auf", "aus", "an", "am", "eine", "einer", "einem", "eines", "ein", "zu"}
+def vollpunkt(s):
+    """Anzeigen-Punkt bereinigt, aber VOLLSTÄNDIG (nie abgeschnitten)."""
+    s = re.sub(r"\s+", " ", s.replace("\xad", "")).strip()
+    s = re.sub(r"\s+([:;,])", r"\1", s)
+    s = s.rstrip(".;,").strip()
+    # Ganze Sätze ("Du übernimmst …") bekommen einen Punkt, Stichpunkte ("Fundierte ERP-Erfahrung") nicht
+    if re.match(r"(Du|Sie|Wir|Ihr|Dich|Dir)\b", s):
+        s += "."
+    return s
 
 
 def kurzpunkt(s, n=60):
-    """Macht aus einem langen Anzeigen-Punkt eine knappe Zeile fürs Bild (max. n Zeichen)."""
-    s = re.sub(r"\s+", " ", s.replace("\xad", "")).strip().rstrip(".;,")
-    if ":" in s and 10 <= len(s.split(":")[0]) <= n:
+    """Kurze, vollständige Fassung eines Punkts fürs Titelbild – oder None, wenn es keine gibt.
+    Erlaubt ist nur der ganze Punkt (wenn er kurz genug ist) oder seine Überschrift vor dem Doppelpunkt
+    (z. B. "Fundierte ERP-Erfahrung: Mehrjährige Praxis …" -> "Fundierte ERP-Erfahrung"). Nie abschneiden."""
+    s = vollpunkt(s)
+    if ":" in s and 10 <= len(s.split(":")[0].strip()) <= n:
         return s.split(":")[0].strip()
-    for trenner in (" sowie ", "; ", " – ", " - ", " (", " inkl. ", " unter Berücksichtigung"):
-        if len(s) > n and len(s.split(trenner)[0].strip()) >= 18:
-            s = s.split(trenner)[0].strip()
-    if len(s) <= n:
-        return s
-    woerter = s[:n].split(" ")[:-1]
-    while woerter and (woerter[-1].lower().strip(",") in FUELLWOERTER or woerter[-1].endswith("-")):
-        woerter.pop()
-    return " ".join(woerter).rstrip(",") + "…"
+    return s if len(s) <= n else None
 
 
-SIE_FORM = re.compile(r"\b(Sie|Ihnen|Ihr\w*|Du|Dir|Dich|Wir|Uns)\b")
+SIE_FORM = re.compile(r"\b(Sie|Ihnen|Ihre?[mnrs]?)\b")   # Sätze in Sie-Form (passen nicht zur Du-Ansprache)
 
 
 def highlights(aufgaben, anforderungen):
-    """Bis zu drei knappe Punkte fürs Bild; Aufgaben bevorzugt, ganze Sätze ("Sie ...") meiden."""
+    """Bis zu drei kurze, vollständige Punkte fürs Titelbild; Aufgaben bevorzugt, Sie-Sätze meiden."""
+    beste = ([], "Das erwartet dich")
     for liste, titel in ((aufgaben, "Das erwartet dich"), (anforderungen, "Das bringst du mit")):
-        gut = [kurzpunkt(p) for p in liste if not SIE_FORM.search(p)]
-        gut = [p for p in gut if not p.endswith("…")] + [p for p in gut if p.endswith("…")]
+        gut = [k for k in (kurzpunkt(p) for p in liste if not SIE_FORM.search(p)) if k]
         if len(gut) >= 3:
             return gut[:3], titel
-    alle = [kurzpunkt(p) for p in (aufgaben or anforderungen)]
-    return alle[:3], "Das erwartet dich" if aufgaben else "Das bringst du mit"
+        if len(gut) > len(beste[0]):
+            beste = (gut[:3], titel)
+    return beste if len(beste[0]) >= 2 else ([], "")
 
 
 ARBEITSZEIT = {"fulltime": "Vollzeit", "parttime": "Teilzeit", "freelance": "Freiberuflich",
@@ -269,12 +264,12 @@ def bildtext(titel, ort, kat, gehalt_text, fk, aufgaben, anforderungen, ohne_ans
     if ort:
         zeilen.append(f"📍 {ort}")
     zeilen.append("")
-    for liste, ueberschrift in ((aufgaben, "Das erwartet dich:"), (anforderungen, "Das bringst du mit:")):
+    for liste, ueberschrift in ((aufgaben, "Deine Aufgaben:"), (anforderungen, "Das bringst du mit:")):
         # Sätze in der Sie-Form passen nicht zur Du-Ansprache auf Instagram und werden ausgelassen
-        gut = [re.sub(r"\s+:", ":", p) for p in liste if not SIE_FORM.search(p)]
+        gut = [p for p in liste if not SIE_FORM.search(p)]
         if len(gut) >= 2:
             zeilen.append(ueberschrift)
-            zeilen += [f"✔️ {kuerzen(p, 110)}" for p in gut[:3]]
+            zeilen += [f"✔️ {vollpunkt(p)}" for p in gut[:3]]
             zeilen.append("")
     zeilen += ["👉 Bewerben: Link in der Bio antippen" + (" – Lebenslauf genügt, kein Anschreiben nötig."
                                                         if ohne_anschreiben else "."),
@@ -289,7 +284,7 @@ def folienpunkte(liste, n=5):
     """Bis zu n Punkte für die Karussell-Seiten; Du-taugliche Punkte zuerst, sonst alle."""
     gut = [p for p in liste if not SIE_FORM.search(p)]
     quelle = gut if len(gut) >= 2 else liste
-    return [kurzpunkt(p, 78) for p in quelle[:n]]
+    return [vollpunkt(p) for p in quelle[:n]]
 
 
 def aus_stelle(s, datum):
