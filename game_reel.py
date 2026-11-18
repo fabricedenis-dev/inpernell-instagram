@@ -188,8 +188,8 @@ def ein_stern(cx, cy, r=30, farbe=WEISS):
 
 def szene_hook():
     hg = welt()
-    el = [(sticker("HEUTE IST RELEASE-TAG", (M - 6, 400)), "pop", -0.3)]
-    l1, y = titel("Heute zockt", (M - 10, 500), 104)
+    el = [(sticker("HEUTE IST RELEASE-TAG", (M - 6, 420)), "pop", -0.3)]
+    l1, y = titel("Heute zockt", (M - 10, 520), 104)
     l2, y = titel("ganz Deutschland.", (M - 10, y - 10), 104)
     el += [(l1, "punch", -0.2), (l2, "punch", 1)]
     for i in range(5):
@@ -306,12 +306,100 @@ def szene_ende():
            anchor="mm")
     el = [(band, "wisch", 0), (t, "punch", 0.5),
           (ktext("Festanstellung freigeschaltet", (W // 2, 830), 54, anchor="mm", breite=7), "hoch", 2),
-          (ktext("Respekt +100", (W // 2, 905), 54, fill=TUERKIS, anchor="mm", breite=7), "pop", 2.5),
+          (ktext("Level up: neuer Job", (W // 2, 905), 54, fill=TUERKIS, anchor="mm", breite=7), "pop", 2.5),
           (knopf, "pop", 4), (marke, "hoch", 5)]
     return {"hg": hg, "schlaege": 9, "el": el, "ohne_logo": True}
 
 
 SZENEN = [szene_hook, szene_gekuendigt, szene_crew, szene_gesucht, szene_cheat, szene_ende]
+
+
+# ---------------------------------------------------------------- Entwurf 4: Ladebildschirm + Poster-Figuren
+
+VIOLETT, MAGENTA, KORALLE, LILA = (60, 14, 90), (200, 40, 130), (250, 110, 90), (120, 30, 140)
+
+
+def poster(name, hoehe):
+    p = Image.open(os.path.join(HIER, "assets", "team", f"{name}_poster.png")).convert("RGBA")
+    return p.resize((int(p.width * hoehe / p.height), hoehe), Image.LANCZOS)
+
+
+def _streifenfeld(poly, farbe, abstand=52, breite=12):
+    maske = Image.new("L", (W, H))
+    ImageDraw.Draw(maske).polygon(poly, fill=255)
+    f = verlauf([(0, farbe), (1, VIOLETT)])
+    fd = ImageDraw.Draw(f)
+    for k in range(-H, W, abstand):
+        fd.line([(k, 0), (k + H, H)], fill=tuple(min(255, c + 28) for c in farbe) + (255,), width=breite)
+    return f, maske
+
+
+def _comicfeld(poly, farbe, name, skal, pos):
+    f, maske = _streifenfeld(poly, farbe)
+    f.alpha_composite(poster(name, skal), pos)
+    img = neu()
+    img.paste(f, (0, 0), maske)
+    ImageDraw.Draw(img).line(poly + [poly[0]], fill=TINTE, width=16, joint="curve")
+    return img
+
+
+def _lader(text="Traumjob wird geladen"):
+    img = neu()
+    d = ImageDraw.Draw(img)
+    cx, cy = 420, 1452
+    for i in range(8):
+        a = i / 8 * 2 * math.pi
+        r = 7 if i < 6 else 4
+        d.ellipse([cx + 26 * math.cos(a) - r, cy + 26 * math.sin(a) - r,
+                   cx + 26 * math.cos(a) + r, cy + 26 * math.sin(a) + r], fill=(255, 255, 255, 255))
+    d.text((cx + 50, cy), text, font=font("h700", 34), fill=WEISS, anchor="lm", stroke_width=4, stroke_fill=TINTE)
+    return img
+
+
+def szene_lade():
+    hg = welt()
+    t, y = titel("INPERNELL", (M - 10, 230), 150, oben=GELB, unten=KORALLE)
+    el = [(t, "punch", -0.3), (sticker("SCHWARZWALD EDITION", (M + 4, y + 4), fuell=TUERKIS), "pop", 0.5),
+          (_comicfeld([(M - 30, 520), (600, 470), (560, 1120), (M - 30, 1170)], MAGENTA, "fabrice", 700, (-80, 500)),
+           "links", 1),
+          (_comicfeld([(615, 465), (W - 110, 420), (W - 130, 1060), (575, 1115)], KORALLE, "pascal", 640, (480, 450)),
+           "rechts", 1.5),
+          (_comicfeld([(M - 30, 1190), (W - 135, 1080), (W - 150, 1390), (M - 30, 1400)], LILA, "waldemar", 520,
+                      (420, 1010)), "hoch", 2),
+          (_lader(), "hoch", 3)]
+    return {"hg": hg, "schlaege": 8, "el": el}
+
+
+def _held(name, anzeige, grund, farbe):
+    def szene():
+        hg = welt()
+        f, maske = _streifenfeld([(0, 560), (W, 430), (W, 1600), (0, 1600)], farbe, 60, 14)
+        flaeche = neu()
+        flaeche.paste(f, (0, 0), maske)
+        ImageDraw.Draw(flaeche).line([(0, 560), (W, 430)], fill=TINTE, width=16)
+        p = poster(name, 900 if name == "pascal" else 980)
+        figur = neu()
+        figur.alpha_composite(p, (W - p.width + (40 if name == "pascal" else 110), 1600 - p.height))
+        t, y = titel(anzeige, (M - 10, 250), 140, oben=GELB, unten=KORALLE)
+        el = [(flaeche, "wisch", 0), (figur, "rechts", 0.5), (t, "punch", 1)]
+        for i in range(5):
+            el.append((ein_stern(M + 30 + i * 70, y + 40, 28, GELB), "pop", 1.5 + 0.35 * i))
+        box = neu()
+        bd = ImageDraw.Draw(box)
+        bd.rounded_rectangle([M - 20, 1150, 720, 1360], radius=22, fill=(236, 220, 190, 255), outline=TINTE, width=8)
+        bd.text((M + 10, 1176), "GESUCHT WEGEN", font=font("h800", 28), fill=(150, 40, 60))
+        for z, zeile in enumerate(rd.wrap(bd, grund, font("h800", 44), 600)):
+            bd.text((M + 10, 1218 + z * 52), zeile, font=font("h800", 44), fill=TINTE)
+        el.append((box, "hoch", 3))
+        return {"hg": hg, "schlaege": 8, "el": el}
+    return szene
+
+
+SZENEN = [szene_lade, szene_hook, szene_gekuendigt,
+          _held("fabrice", "FABRICE", "schwerem Traumjob-Verdacht", MAGENTA),
+          _held("pascal", "PASCAL", "Gehaltserhöhung in Tateinheit", KORALLE),
+          _held("waldemar", "WALDEMAR", "bandenmäßiger Ingenieur-Vermittlung", LILA),
+          szene_cheat, szene_ende]
 
 
 # ---------------------------------------------------------------- Video
@@ -364,7 +452,7 @@ def erzeuge(ziel, titelbild=None):
                 frame = wack
             if s.get("blitz") and t < 2 / FPS:                                  # kurzer Blitz beim Schnitt
                 frame = Image.blend(frame, Image.new("RGBA", (W, H), (255, 255, 255, 255)), 0.7)
-            if si == 2 and titel_frame is None and t >= dauer - 0.2:
+            if si == 0 and titel_frame is None and t >= dauer - 0.2:
                 titel_frame = frame.copy()
             proc.stdin.write(frame.convert("RGB").tobytes())
     proc.stdin.close()
