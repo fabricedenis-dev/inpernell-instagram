@@ -392,3 +392,141 @@ def erzeuge_reel(job, ziel, sekunden=10, fps=30, titelbild=None):
     if titelbild and letztes is not None:
         letztes.convert("RGB").save(titelbild, "JPEG", quality=90)
     return ziel
+
+
+# ---------------------------------------------------------------- Karussell-Folgeseiten
+
+def _folienrahmen(job, nr, gesamt, kat):
+    """Gemeinsamer Rahmen der Seiten 2–4: Foto-Band mit Logo, Seitenzahl, Job-Bezug. Gibt (Bild, y) zurück."""
+    F = FORMATE["bild"]
+    W, H, M = F["W"], F["H"], F["M"]
+    band = 300
+    img = _grund("bild", kat)
+    foto = _foto_vorbereiten(kat, W, band).convert("RGBA")
+    foto = Image.alpha_composite(foto, Image.new("RGBA", (W, band), (*NAVY, 120)))
+    foto = Image.alpha_composite(foto, _foto_schleier(W, band, H))
+    img.paste(foto, (0, 0))
+    d = ImageDraw.Draw(img)
+    lg = Image.open(os.path.join(HIER, "assets", "logo.png")).convert("RGBA")
+    img.alpha_composite(lg, (M - 10, 56))
+    f = font("h700", 21)
+    seite = f"{nr} / {gesamt}"
+    gesperrt(d, (W - M - gesperrt_breite(d, seite, f, 3.6), 82), seite, f, PFIRSICH, 3.6)
+    # Job-Bezug: kleine Überzeile + Titel + Ort
+    y = 196
+    gesperrt(d, (M, y), "TOP JOB DES TAGES" + (f"  ·  {job['datum']}" if job.get("datum") else ""),
+             font("h700", 19), PFIRSICH, 3.4)
+    ft, tz = fit(d, job["titel"], "h800", 44, 30, W - 2 * M, 2)
+    y += 36
+    for z in tz:
+        d.text((M - 2, y), z, font=ft, fill=WEISS)
+        y += int(ft.size * 1.1)
+    if job.get("ort"):
+        d.text((M - 1, y), job["ort"] + ".", font=font("h800", 34), fill=ORANGE)
+        y += 46
+    return img, d, y + 46
+
+
+def _fuss(d, text_links, rechts_pfeil=True):
+    F = FORMATE["bild"]
+    M, H, W = F["M"], F["H"], F["W"]
+    gesperrt(d, (M, H - 60), text_links, font("h600", 18), PFIRSICH, 2.6)
+    if rechts_pfeil:
+        fx = font("t700", 26)
+        t = "Weiter wischen"
+        tw = d.textlength(t, font=fx)
+        x = W - M - tw - 54
+        d.text((x, H - 50), t, font=fx, fill=WEISS, anchor="lm")
+        ax = W - M - 40
+        d.line([(ax, H - 50), (ax + 36, H - 50)], fill=ORANGE, width=4)
+        d.line([(ax + 22, H - 63), (ax + 36, H - 50), (ax + 22, H - 37)], fill=ORANGE, width=4, joint="curve")
+
+
+def _listenseite(job, kat, nr, gesamt, ueberschrift, punkte, ziel):
+    F = FORMATE["bild"]
+    M, W, H = F["M"], F["W"], F["H"]
+    img, d, y = _folienrahmen(job, nr, gesamt, kat)
+    d.text((M - 3, y), ueberschrift, font=font("h800", 62), fill=WEISS)
+    y += 100
+    breite = W - 2 * M - 56
+    for groesse in (36, 33, 30, 28):
+        fp = font("t400", groesse)
+        zh = int(groesse * 1.3)
+        bloecke = [wrap(d, p, fp, breite)[:2] for p in punkte]
+        hoehe = sum(len(b) * zh + 22 for b in bloecke)
+        if y + hoehe < H - 120:
+            break
+    for b in bloecke:
+        if y + len(b) * zh > H - 120:
+            break
+        cy = y + fp.size * 0.62
+        d.line([(M + 2, cy), (M + 12, cy + 10), (M + 30, cy - 9)], fill=ORANGE, width=6, joint="curve")
+        for j, zeile in enumerate(b):
+            d.text((M + 52, y + j * zh), zeile, font=fp, fill=HELL)
+        y += len(b) * zh + 22
+    _fuss(d, "INPERNELL.DE  ·  DIREKTVERMITTLUNG")
+    img.convert("RGB").save(ziel, "JPEG", quality=92, optimize=True)
+    return ziel
+
+
+def _papierflieger(d, x, y, s, farbe):
+    d.polygon([(x, y + s * 0.45), (x + s, y), (x + s * 0.62, y + s)], fill=farbe)
+    d.polygon([(x + s * 0.38, y + s * 0.62), (x + s, y), (x + s * 0.45, y + s * 0.95)], fill=(*farbe[:3],))
+    d.line([(x + s * 0.38, y + s * 0.62), (x + s, y)], fill=NAVY, width=3)
+
+
+def _bewerbungsseite(job, kat, nr, gesamt, ziel):
+    F = FORMATE["bild"]
+    M, W, H = F["M"], F["W"], F["H"]
+    img, d, y = _folienrahmen(job, nr, gesamt, kat)
+    d.text((M - 3, y), "So bewirbst du dich", font=font("h800", 62), fill=WEISS)
+    y += 100
+    schritte = [
+        ("Link in der Bio antippen", "Dort findest du die komplette Stellenanzeige."),
+        ("Lebenslauf hochladen", "Ein Anschreiben ist nicht nötig." if job.get("ohne_anschreiben", True)
+         else "In wenigen Minuten erledigt."),
+        ("Oder per Direktnachricht", "Schreib uns „Interesse“ – wir melden uns bei dir."),
+    ]
+    kh = 118
+    img_rgba = img
+    for i, (kopf, text) in enumerate(schritte):
+        ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        od = ImageDraw.Draw(ov)
+        _glas(od, [M, y, W - M, y + kh], 24)
+        img_rgba = Image.alpha_composite(img_rgba, ov)
+        d = ImageDraw.Draw(img_rgba)
+        d.ellipse([M + 26, y + 30, M + 84, y + 88], fill=ORANGE)
+        d.text((M + 55, y + 59), str(i + 1), font=font("h800", 32), fill=KNOPFTEXT, anchor="mm")
+        d.text((M + 112, y + 26), kopf, font=font("h700", 34), fill=WEISS)
+        d.text((M + 112, y + 72), text, font=font("t400", 27), fill=HELL)
+        y += kh + 18
+    # Weiterleiten-Bitte
+    y += 24
+    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    ImageDraw.Draw(ov).rounded_rectangle([M, y, W - M, y + 132], radius=24, fill=(237, 109, 5, 38),
+                                         outline=(237, 109, 5, 200), width=2)
+    img_rgba = Image.alpha_composite(img_rgba, ov)
+    d = ImageDraw.Draw(img_rgba)
+    _papierflieger(d, M + 30, y + 38, 56, ORANGE)
+    d.text((M + 112, y + 28), "Kennst du jemanden, für den das passt?", font=font("t700", 31), fill=WEISS)
+    d.text((M + 112, y + 74), "Schick ihm den Beitrag weiter.", font=font("t400", 29), fill=HELL)
+    _fuss(d, "KEINE ZEITARBEIT  ·  FÜR DICH KOSTENLOS  ·  INPERNELL.DE", rechts_pfeil=False)
+    img_rgba.convert("RGB").save(ziel, "JPEG", quality=92, optimize=True)
+    return ziel
+
+
+def erzeuge_folgeseiten(job, ordner, basisname):
+    """Erzeugt die Karussell-Seiten 2–4 (Aufgaben, Anforderungen, Bewerbung); Seite 1 ist erzeuge_bild()."""
+    kat = job.get("kategorie") or kategorien.erkenne(job.get("titel"))
+    seiten = []
+    if len(job.get("aufgaben") or []) >= 2:
+        seiten.append(("Das erwartet dich", job["aufgaben"]))
+    if len(job.get("anforderungen") or []) >= 2:
+        seiten.append(("Das bringst du mit", job["anforderungen"]))
+    gesamt = len(seiten) + 2
+    pfade = []
+    for i, (ueberschrift, punkte) in enumerate(seiten, start=2):
+        pfade.append(_listenseite(job, kat, i, gesamt, ueberschrift, punkte,
+                                  os.path.join(ordner, f"{basisname}-{i}.jpg")))
+    pfade.append(_bewerbungsseite(job, kat, gesamt, gesamt, os.path.join(ordner, f"{basisname}-{gesamt}.jpg")))
+    return pfade

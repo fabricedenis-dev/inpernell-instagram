@@ -111,8 +111,9 @@ li:before{{content:"✓";position:absolute;left:2px;color:var(--orange);font-wei
   {f'<h2>{e(post.get("punkte_titel") or "Das erwartet dich")}</h2><ul>{punkte}</ul>' if punkte else ""}
   <a class="cta" href="{e(job_url)}">Jetzt bewerben →</a>
   <a class="alle" href="{ALLE_STELLEN}">Alle offenen Stellen ansehen</a>
-  <p class="hinweis">Direktvermittlung in Festanstellung – keine Zeitarbeit.<br>Für dich als Bewerber kostenlos.</p>
+  <p class="hinweis">{"Lebenslauf genügt – kein Anschreiben nötig.<br>" if post.get("ohne_anschreiben", True) else ""}Direktvermittlung in Festanstellung – keine Zeitarbeit.<br>Für dich als Bewerber kostenlos.</p>
   <div class="fuss"><a href="https://www.inpernell.de/">INPERNELL.DE</a> · PERSONALBERATUNG FÜR FACH- UND FÜHRUNGSKRÄFTE</div>
+  <div class="fuss"><a href="https://www.inpernell.de/impressum/">IMPRESSUM</a> · <a href="https://www.inpernell.de/datenschutz/">DATENSCHUTZ</a></div>
 </main>
 </body>
 </html>
