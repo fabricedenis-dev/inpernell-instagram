@@ -12,6 +12,7 @@ dazu REEL_ID = bestimmtes Reel aus der Warteschlange.
 import csv
 import json
 import os
+import shutil
 import sys
 import time
 import urllib.request
@@ -44,17 +45,39 @@ def protokoll_schreiben(zeile):
         w.writerows(zeilen)
 
 
+def _im_fenster(jetzt, stunde, minute):
+    """Ab 15 Minuten vor der Planzeit bis 4 Stunden danach (GitHub startet geplante Läufe oft verspätet)."""
+    m = jetzt.hour * 60 + jetzt.minute
+    return stunde * 60 + minute - 15 <= m <= stunde * 60 + minute + 240
+
+
 def faelliges_reel(heute):
+    """Normale Reels der Reihe nach (ohne feste Uhrzeit). Sonder-Reels mit "zeit" nur über sonder_reel()."""
     warteschlange = json.load(open(WARTESCHLANGE, encoding="utf-8"))
     erledigt = {z["reel_id"] for z in protokoll_lesen()}
     wunsch = os.environ.get("REEL_ID", "").strip()
     for r in warteschlange:
         if wunsch and r["id"] != wunsch:
             continue
-        if r["id"] in erledigt:
+        if r["id"] in erledigt or (r.get("zeit") and not wunsch):
             continue
         if wunsch or r.get("datum", "0000") <= heute:
             return r
+    return None
+
+
+def sonder_reel(jetzt):
+    """Sonder-Reel mit Datum + Uhrzeit ("zeit": "10:00"), nur wenn vom Inhaber freigegeben."""
+    heute = jetzt.strftime("%Y-%m-%d")
+    erledigt = {z["reel_id"] for z in protokoll_lesen()}
+    for r in json.load(open(WARTESCHLANGE, encoding="utf-8")):
+        if r.get("zeit") and r.get("datum") == heute and r["id"] not in erledigt:
+            stunde, minute = (int(x) for x in r["zeit"].split(":"))
+            if _im_fenster(jetzt, stunde, minute):
+                if not r.get("freigegeben"):
+                    print(f"::warning::Sonder-Reel {r['id']} ist fällig, aber noch nicht freigegeben – nichts veröffentlicht.")
+                    return None
+                return r
     return None
 
 
@@ -77,16 +100,18 @@ def main():
     heute = jetzt.strftime("%Y-%m-%d")
     probe = agent.wahr("DRY_RUN")
     plan = ZEITPLAN.get(jetzt.weekday())
-    if not agent.wahr("ERZWINGEN"):
+    sonder = None if os.environ.get("REEL_ID") else sonder_reel(jetzt)
+    if sonder:
+        print("Sonder-Reel mit fester Uhrzeit:", sonder["id"])
+    elif not agent.wahr("ERZWINGEN"):
         # Fenster ab 15 Minuten vor der Planzeit bis 4 Stunden danach (GitHub startet oft verspätet)
-        minute_jetzt = jetzt.hour * 60 + jetzt.minute
-        if not plan or not (plan[0] * 60 + plan[1] - 15 <= minute_jetzt <= plan[0] * 60 + plan[1] + 240):
+        if not plan or not _im_fenster(jetzt, *plan):
             print(f"Heute/jetzt ({jetzt:%a %H:%M}) ist kein Reel geplant. Ende.")
             return
-    if not probe and any(z["datum"] == heute for z in protokoll_lesen()) and not os.environ.get("REEL_ID"):
+    if not sonder and not probe and any(z["datum"] == heute for z in protokoll_lesen()) and not os.environ.get("REEL_ID"):
         print("Heute wurde bereits ein Reel veröffentlicht. Ende.")
         return
-    reel = faelliges_reel(heute)
+    reel = sonder or faelliges_reel(heute)
     if not reel:
         print("::warning::Die Reel-Warteschlange ist leer – bitte neue Reels in reels/warteschlange.json ergänzen.")
         return
@@ -96,7 +121,11 @@ def main():
     os.makedirs(ordner, exist_ok=True)
     video_rel = f"docs/reels/{reel['id']}.mp4"
     titel_rel = f"docs/reels/{reel['id']}.jpg"
-    reel_anim.aus_definition(reel, os.path.join(HIER, video_rel), titelbild=os.path.join(HIER, titel_rel))
+    if reel.get("fertig_video"):                       # fertig gebautes, vom Inhaber abgenommenes Video
+        shutil.copyfile(os.path.join(HIER, reel["fertig_video"]), os.path.join(HIER, video_rel))
+        shutil.copyfile(os.path.join(HIER, reel["fertig_titelbild"]), os.path.join(HIER, titel_rel))
+    else:
+        reel_anim.aus_definition(reel, os.path.join(HIER, video_rel), titelbild=os.path.join(HIER, titel_rel))
     print(f"Video erzeugt: {os.path.getsize(os.path.join(HIER, video_rel)) / 1e6:.1f} MB")
     if probe:
         print("PROBELAUF: Video liegt in", video_rel, "– es wurde NICHTS veröffentlicht.")

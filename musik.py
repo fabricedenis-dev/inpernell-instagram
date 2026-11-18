@@ -116,3 +116,101 @@ def erzeuge_track(sekunden, ziel_wav, bpm=118, variante=0, seed=3):
         w.setframerate(SR)
         w.writeframes(pcm.tobytes())
     return ziel_wav
+
+
+# ---------------------------------------------------------------- Synthwave (80er-/Miami-Stimmung, eigene Komposition)
+
+def _saege(f, n, verstimmt=(0.0,)):
+    t = np.arange(n) / SR
+    s = np.zeros(n)
+    for v in verstimmt:
+        ff = f * 2 ** (v / 12)
+        s += 2 * ((t * ff) % 1.0) - 1
+    return s / len(verstimmt)
+
+
+def _tiefpass(x, grenze):
+    from scipy.signal import butter, lfilter
+    b, a = butter(2, grenze / (SR / 2))
+    return lfilter(b, a, x)
+
+
+def erzeuge_synthwave(sekunden, ziel_wav, bpm=112, seed=7):
+    """Synthwave: Gated-Reverb-Snare, pulsierender Achtel-Bass, breite Sägezahn-Flächen, Arpeggio, Lead-Hook.
+    Akkorde Fis-Moll – D – A – E (eigene Folge und Melodie, keine Anlehnung an bestehende Stücke)."""
+    rng = np.random.default_rng(seed)
+    beat = 60.0 / bpm
+    n_ges = int((sekunden + 1) * SR)
+    spuren = {k: np.zeros(n_ges) for k in ("drums", "bass", "pad", "arp", "lead")}
+
+    def setze(spur, sig, start, gain=1.0):
+        i = int(start * SR)
+        if i >= n_ges or i < 0:
+            return
+        sig = sig[: n_ges - i]
+        spuren[spur][i:i + len(sig)] += sig * gain
+
+    folge = [(54, "m"), (50, "M"), (57, "M"), (52, "M")]           # F#m – D – A – E
+    melodie = [  # (Schlag im 2-Takt-Muster, Halbton über Grundton der Tonart F#, Länge in Schlägen)
+        (0, 12, 1.5), (1.5, 16, 0.5), (2, 19, 1), (3, 16, 1), (4, 14, 1.5), (5.5, 12, 0.5), (6, 9, 2)]
+    takt = 4 * beat
+    n_takte = int(np.ceil(sekunden / takt)) + 1
+    for tk in range(n_takte):
+        t0 = tk * takt
+        grund, art = folge[tk % len(folge)]
+        terz = 3 if art == "m" else 4
+        noten = [grund, grund + terz, grund + 7]
+        # Fläche: breite, verstimmte Sägezähne, weich gefiltert
+        nf = int(takt * SR)
+        pad = sum(_saege(_hz(m), nf, (-0.1, 0.0, 0.1)) for m in noten + [grund + 12]) / 4
+        env = np.minimum(1, np.arange(nf) / (0.25 * SR)) * np.minimum(1, (nf - np.arange(nf)) / (0.1 * SR))
+        setze("pad", pad * env, t0, 0.35)
+        intro = tk == 0
+        for b in range(4):
+            tb = t0 + b * beat
+            if not intro:
+                setze("drums", _kick(int(0.45 * SR)), tb, 1.0)
+                if b in (1, 3):                                   # Gated-Reverb-Snare (typisch 80er)
+                    n = int(0.32 * SR); t = np.arange(n) / SR
+                    rausch = rng.standard_normal(n) * np.where(t < 0.22, 1.0, np.exp(-(t - 0.22) * 80))
+                    koerper = np.sin(2 * np.pi * 190 * t) * np.exp(-t * 30)
+                    setze("drums", (rausch * 0.5 + koerper * 0.6) * 0.55, tb)
+            for h in range(4):                                    # Sechzehntel-Hats
+                if not intro or h % 2 == 1:
+                    setze("drums", _hat(int(0.04 * SR), rng), tb + h * beat / 4, 0.7 if h % 2 else 0.4)
+            for a8 in range(2):                                   # pulsierender Achtel-Bass (Oktave)
+                f = _hz(grund - 24 + (12 if a8 else 0))
+                n = int(beat / 2 * 0.9 * SR)
+                setze("bass", _saege(f, n, (-0.05, 0.05)) * np.exp(-np.arange(n) / SR * 6), tb + a8 * beat / 2, 0.5)
+            for s16 in range(4):                                  # Arpeggio
+                m = noten[(b * 4 + s16) % 3] + 12 + (12 if (b * 4 + s16) % 6 == 5 else 0)
+                n = int(beat / 4 * 0.8 * SR)
+                setze("arp", _saege(_hz(m), n) * np.exp(-np.arange(n) / SR * 18), tb + s16 * beat / 4, 0.22)
+        if tk >= 2:                                               # Lead-Melodie ab Takt 3
+            for s, iv, lng in melodie:
+                if (tk % 2) * 4 <= s < (tk % 2) * 4 + 4:
+                    ts = t0 + (s - (tk % 2) * 4) * beat
+                    n = int(lng * beat * SR); t = np.arange(n) / SR
+                    vib = np.sin(2 * np.pi * 5.5 * t) * 0.15 * np.minimum(1, t / 0.3)
+                    f = _hz(54 + iv) * 2 ** (vib / 12)
+                    phase = np.cumsum(f) / SR
+                    lead = (2 * (phase % 1.0) - 1) * 0.6 + np.sign(np.sin(2 * np.pi * phase)) * 0.4
+                    env = np.minimum(1, t / 0.02) * np.minimum(1, (n / SR - t) / 0.08)
+                    setze("lead", lead * env, ts, 0.28)
+
+    mix = (spuren["drums"] + _tiefpass(spuren["bass"], 900) + _tiefpass(spuren["pad"], 2200)
+           + _tiefpass(spuren["arp"], 3500) + _tiefpass(spuren["lead"], 4200))
+    # einfacher Hall/Echo (punktierte Achtel) für die 80er-Weite
+    echo = int(beat * 0.75 * SR)
+    hall = np.zeros_like(mix); hall[echo:] = mix[:-echo] * 0.25
+    mix = mix + _tiefpass(hall, 3000)
+    n = int(sekunden * SR); mix = mix[:n]
+    aus = int(1.8 * SR); mix[-aus:] *= np.linspace(1, 0, aus)
+    mix = np.tanh(mix / max(1e-6, np.max(np.abs(mix))) * 1.6) / np.tanh(1.6) * 0.9
+    links = mix
+    rechts = np.concatenate([np.zeros(int(0.015 * SR)), mix])[:n]
+    stereo = np.stack([links, 0.8 * rechts + 0.2 * links], axis=1)
+    with wave.open(ziel_wav, "wb") as w:
+        w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
+        w.writeframes((stereo * 32767).astype(np.int16).tobytes())
+    return ziel_wav
