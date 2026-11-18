@@ -62,3 +62,34 @@ def vertonen(texte, ziel_wav):
                 stimme.synthesize_wav(text, w)
             roh.append(pfad)
         return zusammensetzen(roh, ziel_wav)
+
+
+# ---------------------------------------------------------------- Azure-Neuralstimmen (natürlicher Klang)
+
+AZURE_REGION = os.environ.get("AZURE_SPEECH_REGION", "germanywestcentral")
+AZURE_STIMME = os.environ.get("AZURE_SPEECH_VOICE", "de-DE-FlorianMultilingualNeural")
+
+
+def _azure_wav(text, ziel, stimme, tempo="-3%"):
+    """Ein Text als WAV über Azure Text-to-Speech (Schlüssel aus AZURE_SPEECH_KEY)."""
+    from xml.sax.saxutils import escape
+    ssml = (f'<speak version="1.0" xml:lang="de-DE"><voice name="{stimme}">'
+            f'<prosody rate="{tempo}">{escape(text)}</prosody></voice></speak>')
+    req = urllib.request.Request(
+        f"https://{AZURE_REGION}.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),
+        headers={"Ocp-Apim-Subscription-Key": os.environ.get("AZURE_SPEECH_KEY", "proxy-injected"),
+                 "Content-Type": "application/ssml+xml", "User-Agent": "inpernell-reels",
+                 "X-Microsoft-OutputFormat": "riff-48khz-16bit-mono-pcm"})
+    with urllib.request.urlopen(req, timeout=60) as r, open(ziel, "wb") as f:
+        f.write(r.read())
+
+
+def vertonen_azure(texte, ziel_wav, stimme=None):
+    """Spricht jeden Text mit einer Azure-Neuralstimme und setzt die Tonspur zusammen."""
+    with tempfile.TemporaryDirectory() as tmp:
+        roh = []
+        for i, text in enumerate(texte):
+            pfad = os.path.join(tmp, f"{i}.wav")
+            _azure_wav(text, pfad, stimme or AZURE_STIMME)
+            roh.append(pfad)
+        return zusammensetzen(roh, ziel_wav)
