@@ -78,7 +78,9 @@ def main():
     probe = agent.wahr("DRY_RUN")
     plan = ZEITPLAN.get(jetzt.weekday())
     if not agent.wahr("ERZWINGEN"):
-        if not plan or jetzt.hour != plan[0]:
+        # Fenster ab 15 Minuten vor der Planzeit bis 4 Stunden danach (GitHub startet oft verspätet)
+        minute_jetzt = jetzt.hour * 60 + jetzt.minute
+        if not plan or not (plan[0] * 60 + plan[1] - 15 <= minute_jetzt <= plan[0] * 60 + plan[1] + 240):
             print(f"Heute/jetzt ({jetzt:%a %H:%M}) ist kein Reel geplant. Ende.")
             return
     if not probe and any(z["datum"] == heute for z in protokoll_lesen()) and not os.environ.get("REEL_ID"):

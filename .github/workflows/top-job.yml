@@ -6,6 +6,8 @@ on:
     # (16:50 UTC) jeweils 18:50 Uhr in Deutschland ist. Das Programm prüft die Uhrzeit selbst.
     - cron: "50 16 * * *"
     - cron: "50 17 * * *"
+    # Nachhol-Läufe, falls GitHub die Läufe oben stark verspätet oder auslässt (postet nur, wenn noch nichts da ist)
+    - cron: "20 19,20 * * *"
   workflow_dispatch:
     inputs:
       probelauf:

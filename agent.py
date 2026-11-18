@@ -563,11 +563,15 @@ def main():
     probe = wahr("DRY_RUN")
 
     stunde = poststunde(jetzt)
-    if not wahr("ERZWINGEN") and jetzt.hour != stunde:
+    # Zeitfenster 18:45–22:59 statt nur der Stunde 18: GitHub startet geplante Läufe oft 30–60 Minuten
+    # verspätet. Ein Nachhol-Lauf am Abend postet dann noch; doppelt wird nicht gepostet (Protokoll-Prüfung).
+    minute_jetzt = jetzt.hour * 60 + jetzt.minute
+    im_fenster = stunde is not None and stunde * 60 + 45 <= minute_jetzt <= 22 * 60 + 59
+    if not wahr("ERZWINGEN") and not im_fenster:
         if stunde is None:
             print("Heute (Samstag) ist laut Zeitplan Pause. Ende.")
         else:
-            print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – heute wird in der Stunde ab {stunde} Uhr gepostet. Ende.")
+            print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – gepostet wird zwischen {stunde}:45 und 22:59 Uhr. Ende.")
         return
     protokoll = protokoll_lesen()
     mit_story = os.environ.get("STORY", "true").strip().lower() not in ("0", "false", "nein", "no")

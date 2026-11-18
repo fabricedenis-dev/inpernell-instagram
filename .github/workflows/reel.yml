@@ -6,6 +6,9 @@ on:
     # deshalb je zwei Zeiten für Winter- und Sommerzeit; reel_post.py prüft die Uhrzeit selbst.
     - cron: "30 5,6 * * 2,4"
     - cron: "0 15,16 * * 0"
+    # Nachhol-Läufe bei Verspätung von GitHub (veröffentlicht nur, wenn heute noch kein Reel erschienen ist)
+    - cron: "30 8,9 * * 2,4"
+    - cron: "0 18,19 * * 0"
   workflow_dispatch:
     inputs:
       probelauf:
