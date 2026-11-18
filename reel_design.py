@@ -27,7 +27,13 @@ GRUEN = (52, 199, 123)
 
 # ---------------------------------------------------------------- Grundbausteine
 
-def korn(img, staerke=8, seed=1):
+KORN = 8          # Filmkorn-Stärke; im Video kleiner, weil Rauschen beim Zoomen viel Speicher kostet
+
+
+def korn(img, staerke=None, seed=1):
+    staerke = KORN if staerke is None else staerke
+    if staerke <= 0:
+        return img.convert("RGBA")
     rng = np.random.default_rng(seed)
     n = rng.normal(0, staerke, (img.height, img.width, 1)).astype(np.int16)
     a = np.asarray(img.convert("RGB")).astype(np.int16) + n
@@ -196,7 +202,13 @@ def folie_hook(kat, rubrik, zeilen, markiert, unterzeile, szene=0, anzahl=5, bis
     img = _start(kat, 1250, szene, anzahl, mit_kopf, basis=basis)
     if g():
         sticker(img, rubrik.upper(), (M - 6, 300), winkel=-4)
-    f = font("h800", 124)
+    # Schrift so groß wie möglich, aber jede Zeile (inkl. Marker-Rand) muss in die Breite passen
+    mess = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+    groesse = 124
+    while groesse > 64 and any(mess.textlength(z, font=font("h800", groesse)) + groesse * 0.3 > W - M - R
+                               for z in zeilen):
+        groesse -= 4
+    f = font("h800", groesse)
     y = 600
     for zeile in zeilen:                         # jede Zeile ein Baustein (Wort-für-Wort-Gefühl)
         if g():
@@ -211,7 +223,8 @@ def folie_hook(kat, rubrik, zeilen, markiert, unterzeile, szene=0, anzahl=5, bis
     return img
 
 
-def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mit_kopf=True, nur=None, basis="grund"):
+def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mit_kopf=True, nur=None, basis="grund",
+                    label_schlecht="FEHLER", label_gut="BESSER", durchstreichen=True):
     g = Stufe(bis, nur)
     img = _start(kat, 700, szene, anzahl, mit_kopf, basis=basis)
     breite = W - M - R
@@ -227,10 +240,10 @@ def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mi
         glas(img, [M, y, W - R, y + 270], fuell=(226, 75, 74, 38), rand=(226, 75, 74, 160))
         d = ImageDraw.Draw(img)
         icon_x(d, M + 70, y + 74, 34)
-        gesperrt(d, (M + 126, y + 58), "FEHLER", font("h800", 28), (255, 200, 200), 4)
+        gesperrt(d, (M + 126, y + 58), label_schlecht.upper(), font("h800", 28), (255, 200, 200), 4)
         for i, z in enumerate(zz):
             d.text((M + 40, y + 124 + i * 62), z, font=ff, fill=(214, 218, 228))
-    if g():                                      # Durchstreichen
+    if g() and durchstreichen:                   # Durchstreichen
         d = ImageDraw.Draw(img)
         for i, z in enumerate(zz):
             yy = y + 124 + i * 62 + 32
@@ -243,7 +256,7 @@ def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mi
         glas(img, [M, y, W - R, y + 410], fuell=(52, 199, 123, 34), rand=(52, 199, 123, 170))
         d = ImageDraw.Draw(img)
         icon_haken(d, M + 70, y + 74, 34)
-        gesperrt(d, (M + 126, y + 58), "BESSER", font("h800", 28), (190, 245, 215), 4)
+        gesperrt(d, (M + 126, y + 58), label_gut.upper(), font("h800", 28), (190, 245, 215), 4)
         for i, z in enumerate(zb):
             d.text((M + 40, y + 124 + i * 72), z, font=fb, fill=WEISS)
     if g():
@@ -261,29 +274,42 @@ def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=
     d = ImageDraw.Draw(img)
     if g():
         sticker(img, rubrik.upper(), (M - 6, 290), winkel=3, fuell=WEISS, schrift=NAVY)
-    fz = font("h800", 300)
+    groesse = 300
+    fe = font("h800", 64)
+    while groesse > 140 and d.textlength(zahl, font=font("h800", groesse)) > W - M - R:
+        groesse -= 10
+    fz = font("h800", groesse)
+    zw = d.textlength(zahl, font=fz)
+    daneben = zw + 20 + d.textlength(einheit, font=fe) <= W - M - R
+    y_zahl = 370 + (300 - groesse) // 2
     if g():
-        ImageDraw.Draw(img).text((M - 12, 370), zahl, font=fz, fill=ORANGE)
-    y = 720
+        ImageDraw.Draw(img).text((M - 12, y_zahl), zahl, font=fz, fill=ORANGE)
+    y = 720 if daneben else 760
     if g():
         d = ImageDraw.Draw(img)
-        d.text((M + d.textlength(zahl, font=fz) + 20, 570), einheit, font=font("h800", 64), fill=WEISS)
+        if daneben:
+            d.text((M + zw + 20, y_zahl + int(groesse * 0.67)), einheit, font=fe, fill=WEISS)
+        else:
+            d.text((M, y_zahl + int(groesse * 1.0)), einheit, font=fe, fill=WEISS)
         for z in wrap(d, label, font("h800", 56), W - M - R):
             d.text((M, y), z, font=font("h800", 56), fill=WEISS)
             y += 64
     else:
         y += 64 * len(wrap(d, label, font("h800", 56), W - M - R))
     y += 40
-    maxwert = max(b[1] for b in balken)
-    breite = W - M - R - 220
-    for text, wert, hervor in balken:
+    maxwert = max([b[1] for b in balken] or [1])
+    breite = W - M - R - 250
+    for eintrag in balken:
+        text, wert, hervor = eintrag[:3]
+        anzeige = eintrag[3] if len(eintrag) > 3 else (f"{wert:,.0f}".replace(",", ".") if wert >= 1000
+                                                        else f"{wert:g}".replace(".", ","))
         if g():
             d = ImageDraw.Draw(img)
             d.text((M, y), text, font=font("t700", 34), fill=WEISS if hervor else HELL)
             lang = max(14, int(breite * wert / maxwert))
             d.rounded_rectangle([M, y + 48, M + breite, y + 78], radius=15, fill=(40, 58, 92))
             d.rounded_rectangle([M, y + 48, M + lang, y + 78], radius=15, fill=ORANGE if hervor else (196, 205, 222))
-            d.text((M + breite + 24, y + 40), f"{wert:g}".replace(".", ","), font=font("h800", 40), fill=WEISS)
+            d.text((M + breite + 24, y + 40), anzeige, font=font("h800", 40), fill=WEISS)
         y += 118
     if g():
         ImageDraw.Draw(img).text((M, y + 10), quelle, font=font("t400", 26), fill=PFIRSICH)

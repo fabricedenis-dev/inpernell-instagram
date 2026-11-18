@@ -119,6 +119,20 @@ Recruitee-Texte), bereitet eine tägliche Claude-Aufgabe um 16:07 Uhr die Vorgab
    ansehen – nichts darf überlaufen.
 6. Nur `overrides/<heute>.json` schreiben, per Pull Request nach main bringen. Nichts veröffentlichen.
 
+## Reels (3 pro Woche)
+
+`reel_post.py` (Workflow „Reel der Woche“) veröffentlicht **Dienstag und Donnerstag um 07:30 Uhr und Sonntag um
+17:00 Uhr** das nächste fällige Reel aus `reels/warteschlange.json`:
+
+- Jedes Reel ist dort als Folge von Szenen beschrieben (`hook`, `vergleich` für Fehler/Besser oder Mythos/Fakt,
+  `chat` für Formulierungshilfen, `zahl` mit Balkenvergleich, `ende`), dazu Bildtext (`caption`).
+- `reel_anim.py` baut daraus ein Video (1080 × 1920) mit animierten Bausteinen im Takt; `musik.py` erzeugt die
+  Hintergrundmusik selbst (kein Lizenzrisiko).
+- Das Video liegt kurz unter `docs/reels/` und ist so über https://topjob.inpernell.de/reels/… erreichbar;
+  nach dem Veröffentlichen wird es wieder entfernt. Protokoll: `data/reels.csv`.
+- Fakten in Reels nur aus geprüften Quellen (siehe `research_notes/Reels Strategie für Recruiting/`).
+- Handstart: Actions → „Reel der Woche“ → Run workflow (mit/ohne Probelauf, optional bestimmte Reel-ID).
+
 ## Story
 
 Nach jedem Beitrag wird zusätzlich eine **Story** (1080 × 1920) gepostet: gleiches Design wie der Beitrag,

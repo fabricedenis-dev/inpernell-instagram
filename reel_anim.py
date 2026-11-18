@@ -15,6 +15,7 @@ from bild import ORANGE
 from musik import erzeuge_track
 
 W, H, FPS = rd.W, rd.H, 30
+rd.KORN = 3       # im Video nur ganz leichtes Korn
 
 
 def _ease(p):
@@ -105,7 +106,7 @@ def erzeuge_reel(szenen, ziel, bpm=118, variante=0, titelbild=None):
     erzeuge_track(gesamt, ton, bpm=bpm, variante=variante)
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
            "-r", str(FPS), "-i", "-", "-i", ton, "-map", "0:v", "-map", "1:a", "-shortest",
-           "-c:v", "libx264", "-preset", "slow", "-crf", "19", "-g", "60", "-maxrate", "9M", "-bufsize", "18M",
+           "-c:v", "libx264", "-preset", "slow", "-crf", "21", "-g", "60", "-maxrate", "5M", "-bufsize", "10M",
            "-profile:v", "high", "-tune", "film",
            "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "128k", "-ar", "48000", "-movflags", "+faststart", ziel]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
@@ -167,3 +168,48 @@ def gehalt_beispiel(ziel, titelbild=None):
                                   zusatz="Und schick's an jemanden, der bald verhandelt."),
                    "effekte": [("pop", 0), ("punch", 1), ("hoch", 2.5), ("hoch", 4)]})
     return erzeuge_reel(szenen, ziel, variante=0, titelbild=titelbild)
+
+
+# ---------------------------------------------------------------- Reels aus einer Definition (Warteschlange)
+
+def _szene(s, kat):
+    """Übersetzt eine Szene aus der Warteschlange (JSON) in Folie, Länge (Takte) und Effekte im Takt."""
+    typ = s["typ"]
+    if typ == "hook":
+        n = len(s["zeilen"])
+        zeilen_eff = [("punch", -0.4 + 0.5 * i) for i in range(n)]
+        return {"fn": rd.folie_hook, "takte": 2,
+                "kwargs": dict(kat=kat, rubrik=s["rubrik"], zeilen=s["zeilen"], markiert=set(s.get("markiert", [])),
+                               unterzeile=s["unterzeile"]),
+                "effekte": [("pop", 0.5 * n)] + zeilen_eff + [("hoch", 0.5 * n + 1), ("hoch", 0.5 * n + 2.5)]}
+    if typ == "vergleich":
+        return {"fn": rd.folie_vergleich, "takte": 3,
+                "kwargs": dict(kat=kat, nr=s["nr"], fehler=s["schlecht"], besser=s["gut"], detail=s["detail"],
+                               label_schlecht=s.get("label_schlecht", "FEHLER"),
+                               label_gut=s.get("label_gut", "BESSER"),
+                               durchstreichen=s.get("durchstreichen", True)),
+                "effekte": [("punch", 0), ("links", 1), ("wisch", 3), ("hoch", 5), ("hoch", 7)]}
+    if typ == "chat":
+        return {"fn": rd.folie_formulierung, "takte": 3,
+                "kwargs": dict(kat=kat, ueberschrift=s["ueberschrift"], frage=s["frage"], antwort=s["antwort"],
+                               tipp=s["tipp"]),
+                "effekte": [("pop", 0), ("hoch", 1), ("links", 2.5), ("rechts", 5), ("pop", 8)]}
+    if typ == "zahl":
+        balken = [tuple(b) for b in s.get("balken", [])]
+        return {"fn": rd.folie_zahl, "takte": 3,
+                "kwargs": dict(kat=kat, rubrik=s["rubrik"], zahl=s["zahl"], einheit=s.get("einheit", ""),
+                               label=s["label"], balken=balken, quelle=s.get("quelle", "")),
+                "effekte": [("pop", 0), ("punch", 0.5), ("hoch", 1.5)]
+                + [("wisch", 2.5 + 0.75 * i) for i in range(len(balken))] + [("hoch", 3 + 0.75 * len(balken))]}
+    if typ == "ende":
+        return {"fn": rd.folie_ende, "takte": 2,
+                "kwargs": dict(kat=kat, titel_zeilen=s["zeilen"], markiert=set(s.get("markiert", [])),
+                               zusatz=s["zusatz"]),
+                "effekte": [("pop", 0), ("punch", 1), ("hoch", 2.5), ("hoch", 4)]}
+    raise ValueError(f"Unbekannter Szenentyp: {typ}")
+
+
+def aus_definition(definition, ziel, titelbild=None):
+    kat = definition.get("kategorie", "personal")
+    szenen = [_szene(s, kat) for s in definition["szenen"]]
+    return erzeuge_reel(szenen, ziel, variante=definition.get("variante", 0), titelbild=titelbild)

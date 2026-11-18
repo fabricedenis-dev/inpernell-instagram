@@ -1,0 +1,410 @@
+[
+  {
+    "id": "2026-11-18-gehalts-check-1",
+    "datum": "2026-11-18",
+    "kategorie": "personal",
+    "variante": 0,
+    "szenen": [
+      {
+        "typ": "hook",
+        "rubrik": "Gehalts-Check #1",
+        "zeilen": [
+          "3 Fehler,",
+          "die dich",
+          "Geld kosten"
+        ],
+        "markiert": [
+          "geld",
+          "kosten"
+        ],
+        "unterzeile": "in der Gehaltsverhandlung"
+      },
+      {
+        "typ": "vergleich",
+        "nr": 1,
+        "schlecht": "Ohne eigene Zahl ins Gespräch",
+        "gut": "Marktgehalt vorher checken",
+        "detail": "Zum Beispiel im Entgeltatlas der Arbeitsagentur."
+      },
+      {
+        "typ": "vergleich",
+        "nr": 2,
+        "schlecht": "Nur übers Gehalt reden",
+        "gut": "Das ganze Paket verhandeln",
+        "detail": "Homeoffice, Weiterbildung und Urlaubstage zählen auch."
+      },
+      {
+        "typ": "vergleich",
+        "nr": 3,
+        "schlecht": "Sofort zusagen",
+        "gut": "Einen Tag Bedenkzeit nehmen",
+        "detail": "Das ist normal und wirkt professionell."
+      },
+      {
+        "typ": "zahl",
+        "rubrik": "Gut zu wissen",
+        "zahl": "4.546 €",
+        "einheit": "brutto im Monat",
+        "label": "verdienen Vollzeitkräfte in Baden-Württemberg im Mittel",
+        "balken": [
+          [
+            "Baden-Württemberg",
+            4546,
+            true,
+            "4.546 €"
+          ],
+          [
+            "Deutschland",
+            4217,
+            false,
+            "4.217 €"
+          ]
+        ],
+        "quelle": "Quelle: Bundesagentur für Arbeit, Median 2025, veröffentlicht 20.07.2026"
+      },
+      {
+        "typ": "chat",
+        "ueberschrift": "Und so nennst du deine Zahl",
+        "frage": "Was stellen Sie sich beim Gehalt vor?",
+        "antwort": "Mit meiner Erfahrung sehe ich mich bei 62.000 bis 66.000 Euro im Jahr.",
+        "tipp": "Spanne nennen, Untergrenze realistisch"
+      },
+      {
+        "typ": "ende",
+        "zeilen": [
+          "Speicher",
+          "dir das ab"
+        ],
+        "markiert": [
+          "speicher"
+        ],
+        "zusatz": "Und schick's an jemanden, der bald verhandelt."
+      }
+    ],
+    "caption": "Gehaltsverhandlung: 3 Fehler, die dich Geld kosten – und wie du's besser machst 💶\n\nGehalts-Check Nr. 1 von Inpernell, deiner Personalberatung im Schwarzwald.\n\n❌ Ohne eigene Zahl ins Gespräch → ✅ Marktgehalt vorher checken (z. B. Entgeltatlas der Arbeitsagentur)\n❌ Nur übers Gehalt reden → ✅ Das ganze Paket verhandeln\n❌ Sofort zusagen → ✅ Einen Tag Bedenkzeit nehmen\n\nGut zu wissen: Vollzeitkräfte in Baden-Württemberg verdienen im Mittel 4.546 € brutto im Monat, bundesweit sind es 4.217 € (Bundesagentur für Arbeit, Median 2025).\n\nWelchen Fehler hast du selbst schon mal gemacht? 👇\n\nSpeicher dir das ab und schick's an jemanden, der bald verhandelt. Aktuelle Top Jobs aus der Region: Link in der Bio.\n\n#Gehaltsverhandlung #Karrieretipps #JobsSchwarzwald #Bewerbungstipps #Inpernell"
+  },
+  {
+    "id": "2026-11-19-jobmarkt-region-1",
+    "datum": "2026-11-19",
+    "kategorie": "produktion",
+    "variante": 1,
+    "szenen": [
+      {
+        "typ": "hook",
+        "rubrik": "Jobmarkt Region #1",
+        "zeilen": [
+          "Hier haben",
+          "Fachkräfte",
+          "die besten Karten"
+        ],
+        "markiert": [
+          "besten",
+          "karten"
+        ],
+        "unterzeile": "Zahlen aus Schwarzwald, Baar und Breisgau"
+      },
+      {
+        "typ": "zahl",
+        "rubrik": "Arbeitslosenquote",
+        "zahl": "3,3 %",
+        "einheit": "im Kreis Rottweil",
+        "label": "der niedrigste Wert der Region im Oktober 2026",
+        "balken": [
+          [
+            "Kreis Rottweil",
+            3.3,
+            true,
+            "3,3 %"
+          ],
+          [
+            "Schwarzwald-Baar-Kreis",
+            5.0,
+            false,
+            "5,0 %"
+          ],
+          [
+            "Kreis Tuttlingen",
+            5.5,
+            false,
+            "5,5 %"
+          ]
+        ],
+        "quelle": "Quelle: Agentur für Arbeit Rottweil–Villingen-Schwenningen, Oktober 2026"
+      },
+      {
+        "typ": "zahl",
+        "rubrik": "Region Freiburg",
+        "zahl": "1,5",
+        "einheit": "pro Stelle",
+        "label": "Arbeitslose kommen in Produktion und Technik auf eine offene Stelle",
+        "balken": [
+          [
+            "Produktion und Technik",
+            1.5,
+            true
+          ],
+          [
+            "IT",
+            7.9,
+            false
+          ],
+          [
+            "Büro und Verwaltung",
+            12.0,
+            false,
+            "12,0"
+          ]
+        ],
+        "quelle": "Quelle: Agentur für Arbeit Freiburg, Arbeitsmarktreport Oktober 2026"
+      },
+      {
+        "typ": "ende",
+        "zeilen": [
+          "Folg uns",
+          "für mehr Fakten"
+        ],
+        "markiert": [
+          "folg"
+        ],
+        "zusatz": "Und schick's an jemanden, der gerade wechseln will."
+      }
+    ],
+    "caption": "Jobmarkt Region: Wo Fachkräfte gerade die besten Karten haben 📍\n\nIm Kreis Rottweil lag die Arbeitslosenquote im Oktober 2026 bei 3,3 %, im Schwarzwald-Baar-Kreis bei 5,0 % und im Kreis Tuttlingen bei 5,5 % (Agentur für Arbeit Rottweil–Villingen-Schwenningen).\n\nIn der Region Freiburg kommen in Produktion und Technik nur 1,5 Arbeitslose auf eine offene Stelle – im Büro und in der Verwaltung sind es 12 (Agentur für Arbeit Freiburg, Oktober 2026).\n\nHeißt: Wer in Produktion und Technik Erfahrung mitbringt, kann sich seinen nächsten Job gut aussuchen. 💪\n\nIn welcher Branche arbeitest du? 👇\n\nTop Jobs aus der Region, Direktvermittlung ohne Zeitarbeit: Link in der Bio.\n\n#JobsSchwarzwald #Arbeitsmarkt #Fachkräfte #SchwarzwaldBaar #Inpernell"
+  },
+  {
+    "id": "2026-11-22-mythos-arbeitsrecht-1",
+    "datum": "2026-11-22",
+    "kategorie": "personal",
+    "variante": 2,
+    "szenen": [
+      {
+        "typ": "hook",
+        "rubrik": "Mythos-Check #1",
+        "zeilen": [
+          "3 Job-Mythen,",
+          "die fast jeder",
+          "glaubt"
+        ],
+        "markiert": [
+          "glaubt"
+        ],
+        "unterzeile": "und was wirklich gilt"
+      },
+      {
+        "typ": "vergleich",
+        "nr": 1,
+        "label_schlecht": "Mythos",
+        "label_gut": "Fakt",
+        "schlecht": "Im Arbeitszeugnis steckt ein Geheimcode",
+        "gut": "Versteckte Botschaften sind verboten",
+        "detail": "§ 109 Gewerbeordnung: Das Zeugnis muss klar und verständlich sein."
+      },
+      {
+        "typ": "vergleich",
+        "nr": 2,
+        "label_schlecht": "Mythos",
+        "label_gut": "Fakt",
+        "schlecht": "In der Probezeit kannst du sofort gehen",
+        "gut": "Es gilt eine Frist von 2 Wochen",
+        "detail": "§ 622 BGB, wenn im Vertrag nichts anderes steht."
+      },
+      {
+        "typ": "vergleich",
+        "nr": 3,
+        "label_schlecht": "Mythos",
+        "label_gut": "Fakt",
+        "schlecht": "Kündigungsschutz gilt ab Tag 1",
+        "gut": "Erst nach 6 Monaten",
+        "detail": "Und nur in Betrieben mit mehr als 10 Mitarbeitenden (§§ 1, 23 KSchG)."
+      },
+      {
+        "typ": "ende",
+        "zeilen": [
+          "Speicher",
+          "dir das ab"
+        ],
+        "markiert": [
+          "speicher"
+        ],
+        "zusatz": "Und schick's an jemanden, der gerade neu anfängt."
+      }
+    ],
+    "caption": "3 Job-Mythen, die fast jeder glaubt – und was wirklich gilt ⚖️\n\nMythos-Check Nr. 1 von Inpernell.\n\n❌ Im Arbeitszeugnis steckt ein Geheimcode → ✅ Versteckte Botschaften sind verboten. Das Zeugnis muss klar und verständlich sein (§ 109 Gewerbeordnung).\n❌ In der Probezeit kannst du sofort gehen → ✅ Es gilt eine Kündigungsfrist von 2 Wochen (§ 622 BGB), wenn im Vertrag nichts anderes steht.\n❌ Kündigungsschutz gilt ab Tag 1 → ✅ Erst nach 6 Monaten und in Betrieben mit mehr als 10 Mitarbeitenden (§§ 1, 23 KSchG).\n\nKeine Rechtsberatung – im Einzelfall zählt dein Vertrag.\n\nWelchen Mythos hast du bisher geglaubt? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Arbeitsrecht #Karrieretipps #JobsSchwarzwald #Probezeit #Inpernell"
+  },
+  {
+    "id": "2026-11-24-zeitarbeit-direktvermittlung",
+    "datum": "2026-11-24",
+    "kategorie": "projektleitung",
+    "variante": 0,
+    "szenen": [
+      {
+        "typ": "hook",
+        "rubrik": "Kurz erklärt",
+        "zeilen": [
+          "Zeitarbeit oder",
+          "Direkt-",
+          "vermittlung?"
+        ],
+        "markiert": [
+          "direkt-",
+          "vermittlung?"
+        ],
+        "unterzeile": "Der Unterschied in 30 Sekunden"
+      },
+      {
+        "typ": "vergleich",
+        "nr": 1,
+        "label_schlecht": "Zeitarbeit",
+        "label_gut": "Direktvermittlung",
+        "durchstreichen": false,
+        "schlecht": "Angestellt beim Personaldienstleister",
+        "gut": "Direkt beim Arbeitgeber angestellt",
+        "detail": "Dein Vertrag läuft vom ersten Tag an mit dem Unternehmen."
+      },
+      {
+        "typ": "vergleich",
+        "nr": 2,
+        "label_schlecht": "Zeitarbeit",
+        "label_gut": "Direktvermittlung",
+        "durchstreichen": false,
+        "schlecht": "Beim selben Kunden höchstens 18 Monate",
+        "gut": "Fester Platz im Team",
+        "detail": "Höchstüberlassungsdauer nach dem Arbeitnehmerüberlassungsgesetz."
+      },
+      {
+        "typ": "vergleich",
+        "nr": 3,
+        "label_schlecht": "Zeitarbeit",
+        "label_gut": "Direktvermittlung",
+        "durchstreichen": false,
+        "schlecht": "Gleicher Lohn oft erst nach 9 Monaten",
+        "gut": "Gehalt direkt verhandelt",
+        "detail": "Und für dich als Bewerber kostenlos."
+      },
+      {
+        "typ": "ende",
+        "zeilen": [
+          "Speicher",
+          "dir das ab"
+        ],
+        "markiert": [
+          "speicher"
+        ],
+        "zusatz": "Und schick's an jemanden, der gerade sucht."
+      }
+    ],
+    "caption": "Zeitarbeit oder Direktvermittlung – wo ist der Unterschied? 🤝\n\nZeitarbeit: Du bist beim Personaldienstleister angestellt und wirst an Kunden verliehen – beim selben Kunden höchstens 18 Monate. Gleicher Lohn wie die Stammbelegschaft gilt oft erst nach 9 Monaten (Arbeitnehmerüberlassungsgesetz).\n\nDirektvermittlung: Du unterschreibst direkt beim Arbeitgeber, bist von Anfang an fest im Team und verhandelst dein Gehalt direkt. Für dich als Bewerber kostenlos.\n\nInpernell vermittelt ausschließlich direkt – keine Zeitarbeit.\n\nHast du schon mal in Zeitarbeit gearbeitet? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Direktvermittlung #Jobsuche #JobsSchwarzwald #Karriere #Inpernell"
+  },
+  {
+    "id": "2026-11-26-lebenslauf-1",
+    "datum": "2026-11-26",
+    "kategorie": "konstruktion",
+    "variante": 1,
+    "szenen": [
+      {
+        "typ": "hook",
+        "rubrik": "Bewerbungs-Check #1",
+        "zeilen": [
+          "3 Fehler",
+          "im Lebenslauf,",
+          "die jeder sieht"
+        ],
+        "markiert": [
+          "lebenslauf,"
+        ],
+        "unterzeile": "und wie du sie vermeidest"
+      },
+      {
+        "typ": "vergleich",
+        "nr": 1,
+        "schlecht": "Lücken unkommentiert lassen",
+        "gut": "Kurz erklären",
+        "detail": "Weiterbildung, Familie oder Neuorientierung: ein Satz reicht."
+      },
+      {
+        "typ": "vergleich",
+        "nr": 2,
+        "schlecht": "Nur Aufgaben aufzählen",
+        "gut": "Ergebnisse zeigen",
+        "detail": "Zum Beispiel: Rüstzeiten an der Anlage deutlich verkürzt."
+      },
+      {
+        "typ": "vergleich",
+        "nr": 3,
+        "schlecht": "Ein Lebenslauf für alle Stellen",
+        "gut": "Für jede Stelle anpassen",
+        "detail": "Was in der Anzeige wichtig ist, gehört nach oben."
+      },
+      {
+        "typ": "chat",
+        "ueberschrift": "Und so erklärst du eine Lücke",
+        "frage": "Was haben Sie im Jahr 2024 gemacht?",
+        "antwort": "Ich habe in Vollzeit meinen Techniker gemacht und dabei viel über Prozesse gelernt.",
+        "tipp": "Kurz, ehrlich und positiv"
+      },
+      {
+        "typ": "ende",
+        "zeilen": [
+          "Speicher",
+          "dir das ab"
+        ],
+        "markiert": [
+          "speicher"
+        ],
+        "zusatz": "Und schick's an jemanden, der sich gerade bewirbt."
+      }
+    ],
+    "caption": "Lebenslauf: 3 Fehler, die jeder Recruiter sieht – und wie du sie vermeidest 📄\n\nBewerbungs-Check Nr. 1 von Inpernell.\n\n❌ Lücken unkommentiert lassen → ✅ Kurz erklären: Weiterbildung, Familie oder Neuorientierung\n❌ Nur Aufgaben aufzählen → ✅ Ergebnisse zeigen\n❌ Ein Lebenslauf für alle Stellen → ✅ Für jede Stelle anpassen\n\nÜbrigens: Bei unseren Stellen genügt meist der Lebenslauf – ein Anschreiben ist nicht nötig.\n\nWas fällt dir beim Lebenslauf am schwersten? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Lebenslauf #Bewerbungstipps #JobsSchwarzwald #Karrieretipps #Inpernell"
+  },
+  {
+    "id": "2026-11-29-medizintechnik-tuttlingen",
+    "datum": "2026-11-29",
+    "kategorie": "qualitaet",
+    "variante": 2,
+    "szenen": [
+      {
+        "typ": "hook",
+        "rubrik": "Jobmarkt Region #2",
+        "zeilen": [
+          "Wusstest du,",
+          "was Tuttlingen",
+          "so besonders macht?"
+        ],
+        "markiert": [
+          "tuttlingen"
+        ],
+        "unterzeile": "Ein Weltzentrum direkt vor der Haustür"
+      },
+      {
+        "typ": "zahl",
+        "rubrik": "Medizintechnik",
+        "zahl": "200+",
+        "einheit": "Hersteller",
+        "label": "von Medizintechnik sitzen in Tuttlingen, vom Skalpell bis zum Endoskop",
+        "balken": [],
+        "quelle": "Quelle: IHK Schwarzwald-Baar-Heuberg, Standortsteckbrief Juli 2026"
+      },
+      {
+        "typ": "zahl",
+        "rubrik": "Beschäftigte",
+        "zahl": "14.178",
+        "einheit": "Menschen",
+        "label": "arbeiten in der Region in medizinischen Produkten und Geräten",
+        "balken": [],
+        "quelle": "Quelle: IHK Schwarzwald-Baar-Heuberg, Stand März 2026"
+      },
+      {
+        "typ": "ende",
+        "zeilen": [
+          "Folg uns",
+          "für mehr Fakten"
+        ],
+        "markiert": [
+          "folg"
+        ],
+        "zusatz": "Und schick's an jemanden aus der Region."
+      }
+    ],
+    "caption": "Wusstest du, was Tuttlingen so besonders macht? 🌍\n\nTuttlingen gilt in der Branche als Weltzentrum der Medizintechnik: Mehr als 200 Unternehmen stellen dort chirurgische und medizintechnische Produkte her – vom Skalpell bis zum Endoskop. In der IHK-Region Schwarzwald-Baar-Heuberg arbeiten 14.178 Menschen im Bereich medizinische Produkte und Geräte (IHK Schwarzwald-Baar-Heuberg, 2026).\n\nFür Fachkräfte aus Zerspanung, Qualität und Konstruktion heißt das: viele spannende Arbeitgeber direkt vor der Haustür.\n\nArbeitest du selbst in der Medizintechnik? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Medizintechnik #Tuttlingen #JobsSchwarzwald #Fachkräfte #Inpernell"
+  }
+]
