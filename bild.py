@@ -40,6 +40,8 @@ FORMATE = {
     "bild": dict(W=1080, H=1350, M=72, rechts=72, foto=720, oben=56, unten=1350 - 44, titel=84),
     "reel": dict(W=1080, H=1920, M=72, rechts=150, foto=940, oben=150, unten=1920 - 300, titel=92),
 }
+# Story: gleiches Hochformat wie das Reel, aber als Standbild mit Link zur Stellenanzeige
+FORMATE["story"] = dict(FORMATE["reel"], unten=1920 - 340)
 
 
 def font(key, size):
@@ -284,6 +286,12 @@ def elemente(job, fmt):
         d.line([(ax, ky + kn_h / 2), (ax + 34, ky + kn_h / 2)], fill=KNOPFTEXT, width=4)
         d.line([(ax + 21, ky + kn_h / 2 - 13), (ax + 34, ky + kn_h / 2), (ax + 21, ky + kn_h / 2 + 13)],
                fill=KNOPFTEXT, width=4, joint="curve")
+        if fmt == "story":
+            link = (job.get("job_url") or "https://www.inpernell.de/jobboerse/").split("://", 1)[-1].rstrip("/")
+            gesperrt(d, (M, ky + kn_h + 30), "ZUR STELLENANZEIGE", font("h600", 18), PFIRSICH, 2.6)
+            fl, ll = fit(d, link, "t700", 30, 20, breite, 1)
+            d.text((M, ky + kn_h + 62), ll[0], font=fl, fill=WEISS)
+            return
         d.text((M + kw_ + 172, ky + kn_h / 2), "Link in der Bio", font=font("t700", 29), fill=WEISS, anchor="lm")
         if fmt == "bild":
             gesperrt(d, (M, F["H"] - 52), "KEINE ZEITARBEIT. DIREKTVERMITTLUNG.  ·  INPERNELL.DE",
@@ -320,11 +328,11 @@ def _grund(fmt, kat):
     return Image.alpha_composite(grund, ringe)
 
 
-def erzeuge_bild(job, ziel):
-    """Speichert den Feed-Beitrag (1080x1350 JPEG) nach ziel."""
-    F = FORMATE["bild"]
-    els, kat = elemente(job, "bild")
-    img = _grund("bild", kat)
+def erzeuge_bild(job, ziel, fmt="bild"):
+    """Speichert den Feed-Beitrag (1080x1350 JPEG) bzw. mit fmt="story" die Story (1080x1920) nach ziel."""
+    F = FORMATE[fmt]
+    els, kat = elemente(job, fmt)
+    img = _grund(fmt, kat)
     foto = _foto_vorbereiten(kat, F["W"], F["foto"]).convert("RGBA")
     foto = Image.alpha_composite(foto, _foto_schleier(F["W"], F["foto"], F["H"]))
     img.paste(foto, (0, 0))
@@ -332,6 +340,11 @@ def erzeuge_bild(job, ziel):
         img.alpha_composite(el["img"], (el["x"], el["y"]))
     img.convert("RGB").save(ziel, "JPEG", quality=93, optimize=True)
     return ziel
+
+
+def erzeuge_story(job, ziel):
+    """Speichert die Story (1080x1920 JPEG) mit Link zur Stellenanzeige nach ziel."""
+    return erzeuge_bild(job, ziel, fmt="story")
 
 
 def erzeuge_reel(job, ziel, sekunden=10, fps=30, titelbild=None):

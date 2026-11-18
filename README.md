@@ -86,6 +86,18 @@ Im Projekt: **Actions > Top Job des Tages > Run workflow**
   Die mitgelieferten Fotos sind von Unsplash (kostenlos, auch kommerziell, ohne Namensnennung).
 - **Neues Berufsfeld:** In `kategorien.py` einen Eintrag ergänzen und ein Foto mit dem Schlüssel ablegen.
 
+## Story
+
+Nach jedem Beitrag wird zusätzlich eine **Story** (1080 × 1920) gepostet: gleiches Design wie der Beitrag,
+unten der Link zur Stellenanzeige in Recruitee (gut lesbar ausgeschrieben).
+
+**Wichtig:** Einen anklickbaren Link-Sticker kann die Instagram-Schnittstelle nicht setzen. Wer den Link
+anklickbar haben möchte, öffnet die Story in der Instagram-App und fügt über „Sticker > Link“ den Link
+hinzu – den Link findet man im Beitragstext bzw. in `posts/JJJJ-MM-TT-story.jpg`.
+
+Story abschalten: im Workflow die Variable `STORY: "false"` setzen. Ist der Beitrag eines Tages schon
+online, aber die Story fehlt, holt ein erneuter Lauf nur die Story nach.
+
 ## Bild oder Reel
 
 In `agent.py` legt `WOCHENPLAN` fest, an welchem Tag was kommt. Derzeit (Schritt 1) jeden Tag ein Bild;
