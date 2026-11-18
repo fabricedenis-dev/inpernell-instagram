@@ -254,7 +254,9 @@ def elemente(job, fmt):
         gesamt = 40
         passend = []
         for p in punkte:
-            zl = wrap(mess, p, fp, breite - 56)[:2]
+            zl = wrap(mess, p, fp, breite - 56)
+            if len(zl) > 2:
+                continue                 # nie abschneiden: zu lange Punkte gehören auf die Folgeseiten
             if gesamt + len(zl) * zh + 12 > platz:
                 break
             passend.append(zl)
@@ -443,16 +445,20 @@ def _listenseite(job, kat, nr, gesamt, ueberschrift, punkte, ziel):
     d.text((M - 3, y), ueberschrift, font=font("h800", 62), fill=WEISS)
     y += 100
     breite = W - 2 * M - 56
-    for groesse in (36, 33, 30, 28):
-        fp = font("t400", groesse)
-        zh = int(groesse * 1.3)
-        bloecke = [wrap(d, p, fp, breite)[:2] for p in punkte]
-        hoehe = sum(len(b) * zh + 22 for b in bloecke)
-        if y + hoehe < H - 120:
-            break
+    # Alle Punkte vollständig zeigen; Schrift verkleinern, bis sie passen. Passt es selbst klein nicht,
+    # werden hintere Punkte weggelassen – abgeschnitten wird nie.
+    unten = H - 120
+    for anzahl in range(len(punkte), 0, -1):
+        for groesse in (36, 33, 30, 28, 26):
+            fp = font("t400", groesse)
+            zh = int(groesse * 1.3)
+            bloecke = [wrap(d, p, fp, breite) for p in punkte[:anzahl]]
+            if y + sum(len(b) * zh + 22 for b in bloecke) <= unten:
+                break
+        else:
+            continue
+        break
     for b in bloecke:
-        if y + len(b) * zh > H - 120:
-            break
         cy = y + fp.size * 0.62
         d.line([(M + 2, cy), (M + 12, cy + 10), (M + 30, cy - 9)], fill=ORANGE, width=6, joint="curve")
         for j, zeile in enumerate(b):
