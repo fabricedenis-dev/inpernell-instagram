@@ -36,10 +36,14 @@ jobs:
           python-version: "3.12"
       - run: pip install --quiet -r requirements.txt
       - name: ffmpeg für das Reel
+        # nur nötig, wenn ein Reel entsteht (Handstart mit Format "reel"). Wer im WOCHENPLAN Reel-Tage
+        # einträgt, entfernt diese if-Zeile.
+        if: ${{ inputs.format == 'reel' }}
         run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg)
       - name: Top Job erstellen und veröffentlichen
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.probelauf || 'false' }}
           ERZWINGEN: ${{ github.event_name == 'workflow_dispatch' }}
           FORMAT: ${{ inputs.format }}
