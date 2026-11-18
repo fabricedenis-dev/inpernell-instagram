@@ -171,130 +171,180 @@ def sprechblase(img, text, xy, maxw, eigen=True):
 
 # ---------------------------------------------------------------- Folientypen
 
-def folie_hook(kat, rubrik, zeilen, markiert, unterzeile, szene=0, anzahl=5):
-    img = grund(kat, 1250)
-    kopf(img, szene, anzahl)
-    d = ImageDraw.Draw(img)
-    sticker(img, rubrik.upper(), (M - 6, 300), winkel=-4)
+class Stufe:
+    """Zählt Bausteine einer Folie. Mit bis=k werden nur die ersten k gezeichnet (für die Animation)."""
+    def __init__(self, bis):
+        self.bis, self.i = bis, 0
+
+    def __call__(self):
+        self.i += 1
+        return self.i <= self.bis
+
+
+def _start(kat, foto_hoehe, szene, anzahl, mit_kopf, variante="oben"):
+    img = grund(kat, foto_hoehe, variante)
+    if mit_kopf:
+        kopf(img, szene, anzahl)
+    return img
+
+
+def folie_hook(kat, rubrik, zeilen, markiert, unterzeile, szene=0, anzahl=5, bis=99, mit_kopf=True):
+    g = Stufe(bis)
+    img = _start(kat, 1250, szene, anzahl, mit_kopf)
+    if g():
+        sticker(img, rubrik.upper(), (M - 6, 300), winkel=-4)
     f = font("h800", 124)
-    y = marker_text(d, (M, 600), zeilen, f, markiert)
-    caption_box(img, unterzeile, (M, y + 30))
-    # Hinweis noch in der sicheren Zone (unten blendet Instagram den Bildtext ein)
-    d = ImageDraw.Draw(img)
-    gesperrt(d, (M, 1185), "SPEICHERN LOHNT SICH", font("h700", 24), WEISS, 4)
-    icon_lesezeichen(d, M + 430, 1179, 26, 36, ORANGE)
+    y = 600
+    for zeile in zeilen:                         # jede Zeile ein Baustein (Wort-für-Wort-Gefühl)
+        if g():
+            marker_text(ImageDraw.Draw(img), (M, y), [zeile], f, markiert)
+        y += int(f.size * 1.04)
+    if g():
+        caption_box(img, unterzeile, (M, y + 30))
+    if g():
+        d = ImageDraw.Draw(img)
+        gesperrt(d, (M, 1185), "SPEICHERN LOHNT SICH", font("h700", 24), WEISS, 4)
+        icon_lesezeichen(d, M + 430, 1179, 26, 36, ORANGE)
     return img
 
 
-def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5):
-    img = grund(kat, 700)
-    kopf(img, szene, anzahl)
-    d = ImageDraw.Draw(img)
-    # große Nummer als Umriss
-    f = font("h800", 210)
-    ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    ImageDraw.Draw(ov).text((M - 8, 250), f"{nr:02d}", font=f, fill=(*ORANGE, 40), stroke_width=4, stroke_fill=ORANGE)
-    img.alpha_composite(ov)
-    d = ImageDraw.Draw(img)
+def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mit_kopf=True):
+    g = Stufe(bis)
+    img = _start(kat, 700, szene, anzahl, mit_kopf)
     breite = W - M - R
-    # Fehler-Karte
+    if g():                                      # große Umriss-Nummer
+        ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
+        ImageDraw.Draw(ov).text((M - 8, 250), f"{nr:02d}", font=font("h800", 210), fill=(*ORANGE, 40),
+                                stroke_width=4, stroke_fill=ORANGE)
+        img.alpha_composite(ov)
     y = 520
-    glas(img, [M, y, W - R, y + 270], fuell=(226, 75, 74, 38), rand=(226, 75, 74, 160))
-    d = ImageDraw.Draw(img)
-    icon_x(d, M + 70, y + 74, 34)
-    gesperrt(d, (M + 126, y + 58), "FEHLER", font("h800", 28), (255, 200, 200), 4)
     ff = font("h800", 54)
-    zz = wrap(d, fehler, ff, breite - 80)
-    yy = y + 124
-    for z in zz[:2]:
-        d.text((M + 40, yy), z, font=ff, fill=(255, 255, 255, 190))
-        # durchgestrichen: der Fehler ist "erledigt"
-        d.line([(M + 40, yy + 32), (M + 40 + d.textlength(z, font=ff), yy + 32)], fill=(226, 75, 74), width=5)
-        yy += 62
-    # Besser-Karte
+    zz = wrap(ImageDraw.Draw(img), fehler, ff, breite - 80)[:2]
+    if g():                                      # Fehler-Karte
+        glas(img, [M, y, W - R, y + 270], fuell=(226, 75, 74, 38), rand=(226, 75, 74, 160))
+        d = ImageDraw.Draw(img)
+        icon_x(d, M + 70, y + 74, 34)
+        gesperrt(d, (M + 126, y + 58), "FEHLER", font("h800", 28), (255, 200, 200), 4)
+        for i, z in enumerate(zz):
+            d.text((M + 40, y + 124 + i * 62), z, font=ff, fill=(255, 255, 255, 190))
+    if g():                                      # Durchstreichen
+        d = ImageDraw.Draw(img)
+        for i, z in enumerate(zz):
+            yy = y + 124 + i * 62 + 32
+            d.line([(M + 40, yy), (M + 40 + d.textlength(z, font=ff), yy)], fill=(226, 75, 74), width=5)
     y = 820
-    glas(img, [M, y, W - R, y + 410], fuell=(52, 199, 123, 34), rand=(52, 199, 123, 170))
-    d = ImageDraw.Draw(img)
-    icon_haken(d, M + 70, y + 74, 34)
-    gesperrt(d, (M + 126, y + 58), "BESSER", font("h800", 28), (190, 245, 215), 4)
-    fb = font("h800", 64)
-    yy = y + 124
-    for z in wrap(d, besser, fb, breite - 80)[:3]:
-        d.text((M + 40, yy), z, font=fb, fill=WEISS)
-        yy += 72
-    fd = font("t400", 38)
-    yy += 14
-    for z in wrap(d, detail, fd, breite - 80)[:3]:
-        d.text((M + 40, yy), z, font=fd, fill=HELL)
-        yy += 50
+    if g():                                      # Besser-Karte
+        glas(img, [M, y, W - R, y + 410], fuell=(52, 199, 123, 34), rand=(52, 199, 123, 170))
+        d = ImageDraw.Draw(img)
+        icon_haken(d, M + 70, y + 74, 34)
+        gesperrt(d, (M + 126, y + 58), "BESSER", font("h800", 28), (190, 245, 215), 4)
+        fb = font("h800", 64)
+        yy = y + 124
+        for z in wrap(d, besser, fb, breite - 80)[:3]:
+            d.text((M + 40, yy), z, font=fb, fill=WEISS)
+            yy += 72
+        _detail_y = yy + 14
+    else:
+        _detail_y = None
+    if g() and _detail_y:
+        d = ImageDraw.Draw(img)
+        fd = font("t400", 38)
+        for i, z in enumerate(wrap(d, detail, fd, breite - 80)[:3]):
+            d.text((M + 40, _detail_y + i * 50), z, font=fd, fill=HELL)
     return img
 
 
-def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=5):
+def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=5, bis=99, mit_kopf=True):
     """balken: Liste (Text, Wert, hervorheben?)"""
-    img = grund(kat, 600)
-    kopf(img, szene, anzahl)
+    g = Stufe(bis)
+    img = _start(kat, 600, szene, anzahl, mit_kopf)
     d = ImageDraw.Draw(img)
-    sticker(img, rubrik.upper(), (M - 6, 290), winkel=3, fuell=WEISS, schrift=NAVY)
+    if g():
+        sticker(img, rubrik.upper(), (M - 6, 290), winkel=3, fuell=WEISS, schrift=NAVY)
     fz = font("h800", 300)
-    d.text((M - 12, 370), zahl, font=fz, fill=ORANGE)
-    zw = d.textlength(zahl, font=fz)
-    d.text((M + zw + 20, 570), einheit, font=font("h800", 64), fill=WEISS)
+    if g():
+        ImageDraw.Draw(img).text((M - 12, 370), zahl, font=fz, fill=ORANGE)
     y = 720
-    for z in wrap(d, label, font("h800", 56), W - M - R):
-        d.text((M, y), z, font=font("h800", 56), fill=WEISS)
-        y += 64
-    # Balkenvergleich
+    if g():
+        d = ImageDraw.Draw(img)
+        d.text((M + d.textlength(zahl, font=fz) + 20, 570), einheit, font=font("h800", 64), fill=WEISS)
+        for z in wrap(d, label, font("h800", 56), W - M - R):
+            d.text((M, y), z, font=font("h800", 56), fill=WEISS)
+            y += 64
+    else:
+        y += 64 * len(wrap(d, label, font("h800", 56), W - M - R))
     y += 40
     maxwert = max(b[1] for b in balken)
     breite = W - M - R - 220
     for text, wert, hervor in balken:
-        d.text((M, y), text, font=font("t700", 34), fill=WEISS if hervor else HELL)
-        y += 48
-        lang = max(14, int(breite * wert / maxwert))
-        d.rounded_rectangle([M, y, M + breite, y + 30], radius=15, fill=(255, 255, 255, 30))
-        d.rounded_rectangle([M, y, M + lang, y + 30], radius=15, fill=ORANGE if hervor else (255, 255, 255, 170))
-        d.text((M + breite + 24, y - 8), f"{wert:g}".replace(".", ","), font=font("h800", 40), fill=WEISS)
-        y += 70
-    d.text((M, y + 10), quelle, font=font("t400", 26), fill=PFIRSICH)
+        if g():
+            d = ImageDraw.Draw(img)
+            d.text((M, y), text, font=font("t700", 34), fill=WEISS if hervor else HELL)
+            lang = max(14, int(breite * wert / maxwert))
+            d.rounded_rectangle([M, y + 48, M + breite, y + 78], radius=15, fill=(255, 255, 255, 30))
+            d.rounded_rectangle([M, y + 48, M + lang, y + 78], radius=15, fill=ORANGE if hervor else (255, 255, 255, 170))
+            d.text((M + breite + 24, y + 40), f"{wert:g}".replace(".", ","), font=font("h800", 40), fill=WEISS)
+        y += 118
+    if g():
+        ImageDraw.Draw(img).text((M, y + 10), quelle, font=font("t400", 26), fill=PFIRSICH)
     return img
 
 
-def folie_ende(kat, titel_zeilen, markiert, zusatz, szene, anzahl=5):
-    img = grund(kat, 900, variante="unten")
-    kopf(img, szene, anzahl)
-    d = ImageDraw.Draw(img)
-    icon_lesezeichen(d, M, 320, 80, 110, ORANGE)
-    y = marker_text(d, (M, 480), titel_zeilen, font("h800", 104), markiert)
-    d.text((M, y + 30), zusatz, font=font("t400", 42), fill=HELL)
+def folie_ende(kat, titel_zeilen, markiert, zusatz, szene, anzahl=5, bis=99, mit_kopf=True):
+    g = Stufe(bis)
+    img = _start(kat, 900, szene, anzahl, mit_kopf, variante="unten")
+    if g():
+        icon_lesezeichen(ImageDraw.Draw(img), M, 320, 80, 110, ORANGE)
+    f = font("h800", 104)
+    y = 480
+    if g():
+        y = marker_text(ImageDraw.Draw(img), (M, y), titel_zeilen, f, markiert)
+    else:
+        y += int(f.size * 1.04) * len(titel_zeilen)
+    if g():
+        ImageDraw.Draw(img).text((M, y + 30), zusatz, font=font("t400", 42), fill=HELL)
     y += 150
-    glas(img, [M, y, W - R, y + 200], radius=40)
-    d = ImageDraw.Draw(img)
-    d.text((M + 40, y + 36), "Neue Top Jobs jeden Abend", font=font("h800", 46), fill=WEISS)
-    fk = font("h700", 36)
-    kt = "Link in der Bio"
-    kw = d.textlength(kt, font=fk)
-    d.rounded_rectangle([M + 40, y + 108, M + 40 + kw + 120, y + 172], radius=32, fill=ORANGE)
-    d.text((M + 75, y + 140), kt, font=fk, fill=KNOPFTEXT, anchor="lm")
-    ax = M + 75 + kw + 18
-    d.line([(ax, y + 140), (ax + 30, y + 140)], fill=KNOPFTEXT, width=4)
-    d.line([(ax + 18, y + 128), (ax + 30, y + 140), (ax + 18, y + 152)], fill=KNOPFTEXT, width=4, joint="curve")
-    gesperrt(d, (M, y + 240), "INPERNELL.DE  ·  DIREKTVERMITTLUNG", font("h600", 22), PFIRSICH, 3)
+    if g():
+        glas(img, [M, y, W - R, y + 200], radius=40)
+        d = ImageDraw.Draw(img)
+        d.text((M + 40, y + 36), "Neue Top Jobs jeden Abend", font=font("h800", 46), fill=WEISS)
+        fk = font("h700", 36)
+        kt = "Link in der Bio"
+        kw = d.textlength(kt, font=fk)
+        d.rounded_rectangle([M + 40, y + 108, M + 40 + kw + 120, y + 172], radius=32, fill=ORANGE)
+        d.text((M + 75, y + 140), kt, font=fk, fill=KNOPFTEXT, anchor="lm")
+        ax = M + 75 + kw + 18
+        d.line([(ax, y + 140), (ax + 30, y + 140)], fill=KNOPFTEXT, width=4)
+        d.line([(ax + 18, y + 128), (ax + 30, y + 140), (ax + 18, y + 152)], fill=KNOPFTEXT, width=4, joint="curve")
+        gesperrt(d, (M, y + 240), "INPERNELL.DE  ·  DIREKTVERMITTLUNG", font("h600", 22), PFIRSICH, 3)
     return img
 
 
-def folie_formulierung(kat, ueberschrift, frage, antwort, tipp, szene, anzahl=5):
+def folie_formulierung(kat, ueberschrift, frage, antwort, tipp, szene, anzahl=5, bis=99, mit_kopf=True):
     """'So sagst du's': Chatverlauf Recruiter/Kandidat als Formulierungshilfe."""
-    img = grund(kat, 600)
-    kopf(img, szene, anzahl)
+    g = Stufe(bis)
+    img = _start(kat, 600, szene, anzahl, mit_kopf)
     d = ImageDraw.Draw(img)
-    sticker(img, "SO SAGST DU'S", (M - 6, 290), winkel=-3)
-    y = marker_text(d, (M, 420), wrap(d, ueberschrift, font("h800", 72), W - M - R), font("h800", 72), set())
-    y += 40
-    gesperrt(d, (M, y), "RECRUITER", font("h700", 22), PFIRSICH, 3)
-    y = sprechblase(img, frage, (M, y + 40), W - M - R - 120, eigen=False)
-    d = ImageDraw.Draw(img)
-    gesperrt(d, (W - R - gesperrt_breite(d, "DU", font("h700", 22), 3), y), "DU", font("h700", 22), PFIRSICH, 3)
-    y = sprechblase(img, antwort, (M + 60, y + 40), W - M - R - 60, eigen=True)
-    caption_box(img, tipp, (M, y + 10), groesse=34)
+    if g():
+        sticker(img, "SO SAGST DU'S", (M - 6, 290), winkel=-3)
+    fh = font("h800", 72)
+    zeilen = wrap(d, ueberschrift, fh, W - M - R)
+    if g():
+        marker_text(ImageDraw.Draw(img), (M, 420), zeilen, fh, set())
+    y = 420 + int(fh.size * 1.04) * len(zeilen) + 40
+    # Höhen vorab berechnen, damit spätere Bausteine an der richtigen Stelle stehen
+    probe = Image.new("RGBA", (W, H))
+    y_frage = y
+    y2 = sprechblase(probe, frage, (M, y + 40), W - M - R - 120, eigen=False)
+    y3 = sprechblase(probe, antwort, (M + 60, y2 + 40), W - M - R - 60, eigen=True)
+    if g():
+        d = ImageDraw.Draw(img)
+        gesperrt(d, (M, y_frage), "RECRUITER", font("h700", 22), PFIRSICH, 3)
+        sprechblase(img, frage, (M, y_frage + 40), W - M - R - 120, eigen=False)
+    if g():
+        d = ImageDraw.Draw(img)
+        gesperrt(d, (W - R - gesperrt_breite(d, "DU", font("h700", 22), 3), y2), "DU", font("h700", 22), PFIRSICH, 3)
+        sprechblase(img, antwort, (M + 60, y2 + 40), W - M - R - 60, eigen=True)
+    if g():
+        caption_box(img, tipp, (M, y3 + 10), groesse=34)
     return img
