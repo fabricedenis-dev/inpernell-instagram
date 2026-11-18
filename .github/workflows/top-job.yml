@@ -2,10 +2,8 @@ name: Top Job des Tages
 
 on:
   schedule:
-    # GitHub rechnet in Weltzeit (UTC). Je zwei Zeiten für Winter und Sommer, damit es 12:50 bzw. 18:50 Uhr
-    # in Deutschland ist. Das Programm entscheidet selbst, welcher Lauf heute postet (Zeitplan in agent.py).
-    - cron: "50 10 * * *"
-    - cron: "50 11 * * *"
+    # GitHub rechnet in Weltzeit (UTC). Zwei Zeiten, damit es im Winter (17:50 UTC) und im Sommer
+    # (16:50 UTC) jeweils 18:50 Uhr in Deutschland ist. Das Programm prüft die Uhrzeit selbst.
     - cron: "50 16 * * *"
     - cron: "50 17 * * *"
   workflow_dispatch:

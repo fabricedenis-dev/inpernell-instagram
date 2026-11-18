@@ -47,15 +47,10 @@ GRAPH_FB = "https://graph.facebook.com"        # Schlüssel aus Facebook-/Unifie
 PROTOKOLL = os.path.join(HIER, "data", "protokoll.csv")
 SPERRFRIST = 30          # so viele letzte Posts werden nicht wiederholt
 POSTSTUNDE = 12          # Standard-Stunde (Europe/Berlin), wenn ZEITPLAN nichts anderes sagt
-# Zeitplan-Test (Empfehlung aus dem Reichweiten-Bericht): Mo–Fr wochenweise abwechselnd mittags (12:50) und
-# abends (18:50), Sonntag abends, Samstag Pause. Nach 4–8 Wochen in den Instagram-Statistiken vergleichen
-# und dann eine feste Zeit wählen. None = an diesem Tag kein neuer Top Job.
+# Zeitplan: jeden Tag um 18:50 Uhr (Wunsch Inpernell; Berufstätige suchen abends Jobs).
+# Gibt die Stunde zurück, in der gepostet wird; None = an diesem Tag kein neuer Top Job.
 def poststunde(jetzt):
-    if jetzt.weekday() == 5:
-        return None                                  # Samstag: schwächster Tag, kein neuer Top Job
-    if jetzt.weekday() == 6:
-        return 18                                    # Sonntagabend: Berufstätige suchen Jobs
-    return 12 if jetzt.isocalendar().week % 2 == 0 else 18   # gerade KW mittags, ungerade KW abends
+    return 18
 # Format je Wochentag (0 = Montag): "bild" = Feed-Beitrag 4:5, "reel" = 10-Sekunden-Video 9:16.
 # Eine Vorgabe von Claude ("format": "reel") oder die Variable FORMAT haben Vorrang.
 # "karussell" = 4 Seiten (Top Job, Aufgaben, Anforderungen, So bewirbst du dich) – laut Bericht stärker als
