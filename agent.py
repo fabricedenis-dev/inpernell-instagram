@@ -8,7 +8,9 @@ Liegt für heute eine Datei overrides/JJJJ-MM-TT.json vor (von Claude vorbereite
 Stelle, Bildtexte und Beitragstext daraus genommen. Sonst wählt das Programm selbst.
 
 Umgebungsvariablen:
-  IG_ACCESS_TOKEN    Instagram-Zugangsschlüssel (GitHub-Secret), nötig zum Veröffentlichen
+  IG_ACCESS_TOKEN    Zugangsschlüssel (GitHub-Secret), nötig zum Veröffentlichen. Beginnt er mit "IG",
+                     wird graph.instagram.com genutzt, beginnt er mit "EAA", graph.facebook.com.
+  IG_USER_ID         nur bei EAA-Schlüssel und mehreren Konten: ID des Instagram-Business-Kontos
   GITHUB_REPOSITORY  "konto/projekt" (setzt GitHub Actions automatisch)
   GITHUB_REF_NAME    Zweig, Standard "main"
   DRY_RUN            "true" = alles vorbereiten, aber NICHT veröffentlichen
@@ -36,7 +38,8 @@ from bild import erzeuge_bild, erzeuge_reel
 
 HIER = os.path.dirname(os.path.abspath(__file__))
 RECRUITEE = "https://inpernellgmbh.recruitee.com/api/offers/"
-GRAPH = "https://graph.instagram.com/v26.0"
+GRAPH = "https://graph.instagram.com/v26.0"   # Schlüssel aus "Instagram-Login" (beginnt mit IG…)
+GRAPH_FB = "https://graph.facebook.com"        # Schlüssel aus Facebook-/Unified-Login (beginnt mit EAA…)
 PROTOKOLL = os.path.join(HIER, "data", "protokoll.csv")
 SPERRFRIST = 30          # so viele letzte Posts werden nicht wiederholt
 POSTSTUNDE = 12          # veröffentlicht wird in der Stunde ab 12 Uhr (Europe/Berlin)
@@ -271,11 +274,50 @@ def warte_auf_bild(url):
     raise RuntimeError("Das Bild ist unter seiner öffentlichen Adresse nicht erreichbar: " + url)
 
 
+def ist_facebook_schluessel(token):
+    return token.startswith("EAA")
+
+
+def instagram_konto(token):
+    """Liefert (Basis-Adresse, Instagram-Konto-ID, Name) passend zur Art des Schlüssels."""
+    q = lambda **kw: urllib.parse.urlencode({**kw, "access_token": token})
+    if not ist_facebook_schluessel(token):
+        ich = http(f"{GRAPH}/me?" + q(fields="user_id,username"))
+        return GRAPH, ich.get("user_id") or ich.get("id"), ich.get("username")
+    if os.environ.get("IG_USER_ID", "").strip():
+        return GRAPH_FB, os.environ["IG_USER_ID"].strip(), "(IG_USER_ID)"
+    feld = "instagram_business_account{id,username}"
+    # Benutzer-Schlüssel: Instagram-Konto über die verknüpfte Facebook-Seite finden
+    konten = []
+    try:
+        for seite in http(f"{GRAPH_FB}/me/accounts?" + q(fields=f"name,{feld}")).get("data", []):
+            if seite.get("instagram_business_account"):
+                konten.append(seite["instagram_business_account"])
+    except RuntimeError:
+        pass
+    # Seiten-Schlüssel: /me ist dann die Seite selbst
+    if not konten:
+        ich = http(f"{GRAPH_FB}/me?" + q(fields=f"name,{feld}"))
+        if ich.get("instagram_business_account"):
+            konten.append(ich["instagram_business_account"])
+    if not konten:
+        raise RuntimeError("Zum Schlüssel wurde kein Instagram-Business-Konto gefunden. Das Instagram-Konto muss mit "
+                           "einer Facebook-Seite verknüpft sein, und der Schlüssel braucht die Rechte instagram_basic, "
+                           "instagram_content_publish, pages_show_list und pages_read_engagement.")
+    if len(konten) > 1:
+        namen = ", ".join(f"{k.get('username')} ({k['id']})" for k in konten)
+        wahl = [k for k in konten if "inpernell" in (k.get("username") or "").lower()]
+        if len(wahl) != 1:
+            raise RuntimeError(f"Mehrere Instagram-Konten gefunden: {namen}. Bitte die gewünschte ID als "
+                               "Secret IG_USER_ID hinterlegen.")
+        konten = wahl
+    return GRAPH_FB, konten[0]["id"], konten[0].get("username")
+
+
 def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_url=None):
     """Bild oder Reel über die offizielle Instagram-Schnittstelle veröffentlichen; gibt die Beitrags-ID zurück."""
-    ich = http(f"{GRAPH}/me?" + urllib.parse.urlencode({"fields": "user_id,username", "access_token": token}))
-    ig_id = ich.get("user_id") or ich.get("id")
-    print("Instagram-Konto:", ich.get("username"))
+    basis, ig_id, name = instagram_konto(token)
+    print("Instagram-Konto:", name, "· Schnittstelle:", basis.split("//")[1].split("/")[0])
     if video_url:
         daten = {"media_type": "REELS", "video_url": video_url, "caption": caption, "share_to_feed": "true",
                  "access_token": token}
@@ -285,9 +327,9 @@ def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_ur
     else:
         daten = {"image_url": bild_url, "caption": caption, "access_token": token}
         runden, pause = 15, 4
-    container = http(f"{GRAPH}/{ig_id}/media", daten)["id"]
+    container = http(f"{basis}/{ig_id}/media", daten)["id"]
     for _ in range(runden):
-        status = http(f"{GRAPH}/{container}?" + urllib.parse.urlencode({"fields": "status_code,status",
+        status = http(f"{basis}/{container}?" + urllib.parse.urlencode({"fields": "status_code,status",
                                                                       "access_token": token}))
         if status.get("status_code") == "FINISHED":
             break
@@ -296,11 +338,31 @@ def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_ur
         time.sleep(pause)
     else:
         raise RuntimeError("Instagram hat die Datei nicht rechtzeitig verarbeitet.")
-    return http(f"{GRAPH}/{ig_id}/media_publish", {"creation_id": container, "access_token": token})["id"]
+    return http(f"{basis}/{ig_id}/media_publish", {"creation_id": container, "access_token": token})["id"]
+
+
+def facebook_schluessel_pruefen(token):
+    """Bei EAA-Schlüsseln: Ablaufdatum anzeigen und rechtzeitig warnen (verlängern geht nur im Meta-Dashboard)."""
+    try:
+        info = http(f"{GRAPH_FB}/debug_token?" + urllib.parse.urlencode({"input_token": token, "access_token": token}),
+                    versuche=1).get("data", {})
+        ablauf = int(info.get("expires_at") or 0)
+        if not ablauf:
+            print("Zugangsschlüssel läuft nicht ab.")
+            return
+        tage = (ablauf - time.time()) / 86400
+        print(f"Zugangsschlüssel gültig bis {datetime.fromtimestamp(ablauf, ZoneInfo('Europe/Berlin')):%d.%m.%Y %H:%M}.")
+        if tage < 10:
+            print(f"::warning::Der Zugangsschlüssel läuft in {tage:.0f} Tagen ab. Im Meta-Dashboard einen neuen "
+                  "erzeugen (oder im Access Token Debugger verlängern) und das Secret IG_ACCESS_TOKEN ersetzen.")
+    except Exception as e:
+        print(f"::warning::Ablaufdatum des Zugangsschlüssels nicht lesbar ({e}).")
 
 
 def schluessel_verlaengern(token):
     """Verlängert die Gültigkeit des Zugangsschlüssels um weitere 60 Tage (geht erst ab 24 h Alter)."""
+    if ist_facebook_schluessel(token):
+        return facebook_schluessel_pruefen(token)
     try:
         r = http(f"{GRAPH.rsplit('/', 1)[0]}/refresh_access_token?" +
                  urllib.parse.urlencode({"grant_type": "ig_refresh_token", "access_token": token}), versuche=1)
@@ -358,6 +420,15 @@ def main():
     git_sichern(f"Top Job {heute}: {'Reel' if fmt == 'reel' else 'Bild'} und Text", *dateien)
 
     if probe:
+        token = os.environ.get("IG_ACCESS_TOKEN", "").strip()
+        if token:   # Schlüssel prüfen, ohne etwas zu veröffentlichen
+            try:
+                _, ig_id, name = instagram_konto(token)
+                print(f"Zugangsschlüssel funktioniert: Instagram-Konto {name} (ID {ig_id}).")
+                if ist_facebook_schluessel(token):
+                    facebook_schluessel_pruefen(token)
+            except Exception as e:
+                print(f"::warning::Zugangsschlüssel funktioniert NICHT: {e}")
         print("PROBELAUF: Dateien liegen im Ordner posts/. Es wurde NICHTS veröffentlicht.")
         return
 

@@ -40,6 +40,13 @@ Voraussetzung: Das Instagram-Konto ist ein Business- oder Creator-Konto.
 
 Eine Facebook-Seite und eine App-Prüfung durch Meta sind für das eigene Konto nicht nötig.
 
+**Schlüssel beginnt mit `EAA`?** Dann stammt er aus dem Facebook- bzw. "Unified Login". Das Programm
+erkennt das und veröffentlicht dann über graph.facebook.com. Voraussetzungen: Das Instagram-Konto ist mit
+einer Facebook-Seite verknüpft, und der Schlüssel hat die Rechte `instagram_basic`,
+`instagram_content_publish`, `pages_show_list` und `pages_read_engagement`. Ein solcher Schlüssel wird
+nicht automatisch verlängert; das Programm zeigt im Lauf an, bis wann er gilt, und warnt 10 Tage vorher.
+Ein Probelauf prüft den Schlüssel, ohne etwas zu veröffentlichen.
+
 ### 3. Schlüssel bei GitHub hinterlegen
 Im Projekt: **Settings > Secrets and variables > Actions > New repository secret**
 - Name: `IG_ACCESS_TOKEN`

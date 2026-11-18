@@ -40,6 +40,7 @@ jobs:
       - name: Top Job erstellen und veröffentlichen
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
           DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && inputs.probelauf || 'false' }}
           ERZWINGEN: ${{ github.event_name == 'workflow_dispatch' }}
           FORMAT: ${{ inputs.format }}
