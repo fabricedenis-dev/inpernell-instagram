@@ -264,7 +264,7 @@ def bildtext(titel, ort, kat, gehalt_text, fk, aufgaben, anforderungen, ohne_ans
     if ort:
         zeilen.append(f"📍 {ort}")
     zeilen.append("")
-    for liste, ueberschrift in ((aufgaben, "Das erwartet dich:"), (anforderungen, "Das bringst du mit:")):
+    for liste, ueberschrift in ((aufgaben, "Deine Aufgaben:"), (anforderungen, "Das bringst du mit:")):
         # Sätze in der Sie-Form passen nicht zur Du-Ansprache auf Instagram und werden ausgelassen
         gut = [p for p in liste if not SIE_FORM.search(p)]
         if len(gut) >= 2:

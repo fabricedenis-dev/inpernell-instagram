@@ -449,11 +449,11 @@ def _listenseite(job, kat, nr, gesamt, ueberschrift, punkte, ziel):
     # werden hintere Punkte weggelassen – abgeschnitten wird nie.
     unten = H - 120
     for anzahl in range(len(punkte), 0, -1):
-        for groesse in (36, 33, 30, 28, 26):
+        for groesse in (46, 42, 38, 34, 30):
             fp = font("t400", groesse)
             zh = int(groesse * 1.3)
             bloecke = [wrap(d, p, fp, breite) for p in punkte[:anzahl]]
-            if y + sum(len(b) * zh + 22 for b in bloecke) <= unten:
+            if y + sum(len(b) * zh + 34 for b in bloecke) <= unten:
                 break
         else:
             continue
@@ -463,7 +463,7 @@ def _listenseite(job, kat, nr, gesamt, ueberschrift, punkte, ziel):
         d.line([(M + 2, cy), (M + 12, cy + 10), (M + 30, cy - 9)], fill=ORANGE, width=6, joint="curve")
         for j, zeile in enumerate(b):
             d.text((M + 52, y + j * zh), zeile, font=fp, fill=HELL)
-        y += len(b) * zh + 22
+        y += len(b) * zh + 34
     _fuss(d, "INPERNELL.DE  ·  DIREKTVERMITTLUNG")
     img.convert("RGB").save(ziel, "JPEG", quality=92, optimize=True)
     return ziel
@@ -482,10 +482,10 @@ def _bewerbungsseite(job, kat, nr, gesamt, ziel):
     d.text((M - 3, y), "So bewirbst du dich", font=font("h800", 62), fill=WEISS)
     y += 100
     schritte = [
-        ("Link in der Bio antippen", "Dort findest du die komplette Stellenanzeige."),
-        ("Lebenslauf hochladen", "Ein Anschreiben ist nicht nötig." if job.get("ohne_anschreiben", True)
-         else "In wenigen Minuten erledigt."),
-        ("Oder per Direktnachricht", "Schreib uns „Interesse“ – wir melden uns bei dir."),
+        ("Link in der Bio antippen", "Zur kompletten Stellenanzeige"),
+        ("Lebenslauf hochladen", "Kein Anschreiben nötig" if job.get("ohne_anschreiben", True)
+         else "In wenigen Minuten erledigt"),
+        ("Oder per Direktnachricht", "„Interesse“ schreiben – wir melden uns"),
     ]
     kh = 118
     img_rgba = img
@@ -508,8 +508,8 @@ def _bewerbungsseite(job, kat, nr, gesamt, ziel):
     img_rgba = Image.alpha_composite(img_rgba, ov)
     d = ImageDraw.Draw(img_rgba)
     _papierflieger(d, M + 30, y + 38, 56, ORANGE)
-    d.text((M + 112, y + 28), "Kennst du jemanden, für den das passt?", font=font("t700", 31), fill=WEISS)
-    d.text((M + 112, y + 74), "Schick ihm den Beitrag weiter.", font=font("t400", 29), fill=HELL)
+    d.text((M + 112, y + 28), "Kennst du jemanden, der passt?", font=font("t700", 31), fill=WEISS)
+    d.text((M + 112, y + 74), "Beitrag einfach weiterschicken", font=font("t400", 29), fill=HELL)
     _fuss(d, "KEINE ZEITARBEIT  ·  FÜR DICH KOSTENLOS  ·  INPERNELL.DE", rechts_pfeil=False)
     img_rgba.convert("RGB").save(ziel, "JPEG", quality=92, optimize=True)
     return ziel
@@ -520,7 +520,7 @@ def erzeuge_folgeseiten(job, ordner, basisname):
     kat = job.get("kategorie") or kategorien.erkenne(job.get("titel"))
     seiten = []
     if len(job.get("aufgaben") or []) >= 2:
-        seiten.append(("Das erwartet dich", job["aufgaben"]))
+        seiten.append(("Deine Aufgaben", job["aufgaben"]))
     if len(job.get("anforderungen") or []) >= 2:
         seiten.append(("Das bringst du mit", job["anforderungen"]))
     gesamt = len(seiten) + 2
