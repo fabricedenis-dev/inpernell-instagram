@@ -107,9 +107,8 @@ def sticker(img, text, xy, winkel=-5, fuell=ORANGE, schrift=KNOPFTEXT, groesse=2
 
 
 def kopf(img, szene, anzahl):
+    """Nur der Fortschrittsbalken. Kein Logo oben: dort blendet Instagram schon Kontoname/Profilbild ein."""
     d = ImageDraw.Draw(img)
-    lg = Image.open(os.path.join(HIER, "assets", "logo.png")).convert("RGBA")
-    img.alpha_composite(lg, (M - 10, 96))
     luecke, y = 10, 210
     breite = (W - M - R - luecke * (anzahl - 1)) / anzahl
     for i in range(anzahl):
@@ -230,7 +229,7 @@ def folie_vergleich(kat, nr, fehler, besser, detail, szene, anzahl=5, bis=99, mi
     breite = W - M - R
     if g():                                      # große Umriss-Nummer
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        ImageDraw.Draw(ov).text((M - 8, 250), f"{nr:02d}", font=font("h800", 210), fill=(*ORANGE, 40),
+        ImageDraw.Draw(ov).text((M - 8, 275), f"{nr:02d}", font=font("h800", 190), fill=(*ORANGE, 40),
                                 stroke_width=4, stroke_fill=ORANGE)
         img.alpha_composite(ov)
     y = 520
@@ -298,7 +297,7 @@ def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=
         y += 64 * len(wrap(d, label, font("h800", 56), W - M - R))
     y += 40
     maxwert = max([b[1] for b in balken] or [1])
-    breite = W - M - R - 250
+    breite = W - M - R - 290                    # Werte enden vor Instagrams Knopfleiste rechts
     for eintrag in balken:
         text, wert, hervor = eintrag[:3]
         anzeige = eintrag[3] if len(eintrag) > 3 else (f"{wert:,.0f}".replace(",", ".") if wert >= 1000
@@ -312,7 +311,9 @@ def folie_zahl(kat, rubrik, zahl, einheit, label, balken, quelle, szene, anzahl=
             d.text((M + breite + 24, y + 40), anzeige, font=font("h800", 40), fill=WEISS)
         y += 118
     if g():
-        ImageDraw.Draw(img).text((M, y + 10), quelle, font=font("t400", 26), fill=PFIRSICH)
+        d = ImageDraw.Draw(img)
+        for i, z in enumerate(wrap(d, quelle, font("t400", 26), W - M - R)):
+            d.text((M, y + 10 + i * 34), z, font=font("t400", 26), fill=PFIRSICH)
     return img
 
 
@@ -342,7 +343,9 @@ def folie_ende(kat, titel_zeilen, markiert, zusatz, szene, anzahl=5, bis=99, mit
         ax = M + 75 + kw + 18
         d.line([(ax, y + 140), (ax + 30, y + 140)], fill=KNOPFTEXT, width=4)
         d.line([(ax + 18, y + 128), (ax + 30, y + 140), (ax + 18, y + 152)], fill=KNOPFTEXT, width=4, joint="curve")
-        gesperrt(d, (M, y + 240), "INPERNELL.DE  ·  DIREKTVERMITTLUNG", font("h600", 22), PFIRSICH, 3)
+        lg = Image.open(os.path.join(HIER, "assets", "logo.png")).convert("RGBA")
+        img.alpha_composite(lg, (M - 10, y + 236))
+        gesperrt(ImageDraw.Draw(img), (M + lg.width + 30, y + 266), "DIREKTVERMITTLUNG", font("h600", 22), PFIRSICH, 3)
     return img
 
 
