@@ -211,7 +211,7 @@ def szene_gekuendigt():
     d.rounded_rectangle([M, 1010, W - M, 1130], radius=24, fill=TUERKIS + (255,), outline=TINTE, width=6)
     d.text((W // 2, 1070), "Respawn bei Inpernell", font=font("h800", 62), fill=TINTE, anchor="mm")
     el = [(t, "punch", 0), (ktext("Kein Stress.", (W // 2, 930), 70, anchor="mm"), "hoch", 2.5), (knopf, "pop", 4)]
-    return {"hg": hg, "schlaege": 7, "el": el, "wackeln": (0, 0.9), "blitz": True}
+    return {"hg": hg, "schlaege": 7, "el": el, "wackeln": (0, 0.9), "blitz": True, "statisch": True}
 
 
 def szene_crew():
@@ -415,7 +415,8 @@ def _plakat():
     p = _vorlage("vorlage_poster.png")
     oben = p.getpixel((540, 2))
     img = verlauf([(0, oben), (0.1, oben), (0.8, NACHT), (1, NACHT)])
-    img.alpha_composite(p.resize((1002, 1336), Image.LANCZOS).convert("RGBA"), (39, 190))
+    pl = p.resize((1002, 1336), Image.LANCZOS).filter(ImageFilter.UnsharpMask(radius=1.2, percent=70, threshold=2))
+    img.alpha_composite(pl.convert("RGBA"), (39, 190))
     return img
 
 
@@ -436,12 +437,12 @@ def v_hook():
     el = [(sticker("HEUTE IST RELEASE-TAG", (M - 6, 450)), "pop", -0.3), (l1, "punch", -0.2), (l2, "punch", 1),
           (ktext("Und wir?", (M, y + 30), 66), "hoch", 3),
           (ktext("Haben trotzdem offen.", (M, y + 112), 66, fill=TUERKIS), "pop", 4)]
-    return {"hg": _abdunkeln(_plakat(), 0.62), "schlaege": 7, "el": el, "ohne_logo": True}
+    return {"hg": _abdunkeln(_plakat(), 0.62), "schlaege": 7, "el": el, "ohne_logo": True, "statisch": True}
 
 
 def v_crew():
     return {"hg": _plakat(), "schlaege": 5, "el": [(sticker("DIE CREW IST DA", (M - 6, 230), fuell=TUERKIS), "pop", 0.5)],
-            "ohne_logo": True, "blitz": True}
+            "ohne_logo": True, "blitz": True, "statisch": True}
 
 
 def v_gag():
@@ -452,7 +453,7 @@ def v_gag():
     d.text((W // 2, 1000), "Respawn bei Inpernell", font=font("h800", 62), fill=TINTE, anchor="mm")
     el = [(t, "punch", 0), (ktext("Kein Stress.", (W // 2, 860), 70, anchor="mm"), "hoch", 1.5), (knopf, "pop", 2.5)]
     return {"hg": _abdunkeln(_grau(_plakat()), 0.35), "schlaege": 6, "el": el, "ohne_logo": True,
-            "wackeln": (0, 0.9), "blitz": True}
+            "wackeln": (0, 0.9), "blitz": True, "statisch": True}
 
 
 def _v_held(name, anzeige, grund):
@@ -478,6 +479,7 @@ def v_cheat():
     s["hg"] = _abdunkeln(_plakat(), 0.7)
     s["ohne_logo"] = True
     s["schlaege"] = 10
+    s["statisch"] = True
     return s
 
 
@@ -489,7 +491,7 @@ def v_ende():
     d.rounded_rectangle([W // 2 - kw / 2 - 40, 215, W // 2 + kw / 2 + 40, 295], radius=40, fill=PINK, outline=TINTE,
                         width=6)
     d.text((W // 2, 255), kt, font=fk, fill=WEISS, anchor="mm")
-    return {"hg": _plakat(), "schlaege": 7, "el": [(cta, "pop", 1)], "ohne_logo": True}
+    return {"hg": _plakat(), "schlaege": 7, "el": [(cta, "pop", 1)], "ohne_logo": True, "statisch": True}
 
 
 SZENEN = [v_hook, v_crew, v_gag,
@@ -529,7 +531,8 @@ def erzeuge(ziel, titelbild=None):
         erzeuge_chill(gesamt + 0.3, ton, MUSIK)
     cmd = ["ffmpeg", "-y", "-loglevel", "error", "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}",
            "-r", str(FPS), "-i", "-", "-i", ton, "-map", "0:v", "-map", "1:a", "-shortest",
-           "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-g", "60", "-maxrate", "6M", "-bufsize", "12M",
+           "-c:v", "libx264", "-preset", "slow", "-crf", "16", "-g", "60", "-maxrate", "14M", "-bufsize", "28M",
+           "-x264-params", "aq-mode=3",
            "-profile:v", "high", "-pix_fmt", "yuv420p", "-c:a", "aac", "-b:a", "160k", "-ar", "48000",
            "-movflags", "+faststart", ziel]
     proc = subprocess.Popen(cmd, stdin=subprocess.PIPE)
@@ -539,10 +542,13 @@ def erzeuge(ziel, titelbild=None):
         dauer = s["schlaege"] * SCHLAG
         for i in range(int(round(dauer * FPS))):
             t = i / FPS
-            z = 1.0 + 0.03 * (t / dauer) + 0.05 * (1 - _ease(t / 0.3))       # langsamer Zoom + Punch beim Schnitt
-            cw, ch = int(W / z), int(H / z)
-            x, y = (W - cw) // 2, (H - ch) // 2
-            frame = s["hg"].crop((x, y, x + cw, y + ch)).resize((W, H), Image.LANCZOS)
+            if s.get("statisch"):                                            # Plakat-Folien ohne Zoom (bleiben scharf)
+                frame = s["hg"].copy()
+            else:
+                z = 1.0 + 0.02 * (t / dauer) + 0.03 * (1 - _ease(t / 0.3))   # leichter Zoom + Punch beim Schnitt
+                cw, ch = int(W / z), int(H / z)
+                x, y = (W - cw) // 2, (H - ch) // 2
+                frame = s["hg"].crop((x, y, x + cw, y + ch)).resize((W, H), Image.LANCZOS)
             for eb, eff, schlag in s["ebenen"]:
                 _zeige(frame, eb, eff, (t - schlag * SCHLAG) / (0.7 if eff == "wisch" else 0.4))
             if not s.get("ohne_logo"):
