@@ -25,5 +25,7 @@ Diese Regeln gelten für alle Beiträge, Stories, Reels und die Top-Job-Seite.
 - Vor jeder Änderung am Layout eine Vorschau als Bild zeigen; veröffentlicht wird erst nach Freigabe.
 
 ## Abläufe
+- Redaktionsplan immer bildlich zeigen: `python redaktionsplan.py` erzeugt `vorschau/redaktionsplan.png`
+  (ab heute 14 Tage, mit Status und Vorschaubildern). Nach jeder Planänderung neu erzeugen und mitschicken.
 - Veröffentlichen nur über die Workflows; Löschen geht nicht über die Schnittstelle (Inhaber löscht in der App).
 - Keine bekannten oder fremden Stimmen nachahmen/klonen.
