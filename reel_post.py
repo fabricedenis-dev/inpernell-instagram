@@ -45,10 +45,10 @@ def protokoll_schreiben(zeile):
         w.writerows(zeilen)
 
 
-def _im_fenster(jetzt, stunde, minute):
-    """Ab 15 Minuten vor der Planzeit bis 4 Stunden danach (GitHub startet geplante Läufe oft verspätet)."""
+def _im_fenster(jetzt, stunde, minute, vorher=15):
+    """Ab `vorher` Minuten vor der Planzeit bis 4 Stunden danach (GitHub startet geplante Läufe oft verspätet)."""
     m = jetzt.hour * 60 + jetzt.minute
-    return stunde * 60 + minute - 15 <= m <= stunde * 60 + minute + 240
+    return stunde * 60 + minute - vorher <= m <= stunde * 60 + minute + 240
 
 
 def faelliges_reel(heute):
@@ -73,7 +73,7 @@ def sonder_reel(jetzt):
     for r in json.load(open(WARTESCHLANGE, encoding="utf-8")):
         if r.get("zeit") and r.get("datum") == heute and r["id"] not in erledigt:
             stunde, minute = (int(x) for x in r["zeit"].split(":"))
-            if _im_fenster(jetzt, stunde, minute):
+            if _im_fenster(jetzt, stunde, minute, vorher=0):      # Sonder-Reels nie vor der genannten Uhrzeit
                 if not r.get("freigegeben"):
                     print(f"::warning::Sonder-Reel {r['id']} ist fällig, aber noch nicht freigegeben – nichts veröffentlicht.")
                     return None
