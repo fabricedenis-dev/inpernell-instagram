@@ -387,3 +387,69 @@ def abspann_ebenen(text, knopf):
     ImageDraw.Draw(l).text((W // 2, ly + lg.height + 30), "DIREKTVERMITTLUNG", font=font("h700", 30),
                            fill=(255, 214, 180), anchor="ma")
     return hg, [t, k, l]
+
+
+def _alpaka(d, x, y, s=1.0, wolle=(246, 238, 226), schatten=(222, 210, 192), krawatte=False, blick=1):
+    """Comic-Alpaka (Fußpunkt x, y), Blickrichtung blick=1 rechts / -1 links."""
+    k = lambda v: v * s
+    # Beine
+    for dx in (-70, -30, 40, 80):
+        d.rounded_rectangle(_box(x + k(dx) - k(14), y - k(150), x + k(dx) + k(14), y), radius=10 * K, fill=schatten,
+                            outline=STRICH, width=5 * K)
+    # Körper aus Wollkugeln
+    for cx, cy, r in ((-60, -190, 70), (0, -205, 78), (60, -190, 70), (-20, -150, 70), (40, -150, 66)):
+        d.ellipse(_box(x + k(cx) - k(r), y + k(cy) - k(r), x + k(cx) + k(r), y + k(cy) + k(r)), fill=wolle,
+                  outline=STRICH, width=5 * K)
+    for cx, cy, r in ((-60, -190, 64), (0, -205, 72), (60, -190, 64), (-20, -150, 64), (40, -150, 60)):
+        d.ellipse(_box(x + k(cx) - k(r), y + k(cy) - k(r), x + k(cx) + k(r), y + k(cy) + k(r)), fill=wolle)
+    # Hals und Kopf
+    hx = x + blick * k(95)
+    d.rounded_rectangle(_box(hx - k(36), y - k(420), hx + k(36), y - k(200)), radius=30 * K, fill=wolle, outline=STRICH,
+                        width=5 * K)
+    d.ellipse(_box(hx - k(60), y - k(500), hx + k(60), y - k(390)), fill=wolle, outline=STRICH, width=5 * K)
+    for ox in (-34, 34):
+        d.polygon(_p(hx + k(ox) - k(12), y - k(480), hx + k(ox), y - k(545), hx + k(ox) + k(12), y - k(480)), fill=wolle,
+                  outline=STRICH)
+    d.ellipse(_box(hx + blick * k(20) - k(34), y - k(445), hx + blick * k(20) + k(34), y - k(395)), fill=schatten,
+              outline=STRICH, width=4 * K)                                      # Schnauze
+    for ox in (-22, 22):
+        d.ellipse(_box(hx + k(ox) - k(9), y - k(470), hx + k(ox) + k(9), y - k(452)), fill=STRICH)
+        d.ellipse(_box(hx + k(ox) - k(3), y - k(468), hx + k(ox) + k(2), y - k(463)), fill=WEISS)
+    d.arc(_box(hx + blick * k(20) - k(16), y - k(428), hx + blick * k(20) + k(16), y - k(404)), 20, 160, fill=STRICH,
+          width=4 * K)                                                           # Lächeln
+    if krawatte:
+        d.polygon(_p(hx - k(12), y - k(390), hx + k(12), y - k(390), hx + k(18), y - k(300), hx, y - k(270),
+                     hx - k(18), y - k(300)), fill=(184, 44, 54), outline=STRICH)
+
+
+def einspieler_alpaka(text="INZWISCHEN BEIM VORGÄNGER:"):
+    """Kurzer Einspieler wie in Sitcoms: sonnige Alpaka-Weide, ein Alpaka trägt die alte rote Krawatte."""
+    img = _verlauf(W * K, H * K, (150, 206, 246), (226, 242, 252))
+    d = ImageDraw.Draw(img)
+    d.ellipse(_box(760, 300, 960, 500), fill=(255, 214, 90), outline=STRICH, width=6 * K)          # Sonne
+    for i in range(12):
+        a = i * math.pi / 6
+        d.line(_p(860 + math.cos(a) * 125, 400 + math.sin(a) * 125, 860 + math.cos(a) * 165, 400 + math.sin(a) * 165),
+               fill=(255, 214, 90), width=8 * K)
+    for cx, cy, r in ((200, 520, 60), (270, 500, 75), (340, 525, 55)):                              # Wolke
+        d.ellipse(_box(cx - r, cy - r, cx + r, cy + r), fill=WEISS, outline=STRICH, width=5 * K)
+    d.polygon(_p(0, 1000, 300, 880, 620, 960, 1080, 860, 1080, 1100, 0, 1100), fill=(96, 170, 96), outline=STRICH)
+    d.rectangle(_box(0, 1060, W, H), fill=(120, 192, 104))
+    d.line(_p(0, 1060, W, 1060), fill=STRICH, width=6 * K)
+    for x in range(40, W, 160):                                                                    # Zaun
+        d.rectangle(_box(x, 1000, x + 22, 1180), fill=(196, 150, 104), outline=STRICH, width=4 * K)
+    for yy in (1030, 1110):
+        d.rectangle(_box(0, yy, W, yy + 18), fill=(206, 160, 112), outline=STRICH, width=4 * K)
+    for x, y in ((120, 1700), (500, 1760), (880, 1690), (300, 1840), (760, 1860)):                  # Blumen
+        for a in range(5):
+            w_ = a * math.pi * 2 / 5
+            d.ellipse(_box(x + math.cos(w_) * 14 - 10, y + math.sin(w_) * 14 - 10, x + math.cos(w_) * 14 + 10,
+                           y + math.sin(w_) * 14 + 10), fill=WEISS)
+        d.ellipse(_box(x - 8, y - 8, x + 8, y + 8), fill=(255, 196, 64))
+    _alpaka(d, 300, 1560, 1.0, wolle=(214, 168, 120), schatten=(190, 144, 98), blick=1)
+    _alpaka(d, 700, 1640, 1.25, krawatte=True, blick=-1)
+    img = fertig(img)
+    rd_sticker = __import__("reel_design").sticker
+    rgba = img.convert("RGBA")
+    rd_sticker(rgba, text, (W // 2 - 300, 640), winkel=-3, fuell=(255, 196, 64), schrift=STRICH, groesse=38)
+    return rgba.convert("RGB")

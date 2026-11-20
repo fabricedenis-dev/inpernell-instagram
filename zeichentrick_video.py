@@ -65,8 +65,16 @@ def _sprechen_einmal(e, st):
         f"https://api.elevenlabs.io/v1/text-to-speech/{st['eleven']}?output_format=mp3_44100_128", data=body,
         headers={"xi-api-key": os.environ.get("ELEVENLABS_API_KEY", "proxy-injected"), "Content-Type": "application/json",
                  "Accept": "audio/mpeg"})
-    with urllib.request.urlopen(req, timeout=120) as r:
-        mp3 = r.read()
+    import hashlib
+    cache = os.path.join(os.path.dirname(os.path.abspath(__file__)), "vorschau", "comic", "ton")
+    os.makedirs(cache, exist_ok=True)
+    cpfad = os.path.join(cache, hashlib.sha1((st["eleven"] + "|" + e.get("sprich", e["text"]) + "|" + str(_VERSUCH[0])).encode()).hexdigest()[:16] + ".mp3")
+    if os.path.exists(cpfad):
+        mp3 = open(cpfad, "rb").read()
+    else:
+        with urllib.request.urlopen(req, timeout=120) as r:
+            mp3 = r.read()
+        open(cpfad, "wb").write(mp3)
     dek = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-f", "s16le", "-ac", "1", "-ar", str(SR), "pipe:1"],
                          input=mp3, capture_output=True, check=True).stdout
     ton = np.frombuffer(dek, np.int16).astype(np.float32) / 32768
@@ -80,11 +88,15 @@ def _sprechen_einmal(e, st):
     return ton, [(w.start, w.end) for w in woerter[:n]]
 
 
+_VERSUCH = [0]
+
+
 def sprechen(e, st, versuche=3):
     """Fordert neu an, wenn die Stimme Wörter auslässt (weniger als 85 % der Wörter erkannt)."""
     n = len(e["text"].split())
     beste = None
     for v in range(versuche):
+        _VERSUCH[0] = v
         ton, zeiten = _sprechen_einmal(e, st)
         if beste is None or len(zeiten) > len(beste[1]):
             beste = (ton, zeiten)
@@ -94,7 +106,7 @@ def sprechen(e, st, versuche=3):
     return beste
 
 
-def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
+def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None, ohne_ut=False):
     genz = e["wer"] == "genz"
     img = z.hintergrund("hocker" if genz else "buero")
     cx = 540 if genz else 680
@@ -109,6 +121,13 @@ def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
         x, y = max(0, min(W - cw, x)), max(0, min(H - ch, y))
         img = img.crop((x, y, x + cw, y + ch)).resize((W, H), Image.LANCZOS)
     z.titel(img, TITEL)
+    if e.get("tag"):          # Einordnung über dem Untertitel, z. B. „STELLENANZEIGE“ oder „ÜBERSETZUNG“
+        z_ = ImageDraw.Draw(img)
+        import reel_design as rd_
+        rgba = img.convert("RGBA")
+        rd_.sticker(rgba, e["tag"], (W // 2 - 170, 560), winkel=-3, fuell=tuple(e.get("tag_farbe", (255, 196, 64))),
+                    schrift=z.STRICH, groesse=30)
+        img = rgba.convert("RGB")
     # Untertitel: ganze Zeile, gesprochenes Wort orange
     d = ImageDraw.Draw(img)
     f = font("h800", 56)
@@ -127,7 +146,7 @@ def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
         x = (W - breite) / 2
         for wort in zeile:
             farbe = ORANGE if aktiv == idx else WEISS
-            if worte_bis is None or idx <= worte_bis:
+            if not ohne_ut and (worte_bis is None or idx <= worte_bis):
                 d.text((x, 640 + zi * 72), wort, font=f, fill=farbe, stroke_width=8, stroke_fill=z.STRICH)
             x += d.textlength(wort + " ", font=f)
             idx += 1
@@ -252,6 +271,7 @@ def main(ziel, sketch=None):
             blinzeln.update(range(k, k + 4))
     ab_hg, ab_ebenen = z.abspann_ebenen(ABSPANN_TEXT, "Link in der Bio")
     letztes = None
+    einspieler = None
     mundlog = []
     for k in range(int(gesamt * FPS)):
         zeit = k / FPS
@@ -291,7 +311,16 @@ def main(ziel, sketch=None):
                     aktiv = min(worte - 1, int(rel / max(0.1, sprech_dauer) * worte))
             augen = "zu" if k in blinzeln and e["augen"] not in ("muede",) else e["augen"]
             zoom = 1.0 + 0.12 * min(1, max(0, rel) / max(0.1, sprech_dauer)) if e.get("pointe") else 1.0
-            frame = szene(e, offen, augen, zoom=zoom, aktiv=aktiv)
+            if e.get("einspieler") and rel > sprech_dauer + 0.35:     # Sitcom-Einspieler nach der Pointe
+                q = min(1.0, (rel - sprech_dauer - 0.35) / 0.25)
+                if einspieler is None:
+                    einspieler = z.einspieler_alpaka(e.get("einspieler_text", "INZWISCHEN BEIM VORGÄNGER:"))
+                zz = 1.0 + 0.04 * min(1, (rel - sprech_dauer - 0.35) / 2.5)
+                cw, ch = int(W / zz), int(H / zz)
+                bild = einspieler.crop(((W - cw) // 2, (H - ch) // 2, (W - cw) // 2 + cw, (H - ch) // 2 + ch)).resize((W, H))
+                frame = Image.blend(szene(e, False, augen, zoom=zoom, aktiv=None).convert("RGB"), bild, q) if q < 1 else bild
+            else:
+                frame = szene(e, offen, augen, zoom=zoom, aktiv=aktiv, ohne_ut=rel < -0.05)
             letztes = frame
         mundlog.append(1 if tk is not None and offen else 0)
         proc.stdin.write(frame.convert("RGB").tobytes())
