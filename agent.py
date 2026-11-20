@@ -410,6 +410,19 @@ def facebook_diagnose(token):
     return " ".join(teile)
 
 
+NICHT_VOR = None   # geplante Uhrzeit (datetime): veröffentlicht wird frühestens dann, alles andere vorher vorbereitet
+
+
+def punkt_warten():
+    """Bis zur geplanten Uhrzeit warten (pünktliche Veröffentlichung)."""
+    if NICHT_VOR is None:
+        return
+    rest = (NICHT_VOR - datetime.now(NICHT_VOR.tzinfo)).total_seconds()
+    if rest > 0:
+        print(f"Alles vorbereitet – veröffentliche pünktlich um {NICHT_VOR:%H:%M} Uhr (warte {rest / 60:.1f} Minuten).")
+        time.sleep(rest)
+
+
 def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_url=None, story_url=None,
                      bild_urls=None):
     """Bild, Reel oder Story über die offizielle Instagram-Schnittstelle veröffentlichen; gibt die ID zurück."""
@@ -451,6 +464,7 @@ def veroeffentlichen(token, caption, bild_url=None, video_url=None, titelbild_ur
         runden, pause = 15, 4
     container = http(f"{basis}/{ig_id}/media", daten)["id"]
     warten(container, runden, pause)
+    punkt_warten()
     return http(f"{basis}/{ig_id}/media_publish", {"creation_id": container, "access_token": token})["id"]
 
 
@@ -566,12 +580,17 @@ def main():
     # Zeitfenster 18:45–22:59 statt nur der Stunde 18: GitHub startet geplante Läufe oft 30–60 Minuten
     # verspätet. Ein Nachhol-Lauf am Abend postet dann noch; doppelt wird nicht gepostet (Protokoll-Prüfung).
     minute_jetzt = jetzt.hour * 60 + jetzt.minute
-    im_fenster = stunde is not None and stunde * 60 + 45 <= minute_jetzt <= 22 * 60 + 59
+    # Pünktlich: Läufe starten ab 18:00 (GitHub verspätet geplante Läufe oft), bereiten alles vor und
+    # veröffentlichen erst um 18:50 (NICHT_VOR). Spätere Läufe bis 22:59 holen nach, falls nichts erschienen ist.
+    im_fenster = stunde is not None and stunde * 60 <= minute_jetzt <= 22 * 60 + 59
+    global NICHT_VOR
+    if stunde is not None and minute_jetzt < stunde * 60 + 50 and not wahr("ERZWINGEN"):
+        NICHT_VOR = jetzt.replace(hour=stunde, minute=50, second=0, microsecond=0)
     if not wahr("ERZWINGEN") and not im_fenster:
         if stunde is None:
             print("Heute (Samstag) ist laut Zeitplan Pause. Ende.")
         else:
-            print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – gepostet wird zwischen {stunde}:45 und 22:59 Uhr. Ende.")
+            print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – Läufe zählen zwischen {stunde}:00 und 22:59 Uhr (Post um {stunde}:50). Ende.")
         return
     protokoll = protokoll_lesen()
     mit_story = os.environ.get("STORY", "true").strip().lower() not in ("0", "false", "nein", "no")
