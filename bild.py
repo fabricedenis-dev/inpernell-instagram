@@ -170,7 +170,8 @@ def elemente(job, fmt):
         fc = font("h600", 17)
         gesperrt(d, (x + 50, F["oben"] + 18), "PERSONALBERATUNG FÜR", fc, WEISS, 2.6)
         gesperrt(d, (x + 50, F["oben"] + 44), "FACH- UND FÜHRUNGSKRÄFTE", fc, WEISS, 2.6)
-    els.append({**_element(W, H, kopf), "t": 0.15, "name": "kopf"})
+    if fmt != "reel":       # Videos: kein Logo oben links (dort blendet die Plattform Profil/Kontoname ein)
+        els.append({**_element(W, H, kopf), "t": 0.15, "name": "kopf"})
 
     # Titelblock von unten nach oben planen: zuerst messen, dann platzieren
     ft, tz = fit(mess, job["titel"], "h800", F["titel"], 50, breite, 3)
@@ -184,7 +185,7 @@ def elemente(job, fmt):
     # Überzeile: Badge "TOP JOB DES TAGES" + Datum
     def ueberzeile(d, ebene):
         f = font("h700", 21)
-        text = "TOP JOB DES TAGES"
+        text = job.get("badge") or "TOP JOB DES TAGES"
         tw = gesperrt_breite(d, text, f, 3.6)
         d.rounded_rectangle([M, y0, M + tw + 40, y0 + 40], radius=20, fill=ORANGE)
         gesperrt(d, (M + 20, y0 + 9), text, f, KNOPFTEXT, 3.6)
