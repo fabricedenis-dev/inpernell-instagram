@@ -13,6 +13,7 @@ Ausgabe: vorschau/topjob-video/<JJJJ-MM-TT>-<jobid>.mp4, …-kontaktbogen.jpg, �
 import datetime as dt
 import difflib
 import hashlib
+import itertools
 import json
 import os
 import re
@@ -430,27 +431,43 @@ UT_FONT = 54
 
 
 def ut_bloecke(woerter, maxw=RECHTS - M - 40):
-    """Teilt die Wörter in Blöcke von höchstens zwei Zeilen; Satzende und Doppelpunkt beenden einen Block."""
+    """Untertitel-Blöcke von je einer Zeile: Satzzeichen beenden eine Zeile, lange Satzteile werden
+    gleichmäßig auf mehrere Zeilen verteilt (keine einzelnen Restwörter)."""
     d = ImageDraw.Draw(Image.new("RGB", (1, 1)))
     f = font("h800", UT_FONT)
-    bloecke, zeilen, zeile = [], [], []
+    breite = lambda idx: d.textlength(" ".join(woerter[k] for k in idx), font=f)
+    teile, akt = [], []
     for i, w in enumerate(woerter):
-        probe = " ".join(woerter[k] for k in zeile + [i])
-        if zeile and d.textlength(probe, font=f) > maxw:
-            zeilen.append(zeile)
-            zeile = []
-            if len(zeilen) == 2:
-                bloecke.append(zeilen)
-                zeilen = []
-        zeile.append(i)
-        if re.search(r"[.?!:]$", w) or (re.search(r",$", w) and len(zeilen) == 1 and len(zeile) >= 2):
-            zeilen.append(zeile)
-            bloecke.append(zeilen)
-            zeilen, zeile = [], []
-    if zeile:
-        zeilen.append(zeile)
-    if zeilen:
-        bloecke.append(zeilen)
+        akt.append(i)
+        if re.search(r"[,.?!:]$", w):
+            teile.append(akt)
+            akt = []
+    if akt:
+        teile.append(akt)
+    # sehr kurze Satzteile (bis 2 Wörter) mit dem folgenden zusammenlegen, wenn es in eine Zeile passt
+    zusammen = []
+    for t in teile:
+        if zusammen and len(zusammen[-1]) <= 2 and not re.search(r"[.?!:]$", woerter[zusammen[-1][-1]]) \
+                and breite(zusammen[-1] + t) <= maxw:
+            zusammen[-1] = zusammen[-1] + t
+        else:
+            zusammen.append(t)
+    bloecke = []
+    for t in zusammen:
+        n = 1
+        while True:      # Aufteilung in n Zeilen mit der kleinsten längsten Zeile (alle Trennstellen probieren)
+            beste = None
+            for schnitte in itertools.combinations(range(1, len(t)), n - 1):
+                grenzen = (0,) + schnitte + (len(t),)
+                zz = [t[grenzen[j]:grenzen[j + 1]] for j in range(n)]
+                laengste = max(breite(z) for z in zz)
+                if beste is None or laengste < beste[0]:
+                    beste = (laengste, zz)
+            if beste is None or beste[0] <= maxw or n >= len(t):
+                zeilen = beste[1] if beste else [t]
+                break
+            n += 1
+        bloecke += [[z] for z in zeilen]
     return bloecke
 
 

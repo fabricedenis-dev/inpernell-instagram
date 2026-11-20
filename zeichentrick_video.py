@@ -22,8 +22,8 @@ TITEL = "Wie es sich anfühlt, als Gen Z einen Job zu suchen"
 # Stimmen: ElevenLabs (Starter-Abo mit gewerblicher Lizenz), Stimmen aus der Bibliothek, die die Sprecher selbst
 # dort anbieten. Schlüssel liegt als Netzwerk-Geheimnis in der Umgebung (nicht im Repository).
 STIMMEN = {
-    "personaler": dict(eleven="87AwpS6yC86wa2WglbsK"),     # Michael Danisch – Deep and Soulful
-    "genz": dict(eleven="raYPS0b2ZPlIzZWkcD0G"),           # Lars (jünger und höher als Michael, ca. 115 Hz)
+    "personaler": dict(eleven="89gcX1AeMGgcsN8ypHLu"),     # Rupert – Proper & At Your Service (steif, förmlich)
+    "genz": dict(eleven="JNpQqni9iUx1Jxy9h0P1"),           # Timo – Confident and Mild (jung, lässig)
 }
 _MODELL = {}
 DIALOG = [
@@ -39,8 +39,8 @@ DIALOG = [
          fx="schweiss",
          vor=0.6),
     dict(wer="personaler", text="Wann kannst du anfangen?", sprich="[desperate] [hopeful] Wann kannst du anfangen?",
-         augen="gross", ruhe="grinsen", arm="tisch", brauen="sorge", fx="speedlines", vor=1.3, pointe=True),
-    dict(wer="genz", text="Remote?", sprich="[unimpressed] Remote?", augen="genervt", ruhe="schief", arm="achselzucken", fx="fragezeichen",
+         augen="gross", ruhe="grinsen", arm="tisch_hoch", brauen="sorge", fx="speedlines", sfx_vor="grillen", vor=1.3, pointe=True),
+    dict(wer="genz", text="Remote?", sprich="[unimpressed] Remote?", augen="genervt", ruhe="schief", arm="achselzucken", fx="fragezeichen", sfx_nach="badumtss",
          vor=0.35, nach=1.3),
 ]
 ABSPANN_TEXT = "Fachkräftemangel ist real. Wir finden die, die wirklich wollen."
@@ -135,20 +135,64 @@ def main(ziel):
         takte.append(dict(e=e, start=t, ton=ton, dauer=dauer, zeiten=zeiten, vor=vor))
         t += dauer
     gesamt = t + ABSPANN
-    # Tonspur: Stimmen + leise eigene Musik (im Abspann lauter)
+    # Tonspur: Stimmen + Comedy-Effekte (Grillen in der Starr-Pause, Wusch bei der Pointe, Ba-dum-tss am Schluss);
+    # Musik nur im Abspann
     import musik
+    n = int(gesamt * SR)
+    mix = np.zeros(n, np.float32)
+    rng = np.random.default_rng(7)
+
+    def setze(sig, sek, gain=1.0):
+        i = int(sek * SR)
+        if 0 <= i < n:
+            sig = sig[: n - i]
+            mix[i:i + len(sig)] += sig * gain
+
+    def grillen(dauer):
+        out = np.zeros(int(dauer * SR), np.float32)
+        t = np.arange(int(0.03 * SR)) / SR
+        zirp = np.sin(2 * np.pi * 4600 * t) * np.sin(np.pi * t / 0.03)
+        for k in np.arange(0.05, dauer - 0.2, 0.45):
+            for j in range(3):
+                i = int((k + j * 0.055) * SR)
+                out[i:i + len(zirp)] += zirp[: len(out) - i]
+        return out * 0.18
+
+    def wusch():
+        t = np.arange(int(0.35 * SR)) / SR
+        x = rng.standard_normal(len(t))
+        from scipy.signal import butter, lfilter
+        b_, a_ = butter(2, [800 / (SR / 2), 5000 / (SR / 2)], "band")
+        return (lfilter(b_, a_, x) * np.sin(np.pi * t / 0.35) ** 2 * 0.5).astype(np.float32)
+
+    def badumtss():
+        def tom(f, d=0.16):
+            t = np.arange(int(d * SR)) / SR
+            return np.sin(2 * np.pi * f * (1 + 0.6 * np.exp(-t * 30)) * t) * np.exp(-t * 18)
+        t = np.arange(int(0.9 * SR)) / SR
+        from scipy.signal import butter, lfilter
+        b_, a_ = butter(2, 6000 / (SR / 2), "high")
+        becken = lfilter(b_, a_, rng.standard_normal(len(t))) * np.exp(-t * 4.5) * 0.9
+        out = np.zeros(int(1.4 * SR), np.float32)
+        for sek, sig in ((0, tom(190)), (0.17, tom(130)), (0.40, becken)):
+            i = int(sek * SR)
+            out[i:i + len(sig)] += sig[: len(out) - i]
+        return out * 0.55
+
+    for tk in takte:
+        st = tk["start"] + tk["vor"]
+        setze(tk["ton"], st, 0.95)
+        if tk["e"].get("sfx_vor") == "grillen":
+            setze(grillen(tk["vor"]), tk["start"])
+            setze(wusch(), st - 0.15, 0.6)
+        if tk["e"].get("sfx_nach") == "badumtss":
+            setze(badumtss(), st + len(tk["ton"]) / SR + 0.15)
     mwav = os.path.join(tmp, "musik.wav")
-    musik.erzeuge_chill(gesamt, mwav, "ocean_lofi")
+    musik.erzeuge_track(ABSPANN + 0.5, mwav, variante=2)
     with wave.open(mwav) as w:
         m = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32).reshape(-1, 2).mean(axis=1) / 32768
-    n = int(gesamt * SR)
-    m = np.pad(m, (0, max(0, n - len(m))))[:n]
-    pegel = np.full(n, 0.12)
-    pegel[int(t * SR):] = np.linspace(0.12, 0.45, n - int(t * SR))
-    mix = m * pegel
-    for tk in takte:
-        a = int((tk["start"] + tk["vor"]) * SR)
-        mix[a:a + len(tk["ton"])] += tk["ton"] * 0.95
+    m = m[: n - int(t * SR)] * np.minimum(1, np.arange(len(m[: n - int(t * SR)])) / (0.6 * SR)) * 0.35
+    mix[int(t * SR):int(t * SR) + len(m)] += m
     mix = mix / max(1e-6, np.abs(mix).max()) * 0.9
     tonpfad = os.path.join(tmp, "mix.wav")
     with wave.open(tonpfad, "wb") as w:

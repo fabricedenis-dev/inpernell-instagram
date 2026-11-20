@@ -110,18 +110,6 @@ def hintergrund(stuhl=None):
         d.line(_p(600, 1500, 820, 1500), fill=STRICH, width=18 * K)
         for x in (600, 710, 820):
             d.ellipse(_box(x - 20, 1494, x + 20, 1534), fill=(40, 40, 46), outline=STRICH, width=4 * K)
-        # Schreibtisch links mit Laptop und Kaffee
-        d.polygon(_p(0, 1180, 420, 1180, 440, 1230, 0, 1230), fill=(196, 150, 104), outline=STRICH)
-        d.line(_p(0, 1180, 420, 1180, 440, 1230, 0, 1230), fill=STRICH, width=6 * K)
-        d.rectangle(_box(0, 1230, 430, 1260), fill=(160, 118, 82), outline=STRICH, width=5 * K)
-        d.rectangle(_box(30, 1260, 60, 1560), fill=(150, 110, 76), outline=STRICH, width=5 * K)
-        d.polygon(_p(120, 1180, 330, 1180, 312, 1040, 138, 1040), fill=(170, 176, 190), outline=STRICH)
-        d.line(_p(120, 1180, 330, 1180, 312, 1040, 138, 1040, 120, 1180), fill=STRICH, width=6 * K)
-        d.ellipse(_box(212, 1096, 236, 1120), fill=WEISS)
-        d.rounded_rectangle(_box(356, 1120, 404, 1180), radius=8 * K, fill=WEISS, outline=STRICH, width=5 * K)
-        d.arc(_box(392, 1132, 424, 1164), 270, 90, fill=STRICH, width=5 * K)
-        for sx in (370, 390):
-            d.arc(_box(sx - 8, 1070, sx + 8, 1110), 100, 260, fill=(170, 160, 150), width=3 * K)
     if stuhl == "hocker":
         d.ellipse(_box(380, 1395, 700, 1450), fill=(110, 124, 120), outline=STRICH, width=6 * K)
         d.rectangle(_box(526, 1440, 554, 1560), fill=(90, 100, 96), outline=STRICH, width=5 * K)
@@ -214,6 +202,31 @@ def _kopf(img, cx, cy, r, art, augen, mund, brauen):
         d.arc(_box(cx - 24, my - 6, cx + 24, my + 14), 200, 340, fill=STRICH, width=6 * K)
 
 
+def tisch_vorn(img, cx, oben=1290):
+    """Schreibtisch vor dem Personaler: Platte (Draufsicht leicht schräg) + Front bis zum Boden, Laptop, Kaffeetasse."""
+    d = ImageDraw.Draw(img)
+    x0, x1 = cx - 380, min(W + 40, cx + 400)
+    d.polygon(_p(x0 + 30, oben, x1 - 30, oben, x1, oben + 50, x0, oben + 50), fill=(204, 158, 110))
+    d.line(_p(x0 + 30, oben, x1 - 30, oben, x1, oben + 50, x0, oben + 50, x0 + 30, oben), fill=STRICH, width=7 * K)
+    d.rectangle(_box(x0, oben + 50, x1, oben + 84), fill=(170, 126, 86), outline=STRICH, width=6 * K)
+    d.rectangle(_box(x0 + 20, oben + 84, x1 - 20, 1600), fill=(186, 140, 96), outline=STRICH, width=7 * K)
+    d.rectangle(_box(x0 + 20, oben + 84, x0 + 70, 1600), fill=(160, 118, 80))
+    d.line(_p(x0 + 60, oben + 250, x1 - 60, oben + 250), fill=(156, 114, 78), width=5 * K)       # Schubladen-Fuge
+    d.rounded_rectangle(_box(cx - 40, oben + 160, cx + 40, oben + 180), radius=8 * K, fill=(120, 90, 60))
+    # Laptop (von hinten) links, Tasse rechts
+    lx = cx - 330
+    d.polygon(_p(lx, oben + 26, lx + 190, oben + 26, lx + 176, oben - 120, lx + 14, oben - 120), fill=(176, 182, 196))
+    d.line(_p(lx, oben + 26, lx + 190, oben + 26, lx + 176, oben - 120, lx + 14, oben - 120, lx, oben + 26), fill=STRICH,
+           width=6 * K)
+    d.ellipse(_box(lx + 82, oben - 64, lx + 108, oben - 38), fill=WEISS)
+    tx = cx + 250
+    d.rounded_rectangle(_box(tx, oben - 40, tx + 54, oben + 24), radius=8 * K, fill=WEISS, outline=STRICH, width=5 * K)
+    d.text(_p(tx + 27, oben - 8), "BOSS", font=font("h800", 14 * K), fill=ORANGE, anchor="mm")
+    d.arc(_box(tx + 42, oben - 28, tx + 76, oben + 6), 270, 90, fill=STRICH, width=5 * K)
+    for sx in (tx + 16, tx + 38):
+        d.arc(_box(sx - 8, oben - 100, sx + 8, oben - 56), 100, 260, fill=(170, 160, 150), width=3 * K)
+
+
 def _hand(d, x, y, links=True):
     d.ellipse(_box(x - 26, y - 24, x + 26, y + 26), fill=HAUT, outline=STRICH, width=5 * K)
     tx = x + (20 if links else -20)
@@ -271,12 +284,17 @@ def figur(img, cx, fuss, art, augen="normal", mund="neutral", arm="unten", sitzt
         wege = [[li, (cx - 170, schulter + 150), (cx - 230, schulter + 40)], [re, (cx + 170, schulter + 150), (cx + 230, schulter + 40)]]
     elif arm == "handy":
         wege = [[li, (cx - 110, schulter + 170), (cx - 30, schulter + 150)], [re, (cx + 110, schulter + 170), (cx + 30, schulter + 150)]]
-    elif arm == "tisch":
-        wege = [[li, (cx - 150, schulter + 170), (cx - 250, schulter + 190)], [re, (cx + 40, schulter + 200), (cx - 120, schulter + 210)]]
+    elif arm == "tisch":       # Unterarme liegen auf der Tischplatte
+        wege = [[li, (cx - 150, schulter + 120), (cx - 90, 1296)], [re, (cx + 150, schulter + 120), (cx + 90, 1296)]]
+    elif arm == "tisch_hoch":  # Hände gefaltet, nach vorn gebeugt (verzweifelt-hoffnungsvoll)
+        wege = [[li, (cx - 140, schulter + 110), (cx - 26, schulter + 130)], [re, (cx + 140, schulter + 110), (cx + 26, schulter + 130)]]
     elif arm == "zeigen":
         wege = [[li, (cx - 110, huefte - 30)], [re, (cx + 150, schulter + 20), (cx + 210, schulter - 90)]]
     else:
         wege = [[li, (cx - 120, huefte - 20)], [re, (cx + 120, huefte - 20)]]
+    if arm in ("tisch", "tisch_hoch"):
+        tisch_vorn(img, cx)
+        d = ImageDraw.Draw(img, "RGBA")
     for i, weg in enumerate(wege):
         _linie(d, weg, stoff if i == 0 else stoff_s, 40)
         _hand(d, *weg[-1], links=i == 0)
