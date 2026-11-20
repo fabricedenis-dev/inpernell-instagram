@@ -83,7 +83,8 @@ def _sprechen_einmal(e, st):
     woerter = [w for s in segs for w in s.words]
     n = len(e["text"].split())
     if woerter:
-        ton = ton[: int((woerter[min(len(woerter), n) - 1].end + 0.2) * SR)]
+        # nach dem letzten erkannten Wort schneiden (nicht nach Wortzahl: „Top-Job“ zählt die Erkennung als zwei Wörter)
+        ton = ton[: int((woerter[-1].end + 0.25) * SR)]
     print("  erkannt:", " ".join(w.word.strip() for w in woerter))
     return ton, [(w.start, w.end) for w in woerter[:n]]
 
@@ -283,14 +284,14 @@ def main(ziel, sketch=None):
     pegel = np.full(n, 0.20, np.float32)
     for tk in takte:
         a0 = int((tk["start"] + tk["vor"]) * SR)
-        pegel[a0:a0 + len(tk["ton"])] = 0.11
+        pegel[max(0, a0 - int(0.3 * SR)):a0 + len(tk["ton"])] = 0.11      # schon vor dem ersten Wort leiser
         if tk["e"].get("sfx_vor") == "grillen":                       # Stille für die Pointe
             pegel[int(tk["start"] * SR):int((tk["start"] + tk["vor"] + len(tk["ton"]) / SR) * SR)] = 0.0
         if tk["e"].get("sfx_nach") == "badumtss":
             e0 = int((tk["start"] + tk["vor"] + len(tk["ton"]) / SR) * SR)
             pegel[e0:int(abspann_start * SR)] = 0.0
     pegel[int(abspann_start * SR):] = 0.30
-    pegel[int(ab_sprech * SR):int(ab_sprech * SR) + len(ab_ton)] = 0.16
+    pegel[int((ab_sprech - 0.4) * SR):int(ab_sprech * SR) + len(ab_ton)] = 0.12
     k = int(0.2 * SR)
     pegel = np.convolve(pegel, np.ones(k) / k, mode="same")
     mix += m * pegel
@@ -376,6 +377,10 @@ def main(ziel, sketch=None):
     import json
     json.dump(mundlog, open(ziel + ".mund.json", "w"))
     print(ziel, round(gesamt, 1), "s")
+    # Pflichtprüfung: jedes Wort aus Dialog und Abschluss muss im fertigen Video zu hören sein
+    sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), "werkzeuge"))
+    import vollstaendig
+    vollstaendig.pruefe(ziel, [e["text"] for e in DIALOG] + [ABSPANN_TEXT, "Link in der Bio."], streng=True)
 
 
 if __name__ == "__main__":
