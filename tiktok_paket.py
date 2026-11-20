@@ -1,20 +1,19 @@
 #!/usr/bin/env python3
-"""Inpernell – TikTok-Paket: fertige Videos, Beschreibungstexte und Plan-Bild zum Hochladen in TikTok Studio.
+"""Inpernell – TikTok-Paket: fertige Videos, Beschreibungstexte, Plan-Bild und Anleitung für TikTok Studio.
 
-TikTok erlaubt kein eigenes Upload-Werkzeug für das eigene Konto; deshalb plant der Inhaber die Videos selbst in
-TikTok Studio (Hochladen -> Planen). Dieses Skript liefert alles dafür.
+TikTok erlaubt kein eigenes Upload-Werkzeug für das eigene Konto; der Inhaber plant die Videos selbst in TikTok Studio.
+Inhalte (Stand: vertonte Fassungen):
+  * Reels aus reels/warteschlange.json (Sprecher Michael Danisch, Untertitel) – fertig_video
+  * Comic-Sketche aus der Warteschlange – fertig_video (nicht freigegebene sind im Plan markiert)
+  * "Job der Woche": Stelle mit Michael-Stimme (topjob_video.py), eigene Texte unten
+  * Game-Reel mit eigener Musik statt "Vice Police" (TikTok-Firmenkonten: keine fremde Musik)
 
-Anpassungen für TikTok:
-  * nur eigene Musik (Firmenkonten: keine fremde Musik außer Commercial Music Library) – das Game-Reel bekommt
-    deshalb statt "Vice Police" den eigenen Track "Neon Nights"
-  * Stellen-Video ("Job der Woche") mit Musik statt stiller Tonspur
-  * kurze Beschreibung mit Suchbegriffen, offener Frage und 3–5 Hashtags
-
-Aufruf: python tiktok_paket.py  ->  tiktok/<start>_bis_<ende>/ (Videos nicht im Repository, siehe .gitignore)
+Aufruf: python tiktok_paket.py  ->  tiktok/<start>_bis_<ende>/ + ZIP (Videos nicht im Repository)
 """
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 from datetime import date, timedelta
@@ -26,26 +25,95 @@ sys.path.insert(0, HIER)
 
 START = date(2026, 11, 23)
 TAGE = 30
-# Termine: Mo 18:00, Mi 18:00, Fr 17:00 (Abendstunden; nach 4 Wochen anhand der TikTok-Analyse anpassen)
+GRUND_TAGS = ["#jobtok", "#jobsuche", "#schwarzwald"]
+
+# (Datum, Uhrzeit, Art, Bezug). Art: game | reel | sketch | job | folgt
 PLAN = [
-    ("2026-11-23", "18:00", "game", None),
-    ("2026-11-25", "18:00", "reel", "2026-11-18-gehalts-check-1"),
-    ("2026-11-27", "17:00", "job", 1),
-    ("2026-11-30", "18:00", "reel", "2026-11-19-jobmarkt-region-1"),
-    ("2026-12-02", "18:00", "reel", "2026-11-22-mythos-arbeitsrecht-1"),
-    ("2026-12-04", "17:00", "job", 2),
-    ("2026-12-07", "18:00", "reel", "2026-11-24-zeitarbeit-direktvermittlung"),
-    ("2026-12-09", "18:00", "reel", "2026-11-26-lebenslauf-1"),
-    ("2026-12-11", "17:00", "folgt", "Job der Woche (Stelle wird kurz vorher gewählt)"),
-    ("2026-12-14", "18:00", "reel", "2026-11-29-medizintechnik-tuttlingen"),
+    ("2026-11-23", "18:00", "game", "2026-11-19-game-release"),
+    ("2026-11-25", "18:00", "sketch", "2026-11-25-sketch-genz-wlan"),
+    ("2026-11-27", "17:00", "job", "2833534"),
+    ("2026-11-29", "18:00", "reel", "2026-11-22-mythos-arbeitsrecht-1"),
+    ("2026-11-30", "18:00", "reel", "2026-11-24-zeitarbeit-direktvermittlung"),
+    ("2026-12-02", "18:00", "sketch", "2026-12-02-sketch-staerken"),
+    ("2026-12-04", "17:00", "job", "2771089"),
+    ("2026-12-06", "18:00", "reel", "2026-11-26-lebenslauf-1"),
+    ("2026-12-07", "18:00", "sketch", "2026-11-28-sketch-bewerbung-1995"),
+    ("2026-12-09", "18:00", "sketch", "2026-12-09-sketch-gehalt"),
+    ("2026-12-11", "17:00", "reel", "2026-11-29-medizintechnik-tuttlingen"),
+    ("2026-12-13", "18:00", "sketch", "2026-12-05-sketch-faxgeraet"),
     ("2026-12-16", "18:00", "folgt", "Neues Reel aus der Wochenplanung"),
     ("2026-12-18", "17:00", "folgt", "Job der Woche (Stelle wird kurz vorher gewählt)"),
 ]
-GRUND_TAGS = ["#jobtok", "#jobsuche", "#schwarzwald"]
+
+JOB_TEXTE = {
+    "2833534": {
+        "einstieg": dict(
+            sprich="[confident] Lust auf Software, die Elektronik testet? Dein Job der Woche: Softwareentwickler für "
+                   "Testsysteme in Villingen-Schwenningen, mit 70.000 bis 80.000 Euro im Jahr.",
+            titel=["Software-", "entwickler"], untertitel="Testsysteme und Automatisierung (m/w/d)",
+            chips=["70.000 – 80.000 € / Jahr", "Hybrid / Homeoffice"], badge="JOB DER WOCHE",
+            ausloeser=["Lust", "Software", "Job", "Softwareentwickler", "Villingen", "70.000"]),
+        "aufgaben": dict(
+            sprich="Du entwickelst Software für automatisierte Testanlagen, programmierst Testabläufe und bindest "
+                   "Messtechnik und Roboter ein.",
+            punkte=[("Software für Testanlagen", "von der Konzeption bis zur Inbetriebnahme"),
+                    ("Testabläufe programmieren", "für Komponenten, Baugruppen und Geräte"),
+                    ("Messtechnik & Roboter", "Steuerungen und Automatisierung einbinden")],
+            ausloeser=["Du", "entwickelst", "programmierst", "bindest"]),
+        "profil": dict(
+            sprich="Mitbringen solltest du ein Studium oder eine Ausbildung, idealerweise Erfahrung mit C, C++ "
+                   "oder Python und gutes Deutsch und Englisch.",
+            punkte=[("Studium oder Ausbildung", "z. B. Informatik, Elektrotechnik, Mechatronik"),
+                    ("C, C++ oder Python", "Erfahrung wünschenswert, SQL ein Plus"),
+                    ("Deutsch und Englisch", "gute Kenntnisse in beiden Sprachen")],
+            ausloeser=["Mitbringen", "Studium", "idealerweise", "gutes"]),
+        "vorteile": dict(
+            sprich="Und das Beste: Wir vermitteln dich direkt in eine Festanstellung beim Arbeitgeber. Keine "
+                   "Zeitarbeit, Homeoffice möglich, und für dich kostenlos.",
+            punkte=["Festanstellung beim Arbeitgeber", "Keine Zeitarbeit", "Hybrid / Homeoffice möglich",
+                    "Für dich kostenlos"],
+            ausloeser=["Beste", "direkt", "Keine", "Homeoffice", "kostenlos"]),
+        "ende": dict(
+            sprich="[warm] Klingt nach dir? Dann bewirb dich über den Link in der Bio oder schreib uns einfach "
+                   "eine DM.",
+            ausloeser=["Klingt", "bewirb", "Link", "DM"]),
+    },
+    "2771089": {
+        "einstieg": dict(
+            sprich="[confident] Du kannst CNC-Drehmaschinen im Schlaf rüsten? Dein Job der Woche: Zerspanungsmechaniker "
+                   "in Titisee, mit 50.000 bis 60.000 Euro im Jahr.",
+            titel=["Zerspanungs-", "mechaniker"], untertitel="CNC-Drehen (m/w/d)",
+            chips=["50.000 – 60.000 € / Jahr", "Vollzeit · 40 h"], badge="JOB DER WOCHE",
+            ausloeser=["Du", "CNC", "Job", "Zerspanungsmechaniker", "Titisee", "50.000"]),
+        "aufgaben": dict(
+            sprich="Du rüstest, richtest ein und programmierst CNC-Drehmaschinen, fährst Neu- und Serienteile ein und "
+                   "behebst Störungen selbstständig.",
+            punkte=[("CNC-Drehmaschinen", "rüsten, einrichten und programmieren"),
+                    ("Neu- und Serienteile", "einfahren, optimieren und betreuen"),
+                    ("Störungen beheben", "selbstständig analysieren und lösen")],
+            ausloeser=["Du", "rüstest", "fährst", "behebst"]),
+        "profil": dict(
+            sprich="Mitbringen solltest du eine Ausbildung als Zerspanungsmechaniker oder Industriemechaniker, "
+                   "Qualitätsbewusstsein und die Bereitschaft zur Schichtarbeit.",
+            punkte=[("Abgeschlossene Ausbildung", "Zerspanung, Industriemechanik o. Ä."),
+                    ("Qualitätsbewusstsein", "sorgfältig mit Produkten und Prozessen"),
+                    ("Schichtarbeit", "Flexibilität und Bereitschaft")],
+            ausloeser=["Mitbringen", "Ausbildung", "Qualitätsbewusstsein", "Bereitschaft"]),
+        "vorteile": dict(
+            sprich="Und das Beste: Wir vermitteln dich direkt in eine Festanstellung beim Arbeitgeber. Keine "
+                   "Zeitarbeit, und für dich kostenlos.",
+            punkte=["Festanstellung beim Arbeitgeber", "Keine Zeitarbeit", "Für dich kostenlos"],
+            ausloeser=["Beste", "direkt", "Keine", "kostenlos"]),
+        "ende": dict(
+            sprich="[warm] Klingt nach dir? Dann bewirb dich über den Link in der Bio oder schreib uns einfach "
+                   "eine DM.",
+            ausloeser=["Klingt", "bewirb", "Link", "DM"]),
+    },
+}
 
 
-def _hashtags(ig_caption, extra=()):
-    themen = [t for t in re.findall(r"#\w+", ig_caption) if t.lower() not in ("#topjobdestages", "#gaming")]
+def _hashtags(caption, extra=()):
+    themen = [t for t in re.findall(r"#\w+", caption) if t.lower() not in ("#topjobdestages", "#gaming")]
     tags = list(GRUND_TAGS) + list(extra)
     for t in themen:
         if len(tags) >= 5:
@@ -56,15 +124,13 @@ def _hashtags(ig_caption, extra=()):
 
 
 def tiktok_text(ig_caption, extra_tags=()):
-    """Kurzfassung des Instagram-Bildtexts: Suchzeile, Kernpunkte (alle ❌/✅-Punkte), offene Frage, Hashtags."""
     zeilen = [z.strip() for z in ig_caption.split("\n")]
     zeilen = [z for z in zeilen if z and not z.startswith("#") and not z.startswith("Musik:")
               and "Link in der Bio" not in z and "Top Jobs aus der Region" not in z]
-    suchzeile = zeilen[0]
     frage = next((z for z in zeilen[1:] if "?" in z and "❌" not in z), "")
     vergleiche = [z for z in zeilen[1:] if "❌" in z]
     punkte = vergleiche or [z for z in zeilen[1:] if z != frage][:3]
-    teile = [suchzeile, ""] + punkte + (["", frage] if frage else [])
+    teile = [zeilen[0], ""] + punkte + (["", frage] if frage else [])
     teile += ["", "Top Jobs aus der Region: Link im Profil.", "", _hashtags(ig_caption, extra_tags)]
     return "\n".join(teile).strip() + "\n"
 
@@ -83,71 +149,54 @@ Top Jobs aus der Region: Link im Profil.
 """
 
 
-def mit_musik(video, ziel, bpm_variante=1):
-    import musik
-    dauer = float(subprocess.check_output(["ffprobe", "-v", "error", "-show_entries", "format=duration",
-                                           "-of", "csv=p=0", video]).decode().strip())
-    wav = ziel + ".wav"
-    musik.erzeuge_track(dauer, wav, variante=bpm_variante)
-    subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", video, "-i", wav, "-map", "0:v", "-map", "1:a",
-                    "-c:v", "copy", "-c:a", "aac", "-b:a", "160k", "-shortest", "-movflags", "+faststart", ziel],
-                   check=True)
-    os.remove(wav)
-
-
-def stellen(anzahl):
-    """Stellen mit Gehaltsangabe für "Job der Woche" (nicht die zuletzt auf Instagram gezeigten)."""
-    import agent
-    alle = agent.stellen_laden()
-    gezeigt = {z.get("job_id") for z in agent.protokoll_lesen()}
-    mit_gehalt = [s for s in alle if agent.gehalt(s) and str(s.get("id")) not in gezeigt]
-    rest = [s for s in alle if s not in mit_gehalt and str(s.get("id")) not in gezeigt]
-    return (mit_gehalt + rest)[:anzahl]
-
-
 def main():
     ende = START + timedelta(days=TAGE - 1)
     ordner = os.path.join(HIER, "tiktok", f"{START:%Y-%m-%d}_bis_{ende:%Y-%m-%d}")
-    os.makedirs(ordner, exist_ok=True)
-    warteschlange = {r["id"]: r for r in json.load(open(os.path.join(HIER, "reels", "warteschlange.json"),
-                                                         encoding="utf-8"))}
-    jobs = stellen(2)
+    if os.path.isdir(ordner):
+        shutil.rmtree(ordner)
+    os.makedirs(ordner)
+    q = {r["id"]: r for r in json.load(open(os.path.join(HIER, "reels", "warteschlange.json"), encoding="utf-8"))}
     eintraege = []
     for nr, (tag, zeit, art, ref) in enumerate(PLAN, 1):
         name = f"{nr:02d}_{tag}"
         video = os.path.join(ordner, name + ".mp4")
-        e = {"nr": nr, "datum": tag, "zeit": zeit, "art": art, "datei": os.path.basename(video)}
+        bild = video.replace(".mp4", ".jpg")
+        e = {"nr": nr, "datum": tag, "zeit": zeit, "art": art, "datei": os.path.basename(video), "hinweis": ""}
+        if art == "folgt":
+            e["titel"] = ref
+            eintraege.append(e)
+            continue
         if art == "game":
             import game_reel as g
             g.MUSIK_DATEI, g.MUSIK, g.BPM = None, "neon_nights", 112
             g.SCHLAG = 60.0 / g.BPM
-            if not os.path.exists(video):
-                g.erzeuge(video, video.replace(".mp4", ".jpg"))
-            r = warteschlange["2026-11-19-game-release"]
+            g.erzeuge(video, bild)
             e["titel"] = "Personalvermittlung im Game-Modus"
             text = GAME_TEXT
-        elif art == "reel":
-            import reel_anim
-            r = warteschlange[ref]
-            if not os.path.exists(video):
-                reel_anim.aus_definition(r, video, titelbild=video.replace(".mp4", ".jpg"))
-            hook = next((s for s in r["szenen"] if s["typ"] == "hook"), None)
-            titel = ""
-            for z in (hook["zeilen"] if hook else []):
-                titel = titel[:-1] + z if titel.endswith("-") else (titel + " " + z).strip()
-            e["titel"] = titel or r["id"]
-            text = tiktok_text(r["caption"])
-        elif art == "job":
+        elif art in ("reel", "sketch"):
+            r = q[ref]
+            if not r.get("fertig_video") or not os.path.exists(os.path.join(HIER, r["fertig_video"])):
+                raise RuntimeError(f"{ref}: fertiges Video fehlt (reel_vertont.py / zeichentrick_video.py)")
+            shutil.copyfile(os.path.join(HIER, r["fertig_video"]), video)
+            shutil.copyfile(os.path.join(HIER, r["fertig_titelbild"]), bild)
+            e["titel"] = (r.get("thema") or r["caption"].split("\n")[0]).replace("Sketch: ", "Sketch: ")
+            if art == "reel":
+                hook = next(s for s in r["szenen"] if s["typ"] == "hook")
+                titel = ""
+                for z in hook["zeilen"]:
+                    titel = titel[:-1] + z if titel.endswith("-") else (titel + " " + z).strip()
+                e["titel"] = titel
+            if art == "sketch" and not r.get("freigegeben"):
+                e["hinweis"] = "erst nach Freigabe posten"
+            text = tiktok_text(r["caption"], ["#comedy"] if art == "sketch" else ())
+        else:   # job
             import agent
-            from bild import erzeuge_reel
-            s = jobs[ref - 1]
+            import topjob_video as tv
+            s = next(x for x in agent.stellen_laden() if str(x["id"]) == ref)
+            tv.erzeuge(s, video, JOB_TEXTE[ref])
+            subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-ss", "2.5", "-i", video, "-frames:v", "1", "-q:v", "2",
+                            bild], check=True)
             post = agent.aus_stelle(s, date.fromisoformat(tag).strftime("%d.%m.%Y"))
-            post["badge"], post["datum"] = "JOB DER WOCHE", ""
-            if not os.path.exists(video):
-                roh = video.replace(".mp4", "-roh.mp4")
-                erzeuge_reel(post, roh, sekunden=12, titelbild=video.replace(".mp4", ".jpg"))
-                mit_musik(roh, video, bpm_variante=ref)
-                os.remove(roh)
             e["titel"] = "Job der Woche: " + post["titel"]
             ort = post.get("ort", "")
             eckdaten = [z for z in post["caption"].split("\n") if z[:1] in ("💶", "🕒", "🏠", "📍")]
@@ -155,18 +204,18 @@ def main():
                     + "\n\nDirektvermittlung: Du wirst direkt beim Arbeitgeber angestellt, keine Zeitarbeit, "
                       "für dich kostenlos.\n\nWäre das was für dich oder für jemanden, den du kennst?"
                     + "\n\nBewerben: Link im Profil.\n\n"
-                    + _hashtags(post["caption"], [f"#jobs{re.sub(r'[^A-Za-zÄÖÜäöüß]', '', ort).lower()}"] if ort else []) + "\n")
-        else:
-            e["titel"] = ref
-            eintraege.append(e)
-            continue
+                    + _hashtags(post["caption"], [f"#jobs{re.sub(r'[^A-Za-zÄÖÜäöüß]', '', ort).lower()}"] if ort else [])
+                    + "\n")
         with open(os.path.join(ordner, name + ".txt"), "w", encoding="utf-8") as f:
-            f.write(f"Veröffentlichen am {date.fromisoformat(tag):%d.%m.%Y} um {zeit} Uhr\n\n" + text)
+            f.write(f"Veröffentlichen am {date.fromisoformat(tag):%d.%m.%Y} um {zeit} Uhr"
+                    + (f" ({e['hinweis']})" if e["hinweis"] else "") + "\n\n" + text)
         eintraege.append(e)
         print(name, e["titel"])
     plan_bild(eintraege, ordner)
     anleitung(eintraege, ordner)
-    print(ordner)
+    zip_pfad = os.path.join(HIER, "tiktok", f"TikTok-Paket_{START:%Y-%m-%d}_bis_{ende:%Y-%m-%d}")
+    shutil.make_archive(zip_pfad, "zip", os.path.dirname(ordner), os.path.basename(ordner))
+    print(ordner, zip_pfad + ".zip")
 
 
 def plan_bild(eintraege, ordner):
@@ -175,10 +224,13 @@ def plan_bild(eintraege, ordner):
     img = Image.new("RGB", (B, 260 + zeile * len(eintraege) + 80), NAVY)
     d = ImageDraw.Draw(img)
     d.text((60, 60), "TIKTOK-PLAN", font=font("h800", 70), fill=WEISS)
-    d.text((60, 150), f"{START:%d.%m.} bis {START + timedelta(days=TAGE - 1):%d.%m.%Y} · 3 Videos pro Woche · "
-                      "in TikTok Studio planen", font=font("t400", 30), fill=HELL)
+    d.text((60, 150), f"{START:%d.%m.} bis {START + timedelta(days=TAGE - 1):%d.%m.%Y} · in TikTok Studio planen",
+           font=font("t400", 30), fill=HELL)
     tage = ["Mo", "Di", "Mi", "Do", "Fr", "Sa", "So"]
     y = 250
+    farben = {"game": ORANGE, "reel": ORANGE, "sketch": (236, 120, 190), "job": (70, 150, 230), "folgt": (140, 152, 176)}
+    labels = {"game": "SONDER-VIDEO", "reel": "VIDEO MIT SPRECHER", "sketch": "COMIC-SKETCH", "job": "JOB DER WOCHE",
+              "folgt": "WIRD NACHGELIEFERT"}
     for e in eintraege:
         tag = date.fromisoformat(e["datum"])
         d.rounded_rectangle([40, y, B - 40, y + zeile - 20], radius=22, fill=(18, 40, 78), outline=(52, 74, 112), width=2)
@@ -191,11 +243,14 @@ def plan_bild(eintraege, ordner):
         else:
             d.rounded_rectangle([x, y + 10, x + 106, y + 198], radius=10, outline=(140, 152, 176), width=2)
             d.text((x + 53, y + 104), "folgt", font=font("h700", 24), fill=(140, 152, 176), anchor="mm")
-        farbe = {"game": ORANGE, "reel": ORANGE, "job": (70, 150, 230), "folgt": (140, 152, 176)}[e["art"]]
-        label = {"game": "SONDER-VIDEO", "reel": "VIDEO", "job": "JOB DER WOCHE", "folgt": "WIRD NACHGELIEFERT"}[e["art"]]
-        d.text((x + 140, y + 30), f"{e['nr']:02d} · {label}", font=font("h800", 26), fill=farbe)
-        for k, z in enumerate(wrap(d, e["titel"], font("h700", 34), B - 80 - x - 160)[:3]):
+        d.text((x + 140, y + 30), f"{e['nr']:02d} · {labels[e['art']]}", font=font("h800", 26), fill=farben[e["art"]])
+        zeilen = wrap(d, e["titel"], font("h700", 34), B - 80 - x - 160)[:2]
+        for k, z in enumerate(zeilen):
             d.text((x + 140, y + 72 + k * 42), z, font=font("h700", 34), fill=WEISS)
+        if e["hinweis"]:
+            hy = y + 72 + len(zeilen) * 42 + 4
+            d.ellipse([x + 140, hy + 9, x + 156, hy + 25], fill=ORANGE)
+            d.text((x + 166, hy), e["hinweis"], font=font("t400", 26), fill=ORANGE)
         y += zeile
     img.save(os.path.join(ordner, "00_tiktok-plan.png"), optimize=True)
 
@@ -203,17 +258,18 @@ def plan_bild(eintraege, ordner):
 def anleitung(eintraege, ordner):
     zeilen = ["# TikTok-Plan: so planst du die Videos ein", "",
               "1. Am Computer tiktok.com/tiktokstudio/upload öffnen und mit dem Inpernell-Konto anmelden.",
-              "2. Video auswählen (Datei mit der Nummer aus der Liste unten).",
-              "3. Beschreibung: den Text aus der gleichnamigen .txt-Datei einfügen (ohne die erste Zeile mit dem Termin).",
-              "4. Titelbild: das Bild mit der gleichen Nummer bzw. ein Bild aus dem Video wählen.",
-              "5. Unter „Wann posten“ auf „Planen“ stellen und Datum und Uhrzeit aus der Liste eintragen.",
-              "6. Bei „Inhalte offenlegen“ nichts einschalten (eigene Werbung des eigenen Unternehmens ist erkennbar).",
-              "7. „Planen“ klicken. Fertig.", "",
-              "Hinweis: Musik ist eigene Musik, deshalb in TikTok keine weitere Musik hinzufügen.", "",
+              "2. Video mit der Nummer aus der Liste auswählen.",
+              "3. Beschreibung aus der gleichnamigen .txt-Datei einfügen (ohne die erste Zeile mit dem Termin).",
+              "4. Titelbild: das Bild mit der gleichen Nummer.",
+              "5. Unter „Wann posten“ auf „Planen“ stellen, Datum und Uhrzeit aus der Liste eintragen.",
+              "6. „Planen“ klicken.", "",
+              "Hinweise: Alle Videos haben bereits Ton (Sprecher bzw. eigene Musik): in TikTok keine Musik hinzufügen. "
+              "Sketche mit dem Vermerk „erst nach Freigabe posten“ sind noch nicht freigegeben.", "",
               "| Nr. | Termin | Inhalt | Datei |", "|---|---|---|---|"]
     for e in eintraege:
         datei = e["datei"] if e["art"] != "folgt" else "wird nachgeliefert"
-        zeilen.append(f"| {e['nr']:02d} | {date.fromisoformat(e['datum']):%d.%m.} {e['zeit']} | {e['titel']} | {datei} |")
+        hinweis = f" ({e['hinweis']})" if e["hinweis"] else ""
+        zeilen.append(f"| {e['nr']:02d} | {date.fromisoformat(e['datum']):%d.%m.} {e['zeit']} | {e['titel']}{hinweis} | {datei} |")
     zeilen += ["", "## Beschreibungen zum Kopieren", ""]
     for e in eintraege:
         txt = os.path.join(ordner, e["datei"].replace(".mp4", ".txt"))

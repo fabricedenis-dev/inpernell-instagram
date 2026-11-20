@@ -1,0 +1,59 @@
+{
+ "dauer_s": 45.03,
+ "dauer_ok": true,
+ "transkript": "Lust auf Software die Elektronik testet? Dein Top Job des Tages? Software Entwickler für Testsysteme in Fillingen -Schwenningen. Du entwickelst Software für automatisierte Testanlagen, programmierst Testabläufe und bindest Messtechnik und Roboter ein. Mitbringen solltest du ein Studium oder eine Ausbildung. Idealerweise Erfahrung mit C, C++ oder Python und gutes Deutsch und Englisch. Und das Beste, wir vermitteln dich direkt in eine Festanstellung beim Arbeitgeber. Keine Zeitarbeit, Homeoffice möglich und für dich kostenlos. Klingt nach dir? Dann bewirb dich über den Link in der Bio oder schreib uns einfach eine DN.",
+ "wort_treffer": 0.966,
+ "zeichen_aehnlichkeit": 0.995,
+ "letztes_wort": "DN.",
+ "letztes_wort_ende_s": 42.64,
+ "stille_danach_s": 2.39,
+ "ut_median_ms": 19.6,
+ "ut_mittel_signiert_ms": 14.7,
+ "ut_p90_ms": 50.7,
+ "ut_vergleiche": 85,
+ "lufs": -14.0,
+ "true_peak_dbfs": -1.5,
+ "raender": "ok",
+ "elevenlabs_zeichen": 638,
+ "sprechertext": [
+  "[confident] Lust auf Software, die Elektronik testet? Dein Top Job des Tages: Softwareentwickler für Testsysteme in Villingen-Schwenningen.",
+  "Du entwickelst Software für automatisierte Testanlagen, programmierst Testabläufe und bindest Messtechnik und Roboter ein.",
+  "Mitbringen solltest du ein Studium oder eine Ausbildung, idealerweise Erfahrung mit C, C++ oder Python und gutes Deutsch und Englisch.",
+  "Und das Beste: Wir vermitteln dich direkt in eine Festanstellung beim Arbeitgeber. Keine Zeitarbeit, Homeoffice möglich, und für dich kostenlos.",
+  "[warm] Klingt nach dir? Dann bewirb dich über den Link in der Bio oder schreib uns einfach eine DM."
+ ],
+ "abschnitte": [
+  [
+   "einstieg",
+   0.0,
+   8.54
+  ],
+  [
+   "aufgaben",
+   8.54,
+   7.916916666666666
+  ],
+  [
+   "profil",
+   16.456916666666665,
+   10.8760625
+  ],
+  [
+   "vorteile",
+   27.332979166666664,
+   9.28
+  ],
+  [
+   "ende",
+   36.61297916666666,
+   8.426666666666666
+  ]
+ ],
+ "quoten": {
+  "einstieg": 0.9375,
+  "aufgaben": 1.0,
+  "profil": 1.0,
+  "vorteile": 1.0,
+  "ende": 0.9444444444444444
+ }
+}
