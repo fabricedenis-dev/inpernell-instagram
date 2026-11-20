@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   statistik:
@@ -27,6 +27,7 @@ jobs:
           openssl rand -out k.bin 32
           openssl enc -aes-256-cbc -pbkdf2 -salt -in s.json -out s.enc -pass file:k.bin
           openssl pkeyutl -encrypt -pubin -inkey werkzeuge/statistik_public.pem -pkeyopt rsa_padding_mode:oaep -in k.bin -out k.enc
-          echo "SCHLUESSEL_BEGIN"; base64 -w0 k.enc; echo; echo "SCHLUESSEL_END"
-          echo "DATEN_BEGIN"; base64 -w0 s.enc; echo; echo "DATEN_END"
           rm -f s.json k.bin
+          mkdir -p data/statistik && mv k.enc data/statistik/schluessel.enc && mv s.enc data/statistik/daten.enc
+          git config user.name "inpernell-bot" && git config user.email "bot@users.noreply.github.com"
+          git add data/statistik && git commit -q -m "Statistik: verschlüsselter Stand" && git push -q
