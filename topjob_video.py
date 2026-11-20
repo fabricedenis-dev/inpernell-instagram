@@ -20,6 +20,7 @@ import re
 import subprocess
 import sys
 import tempfile
+import urllib.error
 import urllib.request
 import wave
 
@@ -322,8 +323,11 @@ def eleven_mp3(text, cache):
             f"https://api.elevenlabs.io/v1/text-to-speech/{STIMME}?output_format=mp3_44100_128", data=body,
             headers={"xi-api-key": os.environ.get("ELEVENLABS_API_KEY", "proxy-injected"),
                      "Content-Type": "application/json", "Accept": "audio/mpeg"})
-        with urllib.request.urlopen(req, timeout=180) as r:
-            daten = r.read()
+        try:
+            with urllib.request.urlopen(req, timeout=180) as r:
+                daten = r.read()
+        except urllib.error.HTTPError as ex:
+            raise RuntimeError(f"ElevenLabs {ex.code}: {ex.read()[:300]!r} für Text: {text[:80]}") from ex
         with open(pfad, "wb") as f:
             f.write(daten)
         print(f"  ElevenLabs: {len(text)} Zeichen")
