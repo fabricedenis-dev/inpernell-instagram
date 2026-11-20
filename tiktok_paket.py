@@ -131,7 +131,11 @@ def tiktok_text(ig_caption, extra_tags=()):
     vergleiche = [z for z in zeilen[1:] if "❌" in z]
     punkte = vergleiche or [z for z in zeilen[1:] if z != frage][:3]
     teile = [zeilen[0], ""] + punkte + (["", frage] if frage else [])
-    teile += ["", "Top Jobs aus der Region: Link im Profil.", "", _hashtags(ig_caption, extra_tags)]
+    teile += ["", "Top Jobs aus der Region: Link im Profil."]
+    musik = next((z for z in ig_caption.split("\n") if z.strip().startswith("Musik:")), None)
+    if musik:                       # Namensnennung ist Lizenzpflicht (CC BY), auch auf TikTok
+        teile += ["", musik.strip()]
+    teile += ["", _hashtags(ig_caption, extra_tags)]
     return "\n".join(teile).strip() + "\n"
 
 
@@ -144,6 +148,8 @@ Die Crew: Fabrice (Industrie und IT), Pascal (Bank und Finanzen), Waldemar (Masc
 Welche Mission würdest du in deinem Job als Nächstes freischalten?
 
 Top Jobs aus der Region: Link im Profil.
+
+Musik: Vice Police von Tausdei (CC BY 3.0)
 
 #jobtok #jobsuche #schwarzwald #personalvermittlung #gaming
 """

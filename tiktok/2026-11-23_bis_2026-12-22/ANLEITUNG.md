@@ -16,13 +16,13 @@ Hinweise: Alle Videos haben bereits Ton (Sprecher bzw. eigene Musik): in TikTok 
 | 03 | 27.11. 17:00 | Job der Woche: Softwareentwickler Testsysteme und Automatisierung (m/w/d) | 03_2026-11-27.mp4 |
 | 04 | 29.11. 18:00 | 3 Job-Mythen, die fast jeder glaubt | 04_2026-11-29.mp4 |
 | 05 | 30.11. 18:00 | Zeitarbeit oder Direktvermittlung? | 05_2026-11-30.mp4 |
-| 06 | 02.12. 18:00 | Sketch: Deine Stärken (erst nach Freigabe posten) | 06_2026-12-02.mp4 |
+| 06 | 02.12. 18:00 | Sketch: Runde 6 (erst nach Freigabe posten) | 06_2026-12-02.mp4 |
 | 07 | 04.12. 17:00 | Job der Woche: Zerspanungsmechaniker (m/w/d) | 07_2026-12-04.mp4 |
 | 08 | 06.12. 18:00 | 3 Fehler im Lebenslauf, die jeder sieht | 08_2026-12-06.mp4 |
-| 09 | 07.12. 18:00 | Sketch: Bewerbung früher und heute (erst nach Freigabe posten) | 09_2026-12-07.mp4 |
-| 10 | 09.12. 18:00 | Sketch: Gehaltsvorstellung (erst nach Freigabe posten) | 10_2026-12-09.mp4 |
+| 09 | 07.12. 18:00 | Sketch: Gleitzeit im Schwarzwald (erst nach Freigabe posten) | 09_2026-12-07.mp4 |
+| 10 | 09.12. 18:00 | Sketch: Bewerbung 1995 vs. heute (erst nach Freigabe posten) | 10_2026-12-09.mp4 |
 | 11 | 11.12. 17:00 | Wusstest du, was Tuttlingen so besonders macht? | 11_2026-12-11.mp4 |
-| 12 | 13.12. 18:00 | Sketch: Arbeitgeber aus den 80ern (erst nach Freigabe posten) | 12_2026-12-13.mp4 |
+| 12 | 13.12. 18:00 | Sketch: Laptop kommt Montag (erst nach Freigabe posten) | 12_2026-12-13.mp4 |
 | 13 | 16.12. 18:00 | Neues Reel aus der Wochenplanung | wird nachgeliefert |
 | 14 | 18.12. 17:00 | Job der Woche (Stelle wird kurz vorher gewählt) | wird nachgeliefert |
 
@@ -41,6 +41,8 @@ Welche Mission würdest du in deinem Job als Nächstes freischalten?
 
 Top Jobs aus der Region: Link im Profil.
 
+Musik: Vice Police von Tausdei (CC BY 3.0)
+
 #jobtok #jobsuche #schwarzwald #personalvermittlung #gaming
 ```
 
@@ -49,11 +51,13 @@ Top Jobs aus der Region: Link im Profil.
 ```
 Wie es sich anfühlt, als Gen Z einen Job zu suchen 😅
 
+Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+
 Was war die ehrlichste Antwort, die du je im Vorstellungsgespräch gegeben hast?
 
-Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
-
 Top Jobs aus der Region: Link im Profil.
+
+Musik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
@@ -109,16 +113,18 @@ Top Jobs aus der Region: Link im Profil.
 #jobtok #jobsuche #schwarzwald #Direktvermittlung #JobsSchwarzwald
 ```
 
-### 06 · 02.12. 18:00 · Sketch: Deine Stärken
+### 06 · 02.12. 18:00 · Sketch: Runde 6
 
 ```
-Was sind deine Stärken? Die ehrlichste Antwort im Vorstellungsgespräch 💼
+Bewerbungsgespräch Runde 6: Wenn das Auswahlverfahren kein Ende nimmt 😅
 
-Welche Stärke schreibst du in jede Bewerbung?
+Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
 
-Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+Wie viele Gesprächsrunden hattest du schon für einen einzigen Job?
 
 Top Jobs aus der Region: Link im Profil.
+
+Musik: Sneaky Snitch von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
@@ -158,30 +164,34 @@ Top Jobs aus der Region: Link im Profil.
 #jobtok #jobsuche #schwarzwald #Lebenslauf #Bewerbungstipps
 ```
 
-### 09 · 07.12. 18:00 · Sketch: Bewerbung früher und heute
+### 09 · 07.12. 18:00 · Sketch: Gleitzeit im Schwarzwald
 
 ```
-Bewerbung früher vs. heute: Wenn der Chef von damals erzählt 📮
+Pendeln im Schwarzwald-Winter: Wenn der Recruiter Gleitzeit verspricht ❄️
 
-Wie lange hast du schon mal auf eine Antwort auf deine Bewerbung gewartet?
+Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
 
-Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+Wie lang ist dein Arbeitsweg im Winter?
 
 Top Jobs aus der Region: Link im Profil.
+
+Musik: Fluffing a Duck von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
 
-### 10 · 09.12. 18:00 · Sketch: Gehaltsvorstellung
+### 10 · 09.12. 18:00 · Sketch: Bewerbung 1995 vs. heute
 
 ```
-Was stellst du dir beim Gehalt vor? Gen Z antwortet ehrlich 💶
+Bewerbung 1995 vs. heute: Was hat sich wirklich verändert? 📮
 
-Welche Zahl nennst du, wenn du nach deiner Gehaltsvorstellung gefragt wirst?
+Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
 
-Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+Wie lange hast du schon mal auf eine Antwort auf deine Bewerbung gewartet?
 
 Top Jobs aus der Region: Link im Profil.
+
+Musik: Local Forecast - Elevator von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
@@ -201,16 +211,18 @@ Top Jobs aus der Region: Link im Profil.
 #jobtok #jobsuche #schwarzwald #Medizintechnik #Tuttlingen
 ```
 
-### 12 · 13.12. 18:00 · Sketch: Arbeitgeber aus den 80ern
+### 12 · 13.12. 18:00 · Sketch: Laptop kommt Montag
 
 ```
-Wenn der Arbeitgeber noch in den 80ern lebt 📠
+Erster Arbeitstag ohne Laptop: Onboarding, wie es jeder kennt 💻
 
-Was ist der älteste Benefit, den dir je ein Arbeitgeber angeboten hat?
+Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
 
-Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+Was war das Chaotischste an deinem ersten Arbeitstag?
 
 Top Jobs aus der Region: Link im Profil.
+
+Musik: Carefree von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```

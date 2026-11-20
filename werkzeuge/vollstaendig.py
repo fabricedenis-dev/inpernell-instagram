@@ -61,9 +61,17 @@ def pruefe(video, texte, streng=False):
     for w, t in gehoert:
         hw += [(x, t) for x in _woerter(w)]
     fehlt, pos, t_zuletzt = [], 0, 0.0
+    hw_rest = [False]
     for text in texte:
         for w in _woerter(text):
             treffer = next((j for j in range(pos, min(len(hw), pos + 6)) if _gleich(w, hw[j][0])), None)
+            if treffer is None and pos >= len(hw) and not hw_rest[0]:
+                # Erkennung hat nach einer langen Pause aufgehört: den Rest des Videos einzeln abhören
+                hw_rest[0] = True
+                v0 = t_zuletzt + 0.3
+                for ww, t in _hoeren(ton[int(v0 * 16000):], v0):
+                    hw += [(x, t) for x in _woerter(ww)]
+                treffer = next((j for j in range(pos, min(len(hw), pos + 6)) if _gleich(w, hw[j][0])), None)
             if treffer is not None:
                 pos, t_zuletzt = treffer + 1, hw[treffer][1]
                 continue
