@@ -1,0 +1,32 @@
+name: Instagram-Statistik
+
+# Nur von Hand: liest Kennzahlen (nichts wird veröffentlicht). Die Ausgabe wird mit dem öffentlichen Schlüssel
+# werkzeuge/statistik_public.pem verschlüsselt, weil Protokolle dieses öffentlichen Repositorys einsehbar sind.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  statistik:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet -r requirements.txt
+      - name: Kennzahlen lesen und verschlüsseln
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: |
+          python statistik.py > s.json 2> fehler.txt || { echo "Fehler beim Lesen"; tail -c 300 fehler.txt | sed 's/EAA[A-Za-z0-9]*/***/g'; exit 1; }
+          openssl rand -out k.bin 32
+          openssl enc -aes-256-cbc -pbkdf2 -salt -in s.json -out s.enc -pass file:k.bin
+          openssl pkeyutl -encrypt -pubin -inkey werkzeuge/statistik_public.pem -pkeyopt rsa_padding_mode:oaep -in k.bin -out k.enc
+          echo "SCHLUESSEL_BEGIN"; base64 -w0 k.enc; echo; echo "SCHLUESSEL_END"
+          echo "DATEN_BEGIN"; base64 -w0 s.enc; echo; echo "DATEN_END"
+          rm -f s.json k.bin
