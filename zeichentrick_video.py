@@ -14,7 +14,7 @@ from xml.sax.saxutils import escape
 import numpy as np
 from PIL import Image, ImageDraw
 
-import zeichentrick as z
+import zeichentrick_comic as z
 from bild import ORANGE, WEISS, font, wrap
 
 W, H, FPS, SR = z.W, z.H, 30, 48000
@@ -32,13 +32,15 @@ DIALOG = [
     dict(wer="genz", text="Ehrlich? Ich will gar nicht arbeiten.",
          sprich="[sighs] [bored] Ehrlich? Ich will gar nicht arbeiten.", augen="muede", ruhe="neutral", arm="handy"),
     dict(wer="personaler", text="Und warum hast du dich dann beworben?",
-         sprich="[confused] Und warum hast du dich dann beworben?", augen="gross", ruhe="schief", arm="tisch"),
+         sprich="[confused] Und warum hast du dich dann beworben?", augen="gross", ruhe="schief", arm="tisch",
+         brauen="skeptisch"),
     dict(wer="genz", text="Meine Mutter will sonst das WLAN-Passwort ändern.",
          sprich="[deadpan] Meine Mutter will sonst das WLAN-Passwort ändern.", augen="muede", ruhe="neutral", arm="handy",
+         fx="schweiss",
          vor=0.6),
     dict(wer="personaler", text="Wann kannst du anfangen?", sprich="[desperate] [hopeful] Wann kannst du anfangen?",
-         augen="gross", ruhe="grinsen", arm="tisch", vor=1.3, pointe=True),
-    dict(wer="genz", text="Remote?", sprich="[unimpressed] Remote?", augen="genervt", ruhe="schief", arm="achselzucken",
+         augen="gross", ruhe="grinsen", arm="tisch", brauen="sorge", fx="speedlines", vor=1.3, pointe=True),
+    dict(wer="genz", text="Remote?", sprich="[unimpressed] Remote?", augen="genervt", ruhe="schief", arm="achselzucken", fx="fragezeichen",
          vor=0.35, nach=1.3),
 ]
 ABSPANN_TEXT = "Fachkräftemangel ist real. Wir finden die, die wirklich wollen."
@@ -79,11 +81,15 @@ def sprechen(e, st):
 def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
     genz = e["wer"] == "genz"
     img = z.hintergrund("hocker" if genz else "buero")
-    z.figur(img, 500 if genz else 640, 1560, e["wer"], augen=augen,
-            mund="offen" if offen else e["ruhe"], arm=e["arm"], sitzt=True)
+    cx = 540 if genz else 680
+    z.figur(img, cx, 1560, e["wer"], augen=augen, mund="offen" if offen else e["ruhe"], arm=e["arm"], sitzt=True,
+            brauen=e.get("brauen"))
+    if e.get("fx"):
+        z.effekte(img, e["fx"], cx, 1007)
+    img = z.fertig(img)
     if zoom != 1.0:   # langsamer Zoom auf das Gesicht (Pointe)
         cw, ch = int(W / zoom), int(H / zoom)
-        x, y = int((500 if genz else 640) - cw / 2), int(1020 - ch * 0.45)
+        x, y = int(cx - cw / 2), int(1020 - ch * 0.45)
         x, y = max(0, min(W - cw, x)), max(0, min(H - ch, y))
         img = img.crop((x, y, x + cw, y + ch)).resize((W, H), Image.LANCZOS)
     z.titel(img, TITEL)
