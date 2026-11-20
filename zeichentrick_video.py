@@ -23,20 +23,25 @@ TITEL = "Wie es sich anfühlt, als Gen Z einen Job zu suchen"
 # dort anbieten. Schlüssel liegt als Netzwerk-Geheimnis in der Umgebung (nicht im Repository).
 STIMMEN = {
     "personaler": dict(eleven="87AwpS6yC86wa2WglbsK"),     # Michael Danisch – Deep and Soulful
-    "genz": dict(eleven="IeQubAjK1ujbppIdhJw4"),           # Markus – Young Natural German
+    "genz": dict(eleven="raYPS0b2ZPlIzZWkcD0G"),           # Lars (jünger und höher als Michael, ca. 115 Hz)
 }
 _MODELL = {}
 DIALOG = [
     dict(wer="personaler", text="Warum möchtest du bei uns arbeiten?", sprich="[curious] Warum möchtest du bei uns arbeiten?",
          augen="normal", ruhe="neutral", arm="tisch"),
-    dict(wer="genz", text="Ehrlich gesagt? Ich möchte gar nicht arbeiten.",
-         sprich="[bored] Ehrlich gesagt? [sighs] Ich möchte gar nicht arbeiten.", augen="muede", ruhe="neutral", arm="handy"),
+    dict(wer="genz", text="Ehrlich? Ich will gar nicht arbeiten.",
+         sprich="[sighs] [bored] Ehrlich? Ich will gar nicht arbeiten.", augen="muede", ruhe="neutral", arm="handy"),
     dict(wer="personaler", text="Und warum hast du dich dann beworben?",
          sprich="[confused] Und warum hast du dich dann beworben?", augen="gross", ruhe="schief", arm="tisch"),
-    dict(wer="genz", text="Weil man Miete leider nicht kündigen kann wie ein Abo.",
-         sprich="[deadpan] Weil man Miete leider nicht kündigen kann wie ein Abo.", augen="normal", ruhe="grinsen",
-         arm="achselzucken", pointe=True),
+    dict(wer="genz", text="Meine Mutter will sonst das WLAN-Passwort ändern.",
+         sprich="[deadpan] Meine Mutter will sonst das WLAN-Passwort ändern.", augen="muede", ruhe="neutral", arm="handy",
+         vor=0.6),
+    dict(wer="personaler", text="Wann kannst du anfangen?", sprich="[desperate] [hopeful] Wann kannst du anfangen?",
+         augen="gross", ruhe="grinsen", arm="tisch", vor=1.3, pointe=True),
+    dict(wer="genz", text="Remote?", sprich="[unimpressed] Remote?", augen="genervt", ruhe="schief", arm="achselzucken",
+         vor=0.35, nach=1.3),
 ]
+ABSPANN_TEXT = "Fachkräftemangel ist real. Wir finden die, die wirklich wollen."
 VOR, NACH, ABSPANN = 0.35, 0.45, 3.0
 
 
@@ -78,7 +83,7 @@ def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
             mund="offen" if offen else e["ruhe"], arm=e["arm"], sitzt=True)
     if zoom != 1.0:   # langsamer Zoom auf das Gesicht (Pointe)
         cw, ch = int(W / zoom), int(H / zoom)
-        x, y = int(500 - cw / 2), int(1020 - ch * 0.45)
+        x, y = int((500 if genz else 640) - cw / 2), int(1020 - ch * 0.45)
         x, y = max(0, min(W - cw, x)), max(0, min(H - ch, y))
         img = img.crop((x, y, x + cw, y + ch)).resize((W, H), Image.LANCZOS)
     z.titel(img, TITEL)
@@ -119,8 +124,9 @@ def main(ziel):
         vorne = max(0, laut[0] - 800) if len(laut) else 0
         ton = ton[vorne:]
         zeiten = [(a - vorne / SR, b - vorne / SR) for a, b in zeiten]
-        dauer = VOR + len(ton) / SR + NACH + (0.5 if e.get("pointe") else 0)
-        takte.append(dict(e=e, start=t, ton=ton, dauer=dauer, zeiten=zeiten))
+        vor = e.get("vor", VOR)
+        dauer = vor + len(ton) / SR + e.get("nach", NACH)
+        takte.append(dict(e=e, start=t, ton=ton, dauer=dauer, zeiten=zeiten, vor=vor))
         t += dauer
     gesamt = t + ABSPANN
     # Tonspur: Stimmen + leise eigene Musik (im Abspann lauter)
@@ -135,7 +141,7 @@ def main(ziel):
     pegel[int(t * SR):] = np.linspace(0.12, 0.45, n - int(t * SR))
     mix = m * pegel
     for tk in takte:
-        a = int((tk["start"] + VOR) * SR)
+        a = int((tk["start"] + tk["vor"]) * SR)
         mix[a:a + len(tk["ton"])] += tk["ton"] * 0.95
     mix = mix / max(1e-6, np.abs(mix).max()) * 0.9
     tonpfad = os.path.join(tmp, "mix.wav")
@@ -151,14 +157,15 @@ def main(ziel):
     for k in range(int(gesamt * FPS)):
         if rnd.random() < 0.012:
             blinzeln.update(range(k, k + 4))
-    abspann = z.abspann("Du willst doch arbeiten? Dann wenigstens im richtigen Job.", "Link in der Bio")
+    abspann = z.abspann(ABSPANN_TEXT, "Link in der Bio")
+    mundlog = []
     for k in range(int(gesamt * FPS)):
         zeit = k / FPS
         tk = next((x for x in takte if x["start"] <= zeit < x["start"] + x["dauer"]), None)
         if tk is None:
             frame = abspann
         else:
-            e, rel = tk["e"], zeit - tk["start"] - VOR
+            e, rel = tk["e"], zeit - tk["start"] - tk["vor"]
             sprech_dauer = len(tk["ton"]) / SR
             offen = False
             if 0 <= rel < sprech_dauer:
@@ -175,10 +182,13 @@ def main(ziel):
             augen = "zu" if k in blinzeln and e["augen"] not in ("muede",) else e["augen"]
             zoom = 1.0 + 0.12 * min(1, max(0, rel) / max(0.1, sprech_dauer)) if e.get("pointe") else 1.0
             frame = szene(e, offen, augen, zoom=zoom, aktiv=aktiv)
+        mundlog.append(1 if tk is not None and offen else 0)
         proc.stdin.write(frame.convert("RGB").tobytes())
     proc.stdin.close()
     if proc.wait() != 0:
         raise RuntimeError("ffmpeg-Fehler")
+    import json
+    json.dump(mundlog, open(ziel + ".mund.json", "w"))
     print(ziel, round(gesamt, 1), "s")
 
 
