@@ -51,14 +51,14 @@ def hintergrund(stuhl=None):
     """Büro im Comic-Stil (doppelt aufgelöst). stuhl: "buero" (Schreibtisch + Bürostuhl) oder "hocker"."""
     if stuhl in _CACHE:
         return _CACHE[stuhl].copy()
-    img = _verlauf(W * K, H * K, (238, 229, 216), (214, 203, 190))
+    img = _verlauf(W * K, H * K, (26, 52, 94), (12, 30, 60))            # Inpernell-Navy
     d = ImageDraw.Draw(img)
     # Comic-Rasterpunkte oben an der Wand
     for y in range(0, 1100, 26):
         for x in range((y // 26 % 2) * 13, W, 26):
             r = 2.6 * (1 - y / 1100)
             if r > 0.4:
-                d.ellipse(_box(x - r, y - r, x + r, y + r), fill=(226, 214, 200))
+                d.ellipse(_box(x - r, y - r, x + r, y + r), fill=(36, 66, 112))
     # Fenster mit Skyline
     fx0, fy0, fx1, fy1 = 70, 520, 470, 990
     img.paste(_verlauf((fx1 - fx0) * K, (fy1 - fy0) * K, (126, 186, 236), (252, 214, 176)), (fx0 * K, fy0 * K))
@@ -77,20 +77,24 @@ def hintergrund(stuhl=None):
     d.line(_p((fx0 + fx1) / 2, fy0, (fx0 + fx1) / 2, fy1), fill=STRICH, width=8 * K)
     d.line(_p(fx0, (fy0 + fy1) / 2, fx1, (fy0 + fy1) / 2), fill=STRICH, width=8 * K)
     d.rectangle(_box(fx0 - 16, fy1, fx1 + 16, fy1 + 22), fill=(250, 246, 240), outline=STRICH, width=5 * K)
-    # Poster "TEAMGEIST" (Büro-Ironie)
-    px0, py0, px1, py1 = 700, 540, 980, 860
-    d.rectangle(_box(px0 + 10, py0 + 12, px1 + 10, py1 + 12), fill=(190, 178, 164))
-    d.rectangle(_box(px0, py0, px1, py1), fill=NAVY, outline=STRICH, width=6 * K)
-    d.polygon(_p(px0 + 30, py1 - 110, px0 + 120, py0 + 90, px0 + 170, py0 + 150, px0 + 210, py0 + 110, px1 - 30, py1 - 110),
+    # Motivationsposter (Büro-Ironie) im orangefarbenen Rahmen – bewusst ohne Inpernell-Logo:
+    # das Büro gehört in den Sketchen dem Arbeitgeber, Inpernell erscheint erst als Lösung
+    px0, py0, px1, py1 = 680, 540, 980, 850
+    d.rectangle(_box(px0 + 10, py0 + 12, px1 + 10, py1 + 12), fill=(8, 18, 38))
+    d.rectangle(_box(px0, py0, px1, py1), fill=ORANGE, outline=STRICH, width=6 * K)
+    d.rectangle(_box(px0 + 16, py0 + 16, px1 - 16, py1 - 16), fill=(20, 44, 84), outline=STRICH, width=4 * K)
+    d.polygon(_p(px0 + 40, py1 - 110, px0 + 120, py0 + 80, px0 + 160, py0 + 140, px0 + 200, py0 + 100, px1 - 40, py1 - 110),
               fill=(70, 110, 170))
-    d.polygon(_p(px0 + 92, py0 + 130, px0 + 120, py0 + 90, px0 + 146, py0 + 126), fill=WEISS)
-    d.text(_p((px0 + px1) / 2, py1 - 70), "TEAMGEIST", font=font("h800", 34 * K), fill=ORANGE, anchor="mm")
+    d.polygon(_p(px0 + 98, py0 + 116, px0 + 120, py0 + 80, px0 + 142, py0 + 112), fill=WEISS)
+    d.text(_p((px0 + px1) / 2, py1 - 60), "TEAMGEIST", font=font("h800", 32 * K), fill=ORANGE, anchor="mm")
+    # orange Akzentleiste an der Wand
+    d.rectangle(_box(0, 1168, W, 1190), fill=ORANGE)
     # Boden mit Dielen
     boden = 1250
-    img.paste(_verlauf(W * K, (H - boden) * K, (186, 150, 116), (150, 116, 88)), (0, boden * K))
+    img.paste(_verlauf(W * K, (H - boden) * K, (54, 66, 92), (30, 40, 62)), (0, boden * K))
     d.line(_p(0, boden, W, boden), fill=STRICH, width=6 * K)
     for i in range(-8, 9):
-        d.line(_p(W / 2 + i * 70, boden, W / 2 + i * 260, H), fill=(140, 106, 80), width=3 * K)
+        d.line(_p(W / 2 + i * 70, boden, W / 2 + i * 260, H), fill=(44, 56, 80), width=3 * K)
     # Pflanze
     d.polygon(_p(900, 1180, 1030, 1180, 1012, 1330, 918, 1330), fill=(200, 96, 70), outline=STRICH)
     d.line(_p(900, 1180, 1030, 1180, 1012, 1330, 918, 1330, 900, 1180), fill=STRICH, width=6 * K)
