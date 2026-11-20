@@ -124,7 +124,7 @@ Wie viele Gesprächsrunden hattest du schon für einen einzigen Job?
 
 Top Jobs aus der Region: Link im Profil.
 
-Musik: Sneaky Snitch von Kevin MacLeod (incompetech.com), CC BY 4.0
+Musik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
@@ -175,7 +175,7 @@ Wie lang ist dein Arbeitsweg im Winter?
 
 Top Jobs aus der Region: Link im Profil.
 
-Musik: Fluffing a Duck von Kevin MacLeod (incompetech.com), CC BY 4.0
+Musik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
@@ -191,7 +191,7 @@ Wie lange hast du schon mal auf eine Antwort auf deine Bewerbung gewartet?
 
 Top Jobs aus der Region: Link im Profil.
 
-Musik: Local Forecast - Elevator von Kevin MacLeod (incompetech.com), CC BY 4.0
+Musik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
@@ -222,7 +222,7 @@ Was war das Chaotischste an deinem ersten Arbeitstag?
 
 Top Jobs aus der Region: Link im Profil.
 
-Musik: Carefree von Kevin MacLeod (incompetech.com), CC BY 4.0
+Musik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0
 
 #jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```

@@ -158,9 +158,11 @@ Musik: Vice Police von Tausdei (CC BY 3.0)
 def main():
     ende = START + timedelta(days=TAGE - 1)
     ordner = os.path.join(HIER, "tiktok", f"{START:%Y-%m-%d}_bis_{ende:%Y-%m-%d}")
-    if os.path.isdir(ordner):
-        shutil.rmtree(ordner)
-    os.makedirs(ordner)
+    os.makedirs(ordner, exist_ok=True)
+    for name in os.listdir(ordner):       # alte Dateien weg, Sprach-Zwischenspeicher „ton“ behalten (spart Zeichen)
+        pfad = os.path.join(ordner, name)
+        if name != "ton":
+            shutil.rmtree(pfad) if os.path.isdir(pfad) else os.remove(pfad)
     q = {r["id"]: r for r in json.load(open(os.path.join(HIER, "reels", "warteschlange.json"), encoding="utf-8"))}
     eintraege = []
     for nr, (tag, zeit, art, ref) in enumerate(PLAN, 1):

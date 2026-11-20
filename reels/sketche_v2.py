@@ -11,6 +11,9 @@ sys.path.insert(0, HIER)
 import zeichentrick_video as zv  # noqa: E402
 
 M = "assets/musik/"
+# Einheitliche Sketch-Musik (vom Inhaber gewählt, 20.11.2026)
+MUSIK = M + "monkeys_spinning_monkeys_kevin_macleod.mp3"
+MUSIK_TITEL = "Monkeys Spinning Monkeys"
 
 
 def L(wer, text, sprich, augen="normal", ruhe="neutral", arm="tisch", **kw):
@@ -32,18 +35,18 @@ SKETCHE = [
     dict(id="2026-11-25-sketch-genz-wlan", datum="2026-11-25", zeit="12:00", thema="Sketch: Gen Z sucht einen Job",
          caption=cap("Wie es sich anfühlt, als Gen Z einen Job zu suchen 😅",
                      "Was war die ehrlichste Antwort, die du je im Vorstellungsgespräch gegeben hast?",
-                     "Monkeys Spinning Monkeys"),
+                     MUSIK_TITEL),
          sketch=dict(titel=zv.TITEL, dialog=zv.DIALOG, abspann=zv.ABSPANN_TEXT,
-                     musik_datei=M + "monkeys_spinning_monkeys_kevin_macleod.mp3")),
+                     musik_datei=MUSIK)),
     dict(id="2026-11-28-sketch-gleitzeit", datum="2026-11-28", zeit="11:00", thema="Sketch: Gleitzeit im Schwarzwald",
          caption=cap("Pendeln im Schwarzwald-Winter: Wenn der Recruiter Gleitzeit verspricht ❄️",
-                     "Wie lang ist dein Arbeitsweg im Winter?", "Fluffing a Duck"),
-         sketch=gleitzeit),
+                     "Wie lang ist dein Arbeitsweg im Winter?", MUSIK_TITEL),
+         sketch=dict(gleitzeit, musik_datei=MUSIK)),
     dict(id="2026-12-02-sketch-runde-6", datum="2026-12-02", zeit="12:00", thema="Sketch: Runde 6",
          caption=cap("Bewerbungsgespräch Runde 6: Wenn das Auswahlverfahren kein Ende nimmt 😅",
-                     "Wie viele Gesprächsrunden hattest du schon für einen einzigen Job?", "Sneaky Snitch"),
+                     "Wie viele Gesprächsrunden hattest du schon für einen einzigen Job?", MUSIK_TITEL),
          sketch=dict(titel="Wenn das Bewerbungsgespräch in Runde 6 geht",
-                     musik_datei=M + "sneaky_snitch_kevin_macleod.mp3",
+                     musik_datei=MUSIK,
                      abspann="Keine Lust auf Runde 6? Unsere Top Jobs aus der Region findest du hier.",
                      dialog=[
                          L("personaler", "Glückwunsch! Du bist in Runde 6!",
@@ -62,9 +65,9 @@ SKETCHE = [
                      ])),
     dict(id="2026-12-05-sketch-laptop", datum="2026-12-05", zeit="11:00", thema="Sketch: Laptop kommt Montag",
          caption=cap("Erster Arbeitstag ohne Laptop: Onboarding, wie es jeder kennt 💻",
-                     "Was war das Chaotischste an deinem ersten Arbeitstag?", "Carefree"),
+                     "Was war das Chaotischste an deinem ersten Arbeitstag?", MUSIK_TITEL),
          sketch=dict(titel="Erster Arbeitstag. Wo ist mein Laptop?",
-                     musik_datei=M + "carefree_kevin_macleod.mp3",
+                     musik_datei=MUSIK,
                      abspann="Dein nächster Job startet hoffentlich mit Laptop. Top Jobs aus der Region findest du bei uns.",
                      dialog=[
                          L("genz", "Erster Tag! Wo ist mein Laptop?", "[excited] Erster Tag! Wo ist mein Laptop?",
@@ -79,9 +82,9 @@ SKETCHE = [
     dict(id="2026-12-09-sketch-bewerbung-1995", datum="2026-12-09", zeit="12:00", thema="Sketch: Bewerbung 1995 vs. heute",
          caption=cap("Bewerbung 1995 vs. heute: Was hat sich wirklich verändert? 📮",
                      "Wie lange hast du schon mal auf eine Antwort auf deine Bewerbung gewartet?",
-                     "Local Forecast - Elevator"),
+                     MUSIK_TITEL),
          sketch=dict(titel="Bewerbung 1995 vs. heute",
-                     musik_datei=M + "local_forecast_elevator_kevin_macleod.mp3",
+                     musik_datei=MUSIK,
                      abspann="Bewerben geht heute auch einfacher. Schreib uns einfach eine Nachricht.",
                      dialog=[
                          L("personaler", "Mappe, Passfoto, Briefmarke. Fertig.",
