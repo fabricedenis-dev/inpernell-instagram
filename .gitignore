@@ -3,3 +3,4 @@ __pycache__/
 vorschau/reels/*eigene-stimme*
 vorschau/reels-neu/*.mp4
 tiktok/**/*.mp4
+tiktok/*.zip
