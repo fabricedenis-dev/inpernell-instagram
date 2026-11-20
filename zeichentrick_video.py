@@ -19,50 +19,56 @@ from bild import ORANGE, WEISS, font, wrap
 
 W, H, FPS, SR = z.W, z.H, 30, 48000
 TITEL = "Wie es sich anfühlt, als Gen Z einen Job zu suchen"
-# Stimmen: Chatterbox Multilingual (Open Source, MIT). Gen Z = eigene Stimme des Inhabers (Referenzaufnahme,
-# liegt NICHT im Repository, Pfad über STIMME_GENZ), Personalerin = eingebaute Standardstimme des Modells.
+# Stimmen: ElevenLabs (Starter-Abo mit gewerblicher Lizenz), Stimmen aus der Bibliothek, die die Sprecher selbst
+# dort anbieten. Schlüssel liegt als Netzwerk-Geheimnis in der Umgebung (nicht im Repository).
 STIMMEN = {
-    "personalerin": dict(referenz=None, ausdruck=0.55, cfg=0.45),
-    "genz": dict(referenz=os.environ.get("STIMME_GENZ"), ausdruck=0.35, cfg=0.3),
+    "personaler": dict(eleven="87AwpS6yC86wa2WglbsK"),     # Michael Danisch – Deep and Soulful
+    "genz": dict(eleven="IeQubAjK1ujbppIdhJw4"),           # Markus – Young Natural German
 }
 _MODELL = {}
 DIALOG = [
-    dict(wer="personalerin", text="Warum möchtest du bei uns arbeiten?", augen="normal", ruhe="neutral", arm="tisch"),
-    dict(wer="genz", text="Ehrlich gesagt? Ich möchte gar nicht arbeiten.", augen="muede", ruhe="neutral", arm="handy"),
-    dict(wer="personalerin", text="Und warum hast du dich dann beworben?", augen="gross", ruhe="schief", arm="tisch"),
-    dict(wer="genz", text="Weil man Miete leider nicht kündigen kann wie ein Abo.", augen="normal", ruhe="grinsen",
+    dict(wer="personaler", text="Warum möchtest du bei uns arbeiten?", sprich="[curious] Warum möchtest du bei uns arbeiten?",
+         augen="normal", ruhe="neutral", arm="tisch"),
+    dict(wer="genz", text="Ehrlich gesagt? Ich möchte gar nicht arbeiten.",
+         sprich="[bored] Ehrlich gesagt? [sighs] Ich möchte gar nicht arbeiten.", augen="muede", ruhe="neutral", arm="handy"),
+    dict(wer="personaler", text="Und warum hast du dich dann beworben?",
+         sprich="[confused] Und warum hast du dich dann beworben?", augen="gross", ruhe="schief", arm="tisch"),
+    dict(wer="genz", text="Weil man Miete leider nicht kündigen kann wie ein Abo.",
+         sprich="[deadpan] Weil man Miete leider nicht kündigen kann wie ein Abo.", augen="normal", ruhe="grinsen",
          arm="achselzucken", pointe=True),
 ]
 VOR, NACH, ABSPANN = 0.35, 0.45, 3.0
 
 
-def sprechen(text, ziel, referenz, ausdruck, cfg):
-    """Spricht den Satz mit Chatterbox und schneidet nach dem letzten erkannten Wort ab (gegen Nachgeräusche).
-    Gibt (Ton 48 kHz, Wortzeiten [(start, ende)]) zurück."""
-    import torch
-    if "tts" not in _MODELL:
-        torch.set_num_threads(4)
-        from chatterbox.mtl_tts import ChatterboxMultilingualTTS
+def _asr():
+    if "asr" not in _MODELL:
         from faster_whisper import WhisperModel
-        _MODELL["tts"] = ChatterboxMultilingualTTS.from_pretrained(device="cpu")
         _MODELL["asr"] = WhisperModel("small", device="cpu", compute_type="int8")
-    m = _MODELL["tts"]
-    kw = dict(language_id="de", exaggeration=ausdruck, cfg_weight=cfg)
-    if referenz:
-        kw["audio_prompt_path"] = referenz
-    roh = m.generate(text, **kw).squeeze().numpy()
-    ton = np.interp(np.arange(int(len(roh) * SR / m.sr)) * m.sr / SR, np.arange(len(roh)), roh).astype(np.float32)
+    return _MODELL["asr"]
+
+
+def sprechen(e, st):
+    """Spricht den Satz (ElevenLabs v3, mit Regieanweisungen) und ermittelt Wortzeiten per Spracherkennung;
+    schneidet nach dem letzten erkannten Wort ab. Gibt (Ton 48 kHz, Wortzeiten) zurück."""
+    import json
+    body = json.dumps({"text": e.get("sprich", e["text"]), "model_id": "eleven_v3", "language_code": "de"}).encode()
+    req = urllib.request.Request(
+        f"https://api.elevenlabs.io/v1/text-to-speech/{st['eleven']}?output_format=mp3_44100_128", data=body,
+        headers={"xi-api-key": os.environ.get("ELEVENLABS_API_KEY", "proxy-injected"), "Content-Type": "application/json",
+                 "Accept": "audio/mpeg"})
+    with urllib.request.urlopen(req, timeout=120) as r:
+        mp3 = r.read()
+    dek = subprocess.run(["ffmpeg", "-loglevel", "error", "-i", "pipe:0", "-f", "s16le", "-ac", "1", "-ar", str(SR), "pipe:1"],
+                         input=mp3, capture_output=True, check=True).stdout
+    ton = np.frombuffer(dek, np.int16).astype(np.float32) / 32768
     a16 = np.interp(np.arange(int(len(ton) * 16000 / SR)) * SR / 16000, np.arange(len(ton)), ton).astype(np.float32)
-    segs, _ = _MODELL["asr"].transcribe(a16, language="de", word_timestamps=True)
+    segs, _ = _asr().transcribe(a16, language="de", word_timestamps=True)
     woerter = [w for s in segs for w in s.words]
-    n = len(text.split())
+    n = len(e["text"].split())
     if woerter:
-        ende = woerter[min(len(woerter), n) - 1].end + 0.18
-        ton = ton[: int(ende * SR)]
-    zeiten = [(w.start, w.end) for w in woerter[:n]]
-    erkannt = " ".join(w.word.strip() for w in woerter)
-    print(f"  erkannt: {erkannt}")
-    return ton, zeiten
+        ton = ton[: int((woerter[min(len(woerter), n) - 1].end + 0.2) * SR)]
+    print("  erkannt:", " ".join(w.word.strip() for w in woerter))
+    return ton, [(w.start, w.end) for w in woerter[:n]]
 
 
 def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
@@ -108,7 +114,7 @@ def main(ziel):
     t = 0.0
     for i, e in enumerate(DIALOG):
         st = STIMMEN[e["wer"]]
-        ton, zeiten = sprechen(e["text"], os.path.join(tmp, f"{i}.wav"), st["referenz"], st["ausdruck"], st["cfg"])
+        ton, zeiten = sprechen(e, st)
         laut = np.where(np.abs(ton) > 0.02)[0]
         vorne = max(0, laut[0] - 800) if len(laut) else 0
         ton = ton[vorne:]
