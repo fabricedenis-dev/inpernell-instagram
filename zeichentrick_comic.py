@@ -457,3 +457,55 @@ def einspieler_alpaka(text="INZWISCHEN BEIM VORGÄNGER:"):
     rgba = img.convert("RGBA")
     rd_sticker(rgba, text, (W // 2 - 300, 640), winkel=-3, fuell=(255, 196, 64), schrift=STRICH, groesse=38)
     return rgba.convert("RGB")
+
+
+def einspieler_winter(text="AM NÄCHSTEN MORGEN, 6:48 UHR:", schild="B 500"):
+    """Einspieler für die Gleitzeit-Pointe: verschneite Schwarzwaldstraße bei Nacht.
+    Gibt (Hintergrund RGB, Auto als RGBA-Sprite) zurück; das Auto wird im Video quer über die Straße gerutscht."""
+    img = _verlauf(W * K, H * K, (12, 26, 58), (40, 66, 110))
+    d = ImageDraw.Draw(img)
+    d.ellipse(_box(120, 250, 240, 370), fill=(240, 236, 214), outline=STRICH, width=5 * K)           # Mond
+    for x, h in ((40, 560), (210, 700), (390, 520), (720, 600), (900, 740), (1070, 540)):            # Tannen
+        d.rectangle(_box(x - 14, 1120, x + 14, 1170), fill=(70, 50, 40), outline=STRICH, width=4 * K)
+        for k in range(4):
+            yy = 1150 - k * h * 0.22
+            b = h * 0.58 * (1 - k * 0.2)
+            d.polygon(_p(x - b / 2, yy, x, yy - h * 0.38, x + b / 2, yy), fill=(22, 66, 60), outline=STRICH, width=5 * K)
+            th = h * 0.38
+            d.polygon(_p(x - b * 0.17, yy - th * 0.66, x, yy - th + 6, x + b * 0.17, yy - th * 0.66, x + b * 0.07,
+                         yy - th * 0.58, x - b * 0.05, yy - th * 0.68), fill=(236, 242, 250))       # Schneehaube
+            d.line(_p(x - b / 2 + 14, yy - 8, x + b / 2 - 14, yy - 8), fill=(236, 242, 250), width=9 * K)
+    d.rectangle(_box(0, 1150, W, H), fill=(226, 234, 246))
+    d.line(_p(0, 1150, W, 1150), fill=STRICH, width=6 * K)
+    d.polygon(_p(330, 1150, 750, 1150, 1080, H, 0, H), fill=(84, 92, 112), outline=STRICH, width=6 * K)
+    for k in range(6):                                                                                # Mittellinie
+        y0 = 1180 + k * 125
+        d.polygon(_p(536 - k * 4, y0, 544 + k * 4, y0, 547 + k * 6, y0 + 66, 533 - k * 6, y0 + 66), fill=WEISS_)
+    for x0, x1 in ((330, 0), (750, 1080)):                                                            # Schneewall
+        d.line(_p(x0, 1150, x1, H), fill=(246, 250, 255), width=40 * K)
+    d.rectangle(_box(870, 980, 892, 1290), fill=(150, 150, 160), outline=STRICH, width=4 * K)          # Schild
+    d.rounded_rectangle(_box(770, 880, 992, 994), radius=14 * K, fill=(250, 200, 40), outline=STRICH, width=6 * K)
+    from bild import font
+    d.text(_p(881, 937), schild, font=font("h800", 60 * K), fill=STRICH, anchor="mm")
+    hg = fertig(img)
+    rgba = hg.convert("RGBA")
+    __import__("reel_design").sticker(rgba, text, (W // 2 - 310, 300), winkel=-3, fuell=(255, 196, 64),
+                                      schrift=STRICH, groesse=38)
+    # Auto (Inpernell-Orange), seitlich
+    a = Image.new("RGBA", (560 * K, 330 * K), (0, 0, 0, 0))
+    ad = ImageDraw.Draw(a)
+    from bild import ORANGE
+    ad.rounded_rectangle(_box(20, 120, 540, 250), radius=44 * K, fill=ORANGE, outline=STRICH, width=8 * K)
+    ad.polygon(_p(120, 124, 190, 40, 390, 40, 450, 124), fill=ORANGE, outline=STRICH, width=8 * K)
+    ad.polygon(_p(152, 120, 202, 60, 282, 60, 282, 120), fill=(170, 210, 240), outline=STRICH, width=5 * K)
+    ad.polygon(_p(298, 120, 298, 60, 372, 60, 420, 120), fill=(170, 210, 240), outline=STRICH, width=5 * K)
+    ad.rectangle(_box(190, 34, 390, 46), fill=WEISS_, outline=STRICH, width=4 * K)                     # Schnee auf dem Dach
+    ad.ellipse(_box(500, 150, 534, 184), fill=(255, 240, 170), outline=STRICH, width=4 * K)            # Scheinwerfer
+    for wx in (130, 430):
+        ad.ellipse(_box(wx - 54, 196, wx + 54, 304), fill=STRICH)
+        ad.ellipse(_box(wx - 24, 226, wx + 24, 274), fill=(150, 150, 160))
+    auto = a.resize((560, 330), Image.LANCZOS)
+    return rgba.convert("RGB"), auto
+
+
+WEISS_ = (255, 255, 255)

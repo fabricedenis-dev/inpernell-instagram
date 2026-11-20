@@ -153,9 +153,35 @@ def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None, ohne_ut=False):
     return img
 
 
+_FLOCKEN = [(random.Random(11 + i).uniform(0, W), random.Random(91 + i).uniform(0, H), random.Random(7 + i).choice((3, 4, 6)))
+            for i in range(260)]
+
+
+def _winter_bild(ein, t):
+    """Winter-Einspieler zum Zeitpunkt t: Auto gleitet langsam quer über die Straße und dreht sich, Schnee fällt."""
+    hg, auto = ein
+    img = hg.copy()
+    p = min(1.0, t / 2.6)
+    p = p * p * (3 - 2 * p)
+    # Seitenansicht: Schlingern (Kippen) und eine halbe Drehung, angedeutet durch Stauchen und Spiegeln
+    breite = abs(np.cos(p * np.pi))
+    a2 = auto if p < 0.5 else auto.transpose(Image.FLIP_LEFT_RIGHT)
+    a2 = a2.resize((max(40, int(auto.width * (0.25 + 0.75 * breite))), auto.height), Image.LANCZOS)
+    r = a2.rotate(-12 * np.sin(p * np.pi * 3), resample=Image.BICUBIC, expand=True)
+    cx, cy = 330 + 360 * p, 1420 + 110 * p
+    img.paste(r, (int(cx - r.width / 2), int(cy - r.height / 2)), r)
+    d = ImageDraw.Draw(img)
+    for x, y, g in _FLOCKEN:
+        yy = (y + t * 140 * g / 4) % H
+        xx = (x + 25 * np.sin(t * 1.5 + y)) % W
+        d.ellipse([xx - g, yy - g, xx + g, yy + g], fill=(240, 246, 255))
+    return img
+
+
 def main(ziel, sketch=None):
     """sketch: dict mit titel, dialog (Liste wie DIALOG), abspann. Ohne Angabe: der Gen-Z-Sketch oben."""
     global TITEL, DIALOG, ABSPANN_TEXT
+    sketch = sketch or {}
     if sketch:
         TITEL, DIALOG, ABSPANN_TEXT = sketch["titel"], sketch["dialog"], sketch["abspann"]
     rnd = random.Random(3)
@@ -231,16 +257,29 @@ def main(ziel, sketch=None):
             setze(grillen(tk["vor"]), tk["start"])
             setze(wusch(), st - 0.15, 0.6)
         if tk["e"].get("sfx_nach") == "badumtss":
-            setze(badumtss(), st + len(tk["ton"]) / SR + 0.15)
+            setze(badumtss(), st + len(tk["ton"]) / SR + tk["e"].get("badumtss_nach", 0.15))
+        if tk["e"].get("einspieler") == "winter":                    # Rutschgeräusch zum gleitenden Auto
+            setze(wusch(), st + len(tk["ton"]) / SR + 0.3, 0.5)
     ab_sprech = abspann_start + UEBERGANG + ABSPANN_VOR
     setze(ab_ton, ab_sprech, 0.95)
     # Musik: verspielte Comedy-Untermalung, leise unter den Stimmen, in der Starr-Pause aus (Timing der Pointe),
     # nach dem Ba-dum-tss wieder da, im Abschluss etwas lauter und unter dem Sprecher geduckt
-    mwav = os.path.join(tmp, "musik.wav")
-    musik.erzeuge_comedy(gesamt + 0.5, mwav)
-    with wave.open(mwav) as w:
-        m = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32).reshape(-1, 2).mean(axis=1) / 32768
-    m = np.pad(m, (0, max(0, n - len(m))))[:n]
+    if sketch.get("musik_datei"):          # fertiges Musikstück (Lizenz siehe assets/musik/LIZENZEN.md)
+        roh = subprocess.run(["ffmpeg", "-loglevel", "error", "-ss", str(sketch.get("musik_start", 0)), "-i",
+                              os.path.join(os.path.dirname(os.path.abspath(__file__)), sketch["musik_datei"]),
+                              "-f", "s16le", "-ac", "1", "-ar", str(SR), "pipe:1"], capture_output=True, check=True).stdout
+        m = np.frombuffer(roh, np.int16).astype(np.float32) / 32768
+        while len(m) < n:
+            m = np.concatenate([m, m])
+        m = m[:n] / max(1e-6, float(np.sqrt(np.mean(m[:n] ** 2)))) * 0.2      # auf festen Grundpegel bringen
+        m[: int(0.3 * SR)] *= np.linspace(0, 1, int(0.3 * SR))
+        m[-int(1.5 * SR):] *= np.linspace(1, 0, int(1.5 * SR))
+    else:
+        mwav = os.path.join(tmp, "musik.wav")
+        musik.erzeuge_comedy(gesamt + 0.5, mwav)
+        with wave.open(mwav) as w:
+            m = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32).reshape(-1, 2).mean(axis=1) / 32768
+        m = np.pad(m, (0, max(0, n - len(m))))[:n]
     pegel = np.full(n, 0.20, np.float32)
     for tk in takte:
         a0 = int((tk["start"] + tk["vor"]) * SR)
@@ -313,11 +352,18 @@ def main(ziel, sketch=None):
             zoom = 1.0 + 0.12 * min(1, max(0, rel) / max(0.1, sprech_dauer)) if e.get("pointe") else 1.0
             if e.get("einspieler") and rel > sprech_dauer + 0.35:     # Sitcom-Einspieler nach der Pointe
                 q = min(1.0, (rel - sprech_dauer - 0.35) / 0.25)
-                if einspieler is None:
-                    einspieler = z.einspieler_alpaka(e.get("einspieler_text", "INZWISCHEN BEIM VORGÄNGER:"))
-                zz = 1.0 + 0.04 * min(1, (rel - sprech_dauer - 0.35) / 2.5)
+                te = rel - sprech_dauer - 0.35
+                if e["einspieler"] == "winter":
+                    if einspieler is None:
+                        einspieler = z.einspieler_winter(e.get("einspieler_text", "AM NÄCHSTEN MORGEN, 6:48 UHR:"))
+                    bild = _winter_bild(einspieler, te)
+                else:
+                    if einspieler is None:
+                        einspieler = z.einspieler_alpaka(e.get("einspieler_text", "INZWISCHEN BEIM VORGÄNGER:"))
+                    bild = einspieler
+                zz = 1.0 + 0.04 * min(1, te / 2.5)
                 cw, ch = int(W / zz), int(H / zz)
-                bild = einspieler.crop(((W - cw) // 2, (H - ch) // 2, (W - cw) // 2 + cw, (H - ch) // 2 + ch)).resize((W, H))
+                bild = bild.crop(((W - cw) // 2, (H - ch) // 2, (W - cw) // 2 + cw, (H - ch) // 2 + ch)).resize((W, H))
                 frame = Image.blend(szene(e, False, augen, zoom=zoom, aktiv=None).convert("RGB"), bild, q) if q < 1 else bild
             else:
                 frame = szene(e, offen, augen, zoom=zoom, aktiv=aktiv, ohne_ut=rel < -0.05)
