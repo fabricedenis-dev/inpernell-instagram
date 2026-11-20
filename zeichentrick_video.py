@@ -45,6 +45,8 @@ DIALOG = [
 ]
 ABSPANN_TEXT = "Fachkräftemangel ist real. Wir finden die, die wirklich wollen."
 VOR, NACH, ABSPANN = 0.35, 0.45, 3.0
+UEBERGANG = 0.9           # weiche Überblendung von der letzten Szene in den Abschluss
+ABSPANN_VOR, ABSPANN_NACH = 0.5, 2.2   # Pause vor der Sprecherstimme im Abschluss, Standzeit danach
 
 
 def _asr():
@@ -152,7 +154,13 @@ def main(ziel, sketch=None):
         dauer = vor + len(ton) / SR + e.get("nach", NACH)
         takte.append(dict(e=e, start=t, ton=ton, dauer=dauer, zeiten=zeiten, vor=vor))
         t += dauer
-    gesamt = t + ABSPANN
+    # Abschluss: Michael Danisch spricht den Abspann-Text
+    import topjob_video as tv
+    sprich_ab = "[warm] " + ABSPANN_TEXT + " Link in der Bio."
+    ab_ton, _w, _z, _q = tv.sprich_abschnitt(sprich_ab, os.path.join(os.path.dirname(os.path.abspath(ziel)), "ton"))
+    abspann_start = t
+    abspann_dauer = UEBERGANG + ABSPANN_VOR + len(ab_ton) / SR + ABSPANN_NACH
+    gesamt = t + abspann_dauer
     # Tonspur: Stimmen + Comedy-Effekte (Grillen in der Starr-Pause, Wusch bei der Pointe, Ba-dum-tss am Schluss);
     # Musik nur im Abspann
     import musik
@@ -205,12 +213,29 @@ def main(ziel, sketch=None):
             setze(wusch(), st - 0.15, 0.6)
         if tk["e"].get("sfx_nach") == "badumtss":
             setze(badumtss(), st + len(tk["ton"]) / SR + 0.15)
+    ab_sprech = abspann_start + UEBERGANG + ABSPANN_VOR
+    setze(ab_ton, ab_sprech, 0.95)
+    # Musik: verspielte Comedy-Untermalung, leise unter den Stimmen, in der Starr-Pause aus (Timing der Pointe),
+    # nach dem Ba-dum-tss wieder da, im Abschluss etwas lauter und unter dem Sprecher geduckt
     mwav = os.path.join(tmp, "musik.wav")
-    musik.erzeuge_track(ABSPANN + 0.5, mwav, variante=2)
+    musik.erzeuge_comedy(gesamt + 0.5, mwav)
     with wave.open(mwav) as w:
         m = np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32).reshape(-1, 2).mean(axis=1) / 32768
-    m = m[: n - int(t * SR)] * np.minimum(1, np.arange(len(m[: n - int(t * SR)])) / (0.6 * SR)) * 0.35
-    mix[int(t * SR):int(t * SR) + len(m)] += m
+    m = np.pad(m, (0, max(0, n - len(m))))[:n]
+    pegel = np.full(n, 0.20, np.float32)
+    for tk in takte:
+        a0 = int((tk["start"] + tk["vor"]) * SR)
+        pegel[a0:a0 + len(tk["ton"])] = 0.11
+        if tk["e"].get("sfx_vor") == "grillen":                       # Stille für die Pointe
+            pegel[int(tk["start"] * SR):int((tk["start"] + tk["vor"] + len(tk["ton"]) / SR) * SR)] = 0.0
+        if tk["e"].get("sfx_nach") == "badumtss":
+            e0 = int((tk["start"] + tk["vor"] + len(tk["ton"]) / SR) * SR)
+            pegel[e0:int(abspann_start * SR)] = 0.0
+    pegel[int(abspann_start * SR):] = 0.30
+    pegel[int(ab_sprech * SR):int(ab_sprech * SR) + len(ab_ton)] = 0.16
+    k = int(0.2 * SR)
+    pegel = np.convolve(pegel, np.ones(k) / k, mode="same")
+    mix += m * pegel
     mix = mix / max(1e-6, np.abs(mix).max()) * 0.9
     tonpfad = os.path.join(tmp, "mix.wav")
     with wave.open(tonpfad, "wb") as w:
@@ -225,13 +250,30 @@ def main(ziel, sketch=None):
     for k in range(int(gesamt * FPS)):
         if rnd.random() < 0.012:
             blinzeln.update(range(k, k + 4))
-    abspann = z.abspann(ABSPANN_TEXT, "Link in der Bio")
+    ab_hg, ab_ebenen = z.abspann_ebenen(ABSPANN_TEXT, "Link in der Bio")
+    letztes = None
     mundlog = []
     for k in range(int(gesamt * FPS)):
         zeit = k / FPS
         tk = next((x for x in takte if x["start"] <= zeit < x["start"] + x["dauer"]), None)
         if tk is None:
-            frame = abspann
+            rel = zeit - abspann_start
+            frame = ab_hg.copy()
+            if rel < UEBERGANG and letztes is not None:             # weiche Blende: letzte Szene zoomt weg und blendet aus
+                p = min(1.0, rel / UEBERGANG)
+                p = p * p * (3 - 2 * p)
+                zz = 1 + 0.08 * p
+                cw, ch = int(W / zz), int(H / zz)
+                alt = letztes.crop(((W - cw) // 2, (H - ch) // 2, (W - cw) // 2 + cw, (H - ch) // 2 + ch)).resize((W, H))
+                frame = Image.blend(alt.convert("RGBA"), frame, p)
+            for j, eb in enumerate(ab_ebenen):                       # Text, Knopf, Logo nacheinander sanft einblenden
+                ein = UEBERGANG * 0.6 + j * 0.45
+                q = min(1.0, max(0.0, (rel - ein) / 0.5))
+                if q > 0:
+                    q = q * q * (3 - 2 * q)
+                    eb2 = eb.copy()
+                    eb2.putalpha(eb.getchannel("A").point(lambda v, q=q: int(v * q)))
+                    frame.alpha_composite(eb2, (0, int((1 - q) * 40)))
         else:
             e, rel = tk["e"], zeit - tk["start"] - tk["vor"]
             sprech_dauer = len(tk["ton"]) / SR
@@ -250,6 +292,7 @@ def main(ziel, sketch=None):
             augen = "zu" if k in blinzeln and e["augen"] not in ("muede",) else e["augen"]
             zoom = 1.0 + 0.12 * min(1, max(0, rel) / max(0.1, sprech_dauer)) if e.get("pointe") else 1.0
             frame = szene(e, offen, augen, zoom=zoom, aktiv=aktiv)
+            letztes = frame
         mundlog.append(1 if tk is not None and offen else 0)
         proc.stdin.write(frame.convert("RGB").tobytes())
     proc.stdin.close()

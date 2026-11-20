@@ -363,3 +363,27 @@ def abspann(text, knopf):
     img.paste(lg, ((W - lg.width) // 2, 1060), lg)
     d.text((W // 2, 1060 + lg.height + 30), "DIREKTVERMITTLUNG", font=font("h700", 30), fill=(255, 214, 180), anchor="ma")
     return img
+
+
+def abspann_ebenen(text, knopf):
+    """Abschluss in Ebenen für eine ruhige Animation: Hintergrund (Büro unter Navy-Schleier), Text, Knopf, Logo."""
+    hg = Image.blend(fertig(hintergrund()), Image.new("RGB", (W, H), NAVY), 0.82).convert("RGBA")
+    leer = lambda: Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    t, k, l = leer(), leer(), leer()
+    d = ImageDraw.Draw(t)
+    zeilen = wrap(d, text, font("h800", 70), W - 200)
+    for i, z in enumerate(zeilen):
+        d.text((W // 2, 470 + i * 84), z, font=font("h800", 70), fill=WEISS, anchor="ma", stroke_width=6, stroke_fill=STRICH)
+    y = 470 + len(zeilen) * 84 + 60
+    d = ImageDraw.Draw(k)
+    fk = font("h800", 46)
+    kw = d.textlength(knopf, font=fk)
+    d.rounded_rectangle([W / 2 - kw / 2 - 50, y, W / 2 + kw / 2 + 50, y + 94], radius=47, fill=ORANGE, outline=STRICH, width=6)
+    d.text((W // 2, y + 47), knopf, font=fk, fill=KNOPFTEXT, anchor="mm")
+    lg = Image.open(os.path.join(HIER, "assets", "logo.png")).convert("RGBA")
+    lg = lg.resize((480, int(lg.height * 480 / lg.width)), Image.LANCZOS)
+    ly = y + 170
+    l.alpha_composite(lg, ((W - lg.width) // 2, ly))
+    ImageDraw.Draw(l).text((W // 2, ly + lg.height + 30), "DIREKTVERMITTLUNG", font=font("h700", 30),
+                           fill=(255, 214, 180), anchor="ma")
+    return hg, [t, k, l]
