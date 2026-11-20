@@ -1,0 +1,4 @@
+# Zusätzlich für vertonte Reels und Comic-Sketche (nur in Claude-Sitzungen, nicht im GitHub-Workflow nötig)
+faster-whisper>=1.1
+scipy>=1.11
+librosa>=0.10

@@ -1,29 +1,30 @@
 # TikTok-Plan: so planst du die Videos ein
 
 1. Am Computer tiktok.com/tiktokstudio/upload öffnen und mit dem Inpernell-Konto anmelden.
-2. Video auswählen (Datei mit der Nummer aus der Liste unten).
-3. Beschreibung: den Text aus der gleichnamigen .txt-Datei einfügen (ohne die erste Zeile mit dem Termin).
-4. Titelbild: das Bild mit der gleichen Nummer bzw. ein Bild aus dem Video wählen.
-5. Unter „Wann posten“ auf „Planen“ stellen und Datum und Uhrzeit aus der Liste eintragen.
-6. Bei „Inhalte offenlegen“ nichts einschalten (eigene Werbung des eigenen Unternehmens ist erkennbar).
-7. „Planen“ klicken. Fertig.
+2. Video mit der Nummer aus der Liste auswählen.
+3. Beschreibung aus der gleichnamigen .txt-Datei einfügen (ohne die erste Zeile mit dem Termin).
+4. Titelbild: das Bild mit der gleichen Nummer.
+5. Unter „Wann posten“ auf „Planen“ stellen, Datum und Uhrzeit aus der Liste eintragen.
+6. „Planen“ klicken.
 
-Hinweis: Musik ist eigene Musik, deshalb in TikTok keine weitere Musik hinzufügen.
+Hinweise: Alle Videos haben bereits Ton (Sprecher bzw. eigene Musik): in TikTok keine Musik hinzufügen. Sketche mit dem Vermerk „erst nach Freigabe posten“ sind noch nicht freigegeben.
 
 | Nr. | Termin | Inhalt | Datei |
 |---|---|---|---|
 | 01 | 23.11. 18:00 | Personalvermittlung im Game-Modus | 01_2026-11-23.mp4 |
-| 02 | 25.11. 18:00 | 3 Fehler, die dich Geld kosten | 02_2026-11-25.mp4 |
-| 03 | 27.11. 17:00 | Job der Woche: Konstrukteur & Entwickler (m/w/d) | 03_2026-11-27.mp4 |
-| 04 | 30.11. 18:00 | Hier haben Fachkräfte die besten Karten | 04_2026-11-30.mp4 |
-| 05 | 02.12. 18:00 | 3 Job-Mythen, die fast jeder glaubt | 05_2026-12-02.mp4 |
-| 06 | 04.12. 17:00 | Job der Woche: Manager Arbeitsschutz & Fachkraft für Arbeitssicherheit (m/w/d) | 06_2026-12-04.mp4 |
-| 07 | 07.12. 18:00 | Zeitarbeit oder Direktvermittlung? | 07_2026-12-07.mp4 |
-| 08 | 09.12. 18:00 | 3 Fehler im Lebenslauf, die jeder sieht | 08_2026-12-09.mp4 |
-| 09 | 11.12. 17:00 | Job der Woche (Stelle wird kurz vorher gewählt) | wird nachgeliefert |
-| 10 | 14.12. 18:00 | Wusstest du, was Tuttlingen so besonders macht? | 10_2026-12-14.mp4 |
-| 11 | 16.12. 18:00 | Neues Reel aus der Wochenplanung | wird nachgeliefert |
-| 12 | 18.12. 17:00 | Job der Woche (Stelle wird kurz vorher gewählt) | wird nachgeliefert |
+| 02 | 25.11. 18:00 | Sketch: Gen Z sucht einen Job | 02_2026-11-25.mp4 |
+| 03 | 27.11. 17:00 | Job der Woche: Softwareentwickler Testsysteme und Automatisierung (m/w/d) | 03_2026-11-27.mp4 |
+| 04 | 29.11. 18:00 | 3 Job-Mythen, die fast jeder glaubt | 04_2026-11-29.mp4 |
+| 05 | 30.11. 18:00 | Zeitarbeit oder Direktvermittlung? | 05_2026-11-30.mp4 |
+| 06 | 02.12. 18:00 | Sketch: Deine Stärken (erst nach Freigabe posten) | 06_2026-12-02.mp4 |
+| 07 | 04.12. 17:00 | Job der Woche: Zerspanungsmechaniker (m/w/d) | 07_2026-12-04.mp4 |
+| 08 | 06.12. 18:00 | 3 Fehler im Lebenslauf, die jeder sieht | 08_2026-12-06.mp4 |
+| 09 | 07.12. 18:00 | Sketch: Bewerbung früher und heute (erst nach Freigabe posten) | 09_2026-12-07.mp4 |
+| 10 | 09.12. 18:00 | Sketch: Gehaltsvorstellung (erst nach Freigabe posten) | 10_2026-12-09.mp4 |
+| 11 | 11.12. 17:00 | Wusstest du, was Tuttlingen so besonders macht? | 11_2026-12-11.mp4 |
+| 12 | 13.12. 18:00 | Sketch: Arbeitgeber aus den 80ern (erst nach Freigabe posten) | 12_2026-12-13.mp4 |
+| 13 | 16.12. 18:00 | Neues Reel aus der Wochenplanung | wird nachgeliefert |
+| 14 | 18.12. 17:00 | Job der Woche (Stelle wird kurz vorher gewählt) | wird nachgeliefert |
 
 ## Beschreibungen zum Kopieren
 
@@ -43,31 +44,29 @@ Top Jobs aus der Region: Link im Profil.
 #jobtok #jobsuche #schwarzwald #personalvermittlung #gaming
 ```
 
-### 02 · 25.11. 18:00 · 3 Fehler, die dich Geld kosten
+### 02 · 25.11. 18:00 · Sketch: Gen Z sucht einen Job
 
 ```
-Gehaltsverhandlung: 3 Fehler, die dich Geld kosten – und wie du's besser machst 💶
+Wie es sich anfühlt, als Gen Z einen Job zu suchen 😅
 
-❌ Ohne eigene Zahl ins Gespräch → ✅ Marktgehalt vorher checken (z. B. Entgeltatlas der Arbeitsagentur)
-❌ Nur übers Gehalt reden → ✅ Das ganze Paket verhandeln
-❌ Sofort zusagen → ✅ Einen Tag Bedenkzeit nehmen
+Was war die ehrlichste Antwort, die du je im Vorstellungsgespräch gegeben hast?
 
-Welchen Fehler hast du selbst schon mal gemacht? 👇
+Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
 
 Top Jobs aus der Region: Link im Profil.
 
-#jobtok #jobsuche #schwarzwald #Gehaltsverhandlung #Karrieretipps
+#jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
 
-### 03 · 27.11. 17:00 · Job der Woche: Konstrukteur & Entwickler (m/w/d)
+### 03 · 27.11. 17:00 · Job der Woche: Softwareentwickler Testsysteme und Automatisierung (m/w/d)
 
 ```
-Job der Woche: Konstrukteur & Entwickler (m/w/d) in Tuttlingen
+Job der Woche: Softwareentwickler Testsysteme und Automatisierung (m/w/d) in Villingen-Schwenningen
 
-💶 65.000 – 80.000 € / Jahr
+💶 70.000 – 80.000 € / Jahr
 🕒 Vollzeit · 40 h
 🏠 Hybrid / Homeoffice
-📍 Tuttlingen
+📍 Villingen-Schwenningen
 
 Direktvermittlung: Du wirst direkt beim Arbeitgeber angestellt, keine Zeitarbeit, für dich kostenlos.
 
@@ -75,26 +74,10 @@ Wäre das was für dich oder für jemanden, den du kennst?
 
 Bewerben: Link im Profil.
 
-#jobtok #jobsuche #schwarzwald #jobstuttlingen #Konstruktion
+#jobtok #jobsuche #schwarzwald #jobsvillingenschwenningen #Konstruktion
 ```
 
-### 04 · 30.11. 18:00 · Hier haben Fachkräfte die besten Karten
-
-```
-Jobmarkt Region: Wo Fachkräfte gerade die besten Karten haben 📍
-
-Im Kreis Rottweil lag die Arbeitslosenquote im Oktober 2026 bei 3,3 %, im Schwarzwald-Baar-Kreis bei 5,0 % und im Kreis Tuttlingen bei 5,5 % (Agentur für Arbeit Rottweil–Villingen-Schwenningen).
-In der Region Freiburg kommen in Produktion und Technik nur 1,5 Arbeitslose auf eine offene Stelle – im Büro und in der Verwaltung sind es 12 (Agentur für Arbeit Freiburg, Oktober 2026).
-Heißt: Wer in Produktion und Technik Erfahrung mitbringt, kann sich seinen nächsten Job gut aussuchen. 💪
-
-In welcher Branche arbeitest du? 👇
-
-Top Jobs aus der Region: Link im Profil.
-
-#jobtok #jobsuche #schwarzwald #JobsSchwarzwald #Arbeitsmarkt
-```
-
-### 05 · 02.12. 18:00 · 3 Job-Mythen, die fast jeder glaubt
+### 04 · 29.11. 18:00 · 3 Job-Mythen, die fast jeder glaubt
 
 ```
 3 Job-Mythen, die fast jeder glaubt – und was wirklich gilt ⚖️
@@ -110,26 +93,7 @@ Top Jobs aus der Region: Link im Profil.
 #jobtok #jobsuche #schwarzwald #Arbeitsrecht #Karrieretipps
 ```
 
-### 06 · 04.12. 17:00 · Job der Woche: Manager Arbeitsschutz & Fachkraft für Arbeitssicherheit (m/w/d)
-
-```
-Job der Woche: Manager Arbeitsschutz & Fachkraft für Arbeitssicherheit (m/w/d) in Bad Krozingen
-
-💶 80.000 – 90.000 € / Jahr
-🕒 Vollzeit · 40 h
-🏠 Remote möglich
-📍 Bad Krozingen
-
-Direktvermittlung: Du wirst direkt beim Arbeitgeber angestellt, keine Zeitarbeit, für dich kostenlos.
-
-Wäre das was für dich oder für jemanden, den du kennst?
-
-Bewerben: Link im Profil.
-
-#jobtok #jobsuche #schwarzwald #jobsbadkrozingen #Qualitätsmanagement
-```
-
-### 07 · 07.12. 18:00 · Zeitarbeit oder Direktvermittlung?
+### 05 · 30.11. 18:00 · Zeitarbeit oder Direktvermittlung?
 
 ```
 Zeitarbeit oder Direktvermittlung – wo ist der Unterschied? 🤝
@@ -145,7 +109,40 @@ Top Jobs aus der Region: Link im Profil.
 #jobtok #jobsuche #schwarzwald #Direktvermittlung #JobsSchwarzwald
 ```
 
-### 08 · 09.12. 18:00 · 3 Fehler im Lebenslauf, die jeder sieht
+### 06 · 02.12. 18:00 · Sketch: Deine Stärken
+
+```
+Was sind deine Stärken? Die ehrlichste Antwort im Vorstellungsgespräch 💼
+
+Welche Stärke schreibst du in jede Bewerbung?
+
+Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+
+Top Jobs aus der Region: Link im Profil.
+
+#jobtok #jobsuche #schwarzwald #comedy #jobwechsel
+```
+
+### 07 · 04.12. 17:00 · Job der Woche: Zerspanungsmechaniker (m/w/d)
+
+```
+Job der Woche: Zerspanungsmechaniker (m/w/d) in Titisee
+
+💶 50.000 – 60.000 € / Jahr
+🕒 Vollzeit · 40 h
+🏠 Vor Ort
+📍 Titisee
+
+Direktvermittlung: Du wirst direkt beim Arbeitgeber angestellt, keine Zeitarbeit, für dich kostenlos.
+
+Wäre das was für dich oder für jemanden, den du kennst?
+
+Bewerben: Link im Profil.
+
+#jobtok #jobsuche #schwarzwald #jobstitisee #Zerspanung
+```
+
+### 08 · 06.12. 18:00 · 3 Fehler im Lebenslauf, die jeder sieht
 
 ```
 Lebenslauf: 3 Fehler, die jeder Recruiter sieht – und wie du sie vermeidest 📄
@@ -161,7 +158,35 @@ Top Jobs aus der Region: Link im Profil.
 #jobtok #jobsuche #schwarzwald #Lebenslauf #Bewerbungstipps
 ```
 
-### 10 · 14.12. 18:00 · Wusstest du, was Tuttlingen so besonders macht?
+### 09 · 07.12. 18:00 · Sketch: Bewerbung früher und heute
+
+```
+Bewerbung früher vs. heute: Wenn der Chef von damals erzählt 📮
+
+Wie lange hast du schon mal auf eine Antwort auf deine Bewerbung gewartet?
+
+Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+
+Top Jobs aus der Region: Link im Profil.
+
+#jobtok #jobsuche #schwarzwald #comedy #jobwechsel
+```
+
+### 10 · 09.12. 18:00 · Sketch: Gehaltsvorstellung
+
+```
+Was stellst du dir beim Gehalt vor? Gen Z antwortet ehrlich 💶
+
+Welche Zahl nennst du, wenn du nach deiner Gehaltsvorstellung gefragt wirst?
+
+Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+
+Top Jobs aus der Region: Link im Profil.
+
+#jobtok #jobsuche #schwarzwald #comedy #jobwechsel
+```
+
+### 11 · 11.12. 17:00 · Wusstest du, was Tuttlingen so besonders macht?
 
 ```
 Wusstest du, was Tuttlingen so besonders macht? 🌍
@@ -174,5 +199,19 @@ Arbeitest du selbst in der Medizintechnik? 👇
 Top Jobs aus der Region: Link im Profil.
 
 #jobtok #jobsuche #schwarzwald #Medizintechnik #Tuttlingen
+```
+
+### 12 · 13.12. 18:00 · Sketch: Arbeitgeber aus den 80ern
+
+```
+Wenn der Arbeitgeber noch in den 80ern lebt 📠
+
+Was ist der älteste Benefit, den dir je ein Arbeitgeber angeboten hat?
+
+Kennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.
+
+Top Jobs aus der Region: Link im Profil.
+
+#jobtok #jobsuche #schwarzwald #comedy #jobwechsel
 ```
 

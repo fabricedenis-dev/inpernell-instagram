@@ -177,7 +177,8 @@ def _chip(d, x, y, text, f, fuell, schrift, rand=None):
     return x + b
 
 
-def folie_einstieg(kat, ort, titel, untertitel, chips, bis=99, nur=None, mit_kopf=False, basis="grund"):
+def folie_einstieg(kat, ort, titel, untertitel, chips, bis=99, nur=None, mit_kopf=False, basis="grund",
+                   badge="TOP JOB DES TAGES"):
     g = rd.Stufe(bis, nur)
     img = _grundbild(kat, 1150, basis)
     mess = ImageDraw.Draw(Image.new("RGB", (1, 1)))
@@ -191,7 +192,7 @@ def folie_einstieg(kat, ort, titel, untertitel, chips, bis=99, nur=None, mit_kop
             rd.marker_text(ImageDraw.Draw(img), (M, y), [zeile], f, set())
         y += int(groesse * 1.04)
     if g():
-        rd.sticker(img, "TOP JOB DES TAGES", (M - 6, 330), winkel=-4, groesse=30)
+        rd.sticker(img, badge, (M - 6, 330), winkel=-4, groesse=30)
     fu = font("h700", 44)
     zeilen = wrap(mess, untertitel, fu, RECHTS - M - 40)
     y += 26
@@ -515,7 +516,7 @@ def abschnitte(stelle, texte):
     return kat, [
         dict(name="einstieg", sprich=t["einstieg"]["sprich"], fn=folie_einstieg,
              kw=dict(kat=kat, ort=ort, titel=t["einstieg"]["titel"], untertitel=t["einstieg"]["untertitel"],
-                     chips=t["einstieg"]["chips"]),
+                     chips=t["einstieg"]["chips"], badge=t["einstieg"].get("badge", "TOP JOB DES TAGES")),
              schritte=len(t["einstieg"]["titel"]) + 4, ausloeser=t["einstieg"].get("ausloeser"),
              effekte=["punch"] * len(t["einstieg"]["titel"]) + ["pop", "links", "hoch", "hoch"]),
         dict(name="aufgaben", sprich=t["aufgaben"]["sprich"], fn=folie_liste,

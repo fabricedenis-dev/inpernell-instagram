@@ -34,6 +34,8 @@ def _csv(pfad):
 
 
 def _reel_titel(r):
+    if r.get("sketch") or (r.get("thema") or "").startswith("Sketch"):
+        return r.get("thema", "Comic-Sketch")
     for s in r.get("szenen", []):
         if s["typ"] == "hook":
             text = ""

@@ -7,7 +7,7 @@
     "szenen": [
       {
         "typ": "hook",
-        "rubrik": "Gehalts-Check #1",
+        "rubrik": "Gehalts-Check Nr. 1",
         "zeilen": [
           "3 Fehler,",
           "die dich",
@@ -91,7 +91,7 @@
     "szenen": [
       {
         "typ": "hook",
-        "rubrik": "Jobmarkt Region #1",
+        "rubrik": "Jobmarkt Region Nr. 1",
         "zeilen": [
           "Hier haben",
           "Fachkräfte",
@@ -179,7 +179,7 @@
     "szenen": [
       {
         "typ": "hook",
-        "rubrik": "Mythos-Check #1",
+        "rubrik": "Mythos-Check Nr. 1",
         "zeilen": [
           "3 Job-Mythen,",
           "die fast jeder",
@@ -229,7 +229,16 @@
         "zusatz": "Und schick's an jemanden, der gerade neu anfängt."
       }
     ],
-    "caption": "3 Job-Mythen, die fast jeder glaubt – und was wirklich gilt ⚖️\n\nMythos-Check Nr. 1 von Inpernell.\n\n❌ Im Arbeitszeugnis steckt ein Geheimcode → ✅ Versteckte Botschaften sind verboten. Das Zeugnis muss klar und verständlich sein (§ 109 Gewerbeordnung).\n❌ In der Probezeit kannst du sofort gehen → ✅ Es gilt eine Kündigungsfrist von 2 Wochen (§ 622 BGB), wenn im Vertrag nichts anderes steht.\n❌ Kündigungsschutz gilt ab Tag 1 → ✅ Erst nach 6 Monaten und in Betrieben mit mehr als 10 Mitarbeitenden (§§ 1, 23 KSchG).\n\nKeine Rechtsberatung – im Einzelfall zählt dein Vertrag.\n\nWelchen Mythos hast du bisher geglaubt? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Arbeitsrecht #Karrieretipps #JobsSchwarzwald #Probezeit #Inpernell"
+    "caption": "3 Job-Mythen, die fast jeder glaubt – und was wirklich gilt ⚖️\n\nMythos-Check Nr. 1 von Inpernell.\n\n❌ Im Arbeitszeugnis steckt ein Geheimcode → ✅ Versteckte Botschaften sind verboten. Das Zeugnis muss klar und verständlich sein (§ 109 Gewerbeordnung).\n❌ In der Probezeit kannst du sofort gehen → ✅ Es gilt eine Kündigungsfrist von 2 Wochen (§ 622 BGB), wenn im Vertrag nichts anderes steht.\n❌ Kündigungsschutz gilt ab Tag 1 → ✅ Erst nach 6 Monaten und in Betrieben mit mehr als 10 Mitarbeitenden (§§ 1, 23 KSchG).\n\nKeine Rechtsberatung – im Einzelfall zählt dein Vertrag.\n\nWelchen Mythos hast du bisher geglaubt? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Arbeitsrecht #Karrieretipps #JobsSchwarzwald #Probezeit #Inpernell",
+    "sprecher": [
+      "[confident] 3 Job-Mythen, die fast jeder glaubt. Und was wirklich gilt.",
+      "Mythos 1: Im Arbeitszeugnis steckt ein Geheimcode. Fakt: Versteckte Botschaften sind verboten. Das Zeugnis muss klar und verständlich sein.",
+      "Mythos 2: In der Probezeit kannst du sofort gehen. Fakt: Es gilt eine Frist von 2 Wochen, wenn im Vertrag nichts anderes steht.",
+      "Mythos 3: Kündigungsschutz gilt ab dem ersten Tag. Fakt: Erst nach 6 Monaten, und nur in Betrieben mit mehr als 10 Mitarbeitenden.",
+      "[warm] Speicher dir das ab und schick es an jemanden, der gerade neu anfängt."
+    ],
+    "fertig_video": "reels/fertig/2026-11-22-mythos-arbeitsrecht-1.mp4",
+    "fertig_titelbild": "reels/fertig/2026-11-22-mythos-arbeitsrecht-1.jpg"
   },
   {
     "id": "2026-11-24-zeitarbeit-direktvermittlung",
@@ -293,7 +302,16 @@
         "zusatz": "Und schick's an jemanden, der gerade sucht."
       }
     ],
-    "caption": "Zeitarbeit oder Direktvermittlung – wo ist der Unterschied? 🤝\n\nZeitarbeit: Du bist beim Personaldienstleister angestellt und wirst an Kunden verliehen – beim selben Kunden höchstens 18 Monate. Gleicher Lohn wie die Stammbelegschaft gilt oft erst nach 9 Monaten (Arbeitnehmerüberlassungsgesetz).\n\nDirektvermittlung: Du unterschreibst direkt beim Arbeitgeber, bist von Anfang an fest im Team und verhandelst dein Gehalt direkt. Für dich als Bewerber kostenlos.\n\nInpernell vermittelt ausschließlich direkt – keine Zeitarbeit.\n\nHast du schon mal in Zeitarbeit gearbeitet? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Direktvermittlung #Jobsuche #JobsSchwarzwald #Karriere #Inpernell"
+    "caption": "Zeitarbeit oder Direktvermittlung – wo ist der Unterschied? 🤝\n\nZeitarbeit: Du bist beim Personaldienstleister angestellt und wirst an Kunden verliehen – beim selben Kunden höchstens 18 Monate. Gleicher Lohn wie die Stammbelegschaft gilt oft erst nach 9 Monaten (Arbeitnehmerüberlassungsgesetz).\n\nDirektvermittlung: Du unterschreibst direkt beim Arbeitgeber, bist von Anfang an fest im Team und verhandelst dein Gehalt direkt. Für dich als Bewerber kostenlos.\n\nInpernell vermittelt ausschließlich direkt – keine Zeitarbeit.\n\nHast du schon mal in Zeitarbeit gearbeitet? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Direktvermittlung #Jobsuche #JobsSchwarzwald #Karriere #Inpernell",
+    "sprecher": [
+      "[confident] Zeitarbeit oder Direktvermittlung? Der Unterschied in 30 Sekunden.",
+      "Bei der Zeitarbeit bist du beim Personaldienstleister angestellt. Bei der Direktvermittlung unterschreibst du direkt beim Arbeitgeber, vom ersten Tag an.",
+      "In der Zeitarbeit bist du beim selben Kunden höchstens 18 Monate. Direkt vermittelt hast du einen festen Platz im Team.",
+      "Den gleichen Lohn wie die Stammbelegschaft gibt es oft erst nach 9 Monaten. Direkt verhandelst du dein Gehalt selbst, und für dich ist das kostenlos.",
+      "[warm] Speicher dir das ab und schick es an jemanden, der gerade sucht."
+    ],
+    "fertig_video": "reels/fertig/2026-11-24-zeitarbeit-direktvermittlung.mp4",
+    "fertig_titelbild": "reels/fertig/2026-11-24-zeitarbeit-direktvermittlung.jpg"
   },
   {
     "id": "2026-11-26-lebenslauf-1",
@@ -303,7 +321,7 @@
     "szenen": [
       {
         "typ": "hook",
-        "rubrik": "Bewerbungs-Check #1",
+        "rubrik": "Bewerbungs-Check Nr. 1",
         "zeilen": [
           "3 Fehler",
           "im Lebenslauf,",
@@ -354,7 +372,17 @@
         "zusatz": "Und schick's an jemanden, der sich gerade bewirbt."
       }
     ],
-    "caption": "Lebenslauf: 3 Fehler, die jeder Recruiter sieht – und wie du sie vermeidest 📄\n\nBewerbungs-Check Nr. 1 von Inpernell.\n\n❌ Lücken unkommentiert lassen → ✅ Kurz erklären: Weiterbildung, Familie oder Neuorientierung\n❌ Nur Aufgaben aufzählen → ✅ Ergebnisse zeigen\n❌ Ein Lebenslauf für alle Stellen → ✅ Für jede Stelle anpassen\n\nÜbrigens: Bei unseren Stellen genügt meist der Lebenslauf – ein Anschreiben ist nicht nötig.\n\nWas fällt dir beim Lebenslauf am schwersten? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Lebenslauf #Bewerbungstipps #JobsSchwarzwald #Karrieretipps #Inpernell"
+    "caption": "Lebenslauf: 3 Fehler, die jeder Recruiter sieht – und wie du sie vermeidest 📄\n\nBewerbungs-Check Nr. 1 von Inpernell.\n\n❌ Lücken unkommentiert lassen → ✅ Kurz erklären: Weiterbildung, Familie oder Neuorientierung\n❌ Nur Aufgaben aufzählen → ✅ Ergebnisse zeigen\n❌ Ein Lebenslauf für alle Stellen → ✅ Für jede Stelle anpassen\n\nÜbrigens: Bei unseren Stellen genügt meist der Lebenslauf – ein Anschreiben ist nicht nötig.\n\nWas fällt dir beim Lebenslauf am schwersten? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Lebenslauf #Bewerbungstipps #JobsSchwarzwald #Karrieretipps #Inpernell",
+    "sprecher": [
+      "[confident] 3 Fehler im Lebenslauf, die jeder Recruiter sieht. Und wie du sie vermeidest.",
+      "Fehler 1: Lücken unkommentiert lassen. Besser: kurz erklären. Ein Satz zu Weiterbildung, Familie oder Neuorientierung reicht.",
+      "Fehler 2: nur Aufgaben aufzählen. Besser: Ergebnisse zeigen. Zum Beispiel: Rüstzeiten an der Anlage deutlich verkürzt.",
+      "Fehler 3: ein Lebenslauf für alle Stellen. Besser: Pass ihn für jede Stelle an. Was in der Anzeige wichtig ist, gehört nach oben.",
+      "Und so erklärst du eine Lücke im Gespräch: kurz, ehrlich und positiv.",
+      "[warm] Speicher dir das ab und schick es an jemanden, der sich gerade bewirbt."
+    ],
+    "fertig_video": "reels/fertig/2026-11-26-lebenslauf-1.mp4",
+    "fertig_titelbild": "reels/fertig/2026-11-26-lebenslauf-1.jpg"
   },
   {
     "id": "2026-11-29-medizintechnik-tuttlingen",
@@ -364,7 +392,7 @@
     "szenen": [
       {
         "typ": "hook",
-        "rubrik": "Jobmarkt Region #2",
+        "rubrik": "Jobmarkt Region Nr. 2",
         "zeilen": [
           "Wusstest du,",
           "was Tuttlingen",
@@ -405,7 +433,15 @@
         "zusatz": "Und schick's an jemanden aus der Region."
       }
     ],
-    "caption": "Wusstest du, was Tuttlingen so besonders macht? 🌍\n\nTuttlingen gilt in der Branche als Weltzentrum der Medizintechnik: Mehr als 200 Unternehmen stellen dort chirurgische und medizintechnische Produkte her – vom Skalpell bis zum Endoskop. In der IHK-Region Schwarzwald-Baar-Heuberg arbeiten 14.178 Menschen im Bereich medizinische Produkte und Geräte (IHK Schwarzwald-Baar-Heuberg, 2026).\n\nFür Fachkräfte aus Zerspanung, Qualität und Konstruktion heißt das: viele spannende Arbeitgeber direkt vor der Haustür.\n\nArbeitest du selbst in der Medizintechnik? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Medizintechnik #Tuttlingen #JobsSchwarzwald #Fachkräfte #Inpernell"
+    "caption": "Wusstest du, was Tuttlingen so besonders macht? 🌍\n\nTuttlingen gilt in der Branche als Weltzentrum der Medizintechnik: Mehr als 200 Unternehmen stellen dort chirurgische und medizintechnische Produkte her – vom Skalpell bis zum Endoskop. In der IHK-Region Schwarzwald-Baar-Heuberg arbeiten 14.178 Menschen im Bereich medizinische Produkte und Geräte (IHK Schwarzwald-Baar-Heuberg, 2026).\n\nFür Fachkräfte aus Zerspanung, Qualität und Konstruktion heißt das: viele spannende Arbeitgeber direkt vor der Haustür.\n\nArbeitest du selbst in der Medizintechnik? 👇\n\nTop Jobs aus der Region: Link in der Bio.\n\n#Medizintechnik #Tuttlingen #JobsSchwarzwald #Fachkräfte #Inpernell",
+    "sprecher": [
+      "[curious] Wusstest du, was Tuttlingen so besonders macht? Ein Weltzentrum direkt vor der Haustür.",
+      "Mehr als 200 Hersteller von Medizintechnik sitzen in Tuttlingen, vom Skalpell bis zum Endoskop.",
+      "Und über 14.000 Menschen arbeiten in der Region in medizinischen Produkten und Geräten.",
+      "[warm] Folg uns für mehr Fakten aus der Region und schick das an jemanden, der hier arbeitet."
+    ],
+    "fertig_video": "reels/fertig/2026-11-29-medizintechnik-tuttlingen.mp4",
+    "fertig_titelbild": "reels/fertig/2026-11-29-medizintechnik-tuttlingen.jpg"
   },
   {
     "id": "2026-11-19-game-release",
@@ -416,5 +452,298 @@
     "fertig_titelbild": "reels/fertig/2026-11-19-game-release.jpg",
     "thema": "Sonder-Reel zum Game-Release-Tag (eigener 80er-Neon-Look, keine fremden Marken)",
     "caption": "Personalvermittlung im Game-Modus: Mission Traumjob im Schwarzwald 🎮🌴\n\nHeute zockt ganz Deutschland. Wir haben trotzdem offen und vermitteln weiter: Festanstellung direkt beim Arbeitgeber, für dich kostenlos.\n\nDie Crew:\n🎯 Fabrice: Industrie und IT\n💶 Pascal: Bank und Finanzen\n⚙️ Waldemar: Maschinenbau\n\nCheatcode für deinen Traumjob:\n1️⃣ Lebenslauf schicken\n2️⃣ Kurz mit uns sprechen\n3️⃣ Vertrag beim Arbeitgeber\n\nWelche Mission würdest du in deinem Job als Nächstes freischalten?\n\nNeue Top Jobs jeden Abend: Link in der Bio.\n\nMusik: Vice Police von Tausdei (CC BY 3.0)\n\n#Personalvermittlung #Schwarzwald #Jobwechsel #Gaming #TopJobDesTages"
+  },
+  {
+    "id": "2026-11-25-sketch-genz-wlan",
+    "datum": "2026-11-25",
+    "zeit": "12:00",
+    "freigegeben": true,
+    "thema": "Sketch: Gen Z sucht einen Job",
+    "caption": "Wie es sich anfühlt, als Gen Z einen Job zu suchen 😅\n\nKennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWas war die ehrlichste Antwort, die du je im Vorstellungsgespräch gegeben hast?\n\nTop Jobs aus der Region: Link in der Bio.\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
+    "fertig_video": "reels/fertig/2026-11-25-sketch-genz-wlan.mp4",
+    "fertig_titelbild": "reels/fertig/2026-11-25-sketch-genz-wlan.jpg"
+  },
+  {
+    "id": "2026-11-28-sketch-bewerbung-1995",
+    "datum": "2026-11-28",
+    "zeit": "11:00",
+    "freigegeben": false,
+    "thema": "Sketch: Bewerbung früher und heute",
+    "caption": "Bewerbung früher vs. heute: Wenn der Chef von damals erzählt 📮\n\nKennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWie lange hast du schon mal auf eine Antwort auf deine Bewerbung gewartet?\n\nTop Jobs aus der Region: Link in der Bio.\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
+    "sketch": {
+      "titel": "Wie es sich anfühlt, wenn der Chef von früher erzählt",
+      "abspann": "Bewerben geht heute schneller. Zum Beispiel per DM an uns.",
+      "dialog": [
+        {
+          "wer": "personaler",
+          "text": "Früher haben wir Bewerbungen noch per Post geschickt.",
+          "sprich": "[nostalgic] Früher haben wir Bewerbungen noch per Post geschickt.",
+          "augen": "normal",
+          "ruhe": "neutral",
+          "arm": "tisch"
+        },
+        {
+          "wer": "genz",
+          "text": "Per was?",
+          "sprich": "[confused] Per was?",
+          "augen": "gross",
+          "ruhe": "neutral",
+          "arm": "handy",
+          "brauen": "hoch",
+          "vor": 0.5
+        },
+        {
+          "wer": "personaler",
+          "text": "Per Post. Mit Briefmarke und Foto vom Fotografen.",
+          "sprich": "[proud] Per Post. Mit Briefmarke und Foto vom Fotografen.",
+          "augen": "normal",
+          "ruhe": "grinsen",
+          "arm": "tisch"
+        },
+        {
+          "wer": "genz",
+          "text": "Und wie lange hat die Antwort gedauert?",
+          "sprich": "[skeptical] Und wie lange hat die Antwort gedauert?",
+          "augen": "muede",
+          "ruhe": "neutral",
+          "arm": "handy"
+        },
+        {
+          "wer": "personaler",
+          "text": "Sechs Wochen.",
+          "sprich": "[matter-of-fact] Sechs Wochen.",
+          "augen": "normal",
+          "ruhe": "grinsen",
+          "arm": "tisch",
+          "vor": 0.5
+        },
+        {
+          "wer": "genz",
+          "text": "Ich hab schon gekündigt, weil nach vier Stunden keiner geantwortet hat.",
+          "sprich": "[deadpan] Ich hab schon gekündigt, weil nach vier Stunden keiner geantwortet hat.",
+          "augen": "genervt",
+          "ruhe": "schief",
+          "arm": "achselzucken",
+          "fx": "fragezeichen",
+          "sfx_vor": "grillen",
+          "vor": 1.2,
+          "nach": 1.3,
+          "sfx_nach": "badumtss"
+        }
+      ]
+    },
+    "fertig_video": "reels/fertig/2026-11-28-sketch-bewerbung-1995.mp4",
+    "fertig_titelbild": "reels/fertig/2026-11-28-sketch-bewerbung-1995.jpg"
+  },
+  {
+    "id": "2026-12-02-sketch-staerken",
+    "datum": "2026-12-02",
+    "zeit": "12:00",
+    "freigegeben": false,
+    "thema": "Sketch: Deine Stärken",
+    "caption": "Was sind deine Stärken? Die ehrlichste Antwort im Vorstellungsgespräch 💼\n\nKennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWelche Stärke schreibst du in jede Bewerbung?\n\nTop Jobs aus der Region: Link in der Bio.\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
+    "sketch": {
+      "titel": "Wie es sich anfühlt, im Gespräch ehrlich zu sein",
+      "abspann": "Ehrlich hilft. Den passenden Job finden wir trotzdem.",
+      "dialog": [
+        {
+          "wer": "personaler",
+          "text": "Was sind deine Stärken?",
+          "sprich": "[professional] Was sind deine Stärken?",
+          "augen": "normal",
+          "ruhe": "neutral",
+          "arm": "tisch"
+        },
+        {
+          "wer": "genz",
+          "text": "Ich bin sehr gut im Multitasking.",
+          "sprich": "[confident] Ich bin sehr gut im Multitasking.",
+          "augen": "normal",
+          "ruhe": "grinsen",
+          "arm": "handy"
+        },
+        {
+          "wer": "personaler",
+          "text": "Zum Beispiel?",
+          "sprich": "[curious] Zum Beispiel?",
+          "augen": "gross",
+          "ruhe": "neutral",
+          "arm": "tisch",
+          "brauen": "hoch"
+        },
+        {
+          "wer": "genz",
+          "text": "Ich kann gleichzeitig im Meeting sein und nicht zuhören.",
+          "sprich": "[deadpan] Ich kann gleichzeitig im Meeting sein und nicht zuhören.",
+          "augen": "muede",
+          "ruhe": "neutral",
+          "arm": "handy",
+          "vor": 0.6
+        },
+        {
+          "wer": "personaler",
+          "text": "Du passt perfekt ins Management.",
+          "sprich": "[impressed] Du passt perfekt ins Management.",
+          "augen": "gross",
+          "ruhe": "grinsen",
+          "arm": "tisch_hoch",
+          "brauen": "hoch",
+          "fx": "speedlines",
+          "sfx_vor": "grillen",
+          "vor": 1.3,
+          "pointe": true,
+          "nach": 1.3,
+          "sfx_nach": "badumtss"
+        }
+      ]
+    },
+    "fertig_video": "reels/fertig/2026-12-02-sketch-staerken.mp4",
+    "fertig_titelbild": "reels/fertig/2026-12-02-sketch-staerken.jpg"
+  },
+  {
+    "id": "2026-12-05-sketch-faxgeraet",
+    "datum": "2026-12-05",
+    "zeit": "11:00",
+    "freigegeben": false,
+    "thema": "Sketch: Arbeitgeber aus den 80ern",
+    "caption": "Wenn der Arbeitgeber noch in den 80ern lebt 📠\n\nKennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWas ist der älteste Benefit, den dir je ein Arbeitgeber angeboten hat?\n\nTop Jobs aus der Region: Link in der Bio.\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
+    "sketch": {
+      "titel": "Wie es sich anfühlt, wenn der Arbeitgeber noch in den 80ern lebt",
+      "abspann": "Wir finden Arbeitgeber, die im Jahr 2026 angekommen sind.",
+      "dialog": [
+        {
+          "wer": "personaler",
+          "text": "Wir bieten Obstkorb, Kicker und ein Faxgerät.",
+          "sprich": "[proud] Wir bieten Obstkorb, Kicker und ein Faxgerät.",
+          "augen": "normal",
+          "ruhe": "grinsen",
+          "arm": "tisch"
+        },
+        {
+          "wer": "genz",
+          "text": "Ein was?",
+          "sprich": "[confused] Ein was?",
+          "augen": "gross",
+          "ruhe": "neutral",
+          "arm": "handy",
+          "brauen": "hoch",
+          "vor": 0.5
+        },
+        {
+          "wer": "personaler",
+          "text": "Ein Faxgerät. Ganz neu. Mit Papierrolle.",
+          "sprich": "[excited] Ein Faxgerät. Ganz neu. Mit Papierrolle.",
+          "augen": "normal",
+          "ruhe": "grinsen",
+          "arm": "tisch_hoch"
+        },
+        {
+          "wer": "genz",
+          "text": "Und gibt es Homeoffice?",
+          "sprich": "[hopeful] Und gibt es Homeoffice?",
+          "augen": "normal",
+          "ruhe": "neutral",
+          "arm": "handy"
+        },
+        {
+          "wer": "personaler",
+          "text": "Klar. Du darfst das Faxgerät mit nach Hause nehmen.",
+          "sprich": "[generous] Klar. Du darfst das Faxgerät mit nach Hause nehmen.",
+          "augen": "normal",
+          "ruhe": "grinsen",
+          "arm": "tisch_hoch",
+          "fx": "speedlines",
+          "vor": 0.6,
+          "pointe": true
+        },
+        {
+          "wer": "genz",
+          "text": "Ich glaube, ich muss los.",
+          "sprich": "[flat] Ich glaube, ich muss los.",
+          "augen": "genervt",
+          "ruhe": "schief",
+          "arm": "achselzucken",
+          "fx": "fragezeichen",
+          "sfx_vor": "grillen",
+          "vor": 1.2,
+          "nach": 1.3,
+          "sfx_nach": "badumtss"
+        }
+      ]
+    },
+    "fertig_video": "reels/fertig/2026-12-05-sketch-faxgeraet.mp4",
+    "fertig_titelbild": "reels/fertig/2026-12-05-sketch-faxgeraet.jpg"
+  },
+  {
+    "id": "2026-12-09-sketch-gehalt",
+    "datum": "2026-12-09",
+    "zeit": "12:00",
+    "freigegeben": false,
+    "thema": "Sketch: Gehaltsvorstellung",
+    "caption": "Was stellst du dir beim Gehalt vor? Gen Z antwortet ehrlich 💶\n\nKennst du das? Ein Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWelche Zahl nennst du, wenn du nach deiner Gehaltsvorstellung gefragt wirst?\n\nTop Jobs aus der Region: Link in der Bio.\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
+    "sketch": {
+      "titel": "Wie es sich anfühlt, nach dem Gehalt gefragt zu werden",
+      "abspann": "Was ist drin? Wir sagen es dir ehrlich. Kostenlos.",
+      "dialog": [
+        {
+          "wer": "personaler",
+          "text": "Was stellst du dir beim Gehalt vor?",
+          "sprich": "[professional] Was stellst du dir beim Gehalt vor?",
+          "augen": "normal",
+          "ruhe": "neutral",
+          "arm": "tisch"
+        },
+        {
+          "wer": "genz",
+          "text": "Mehr.",
+          "sprich": "[confident] Mehr.",
+          "augen": "normal",
+          "ruhe": "grinsen",
+          "arm": "handy",
+          "vor": 0.5
+        },
+        {
+          "wer": "personaler",
+          "text": "Mehr als was?",
+          "sprich": "[confused] Mehr als was?",
+          "augen": "gross",
+          "ruhe": "neutral",
+          "arm": "tisch",
+          "brauen": "skeptisch"
+        },
+        {
+          "wer": "genz",
+          "text": "Mehr als jetzt.",
+          "sprich": "[obvious] Mehr als jetzt.",
+          "augen": "muede",
+          "ruhe": "neutral",
+          "arm": "handy"
+        },
+        {
+          "wer": "personaler",
+          "text": "Und was verdienst du jetzt?",
+          "sprich": "[cautious] Und was verdienst du jetzt?",
+          "augen": "normal",
+          "ruhe": "neutral",
+          "arm": "tisch",
+          "brauen": "sorge"
+        },
+        {
+          "wer": "genz",
+          "text": "Nichts. Deshalb ja.",
+          "sprich": "[deadpan] Nichts. Deshalb ja.",
+          "augen": "genervt",
+          "ruhe": "schief",
+          "arm": "achselzucken",
+          "fx": "fragezeichen",
+          "sfx_vor": "grillen",
+          "vor": 1.2,
+          "nach": 1.3,
+          "sfx_nach": "badumtss"
+        }
+      ]
+    },
+    "fertig_video": "reels/fertig/2026-12-09-sketch-gehalt.mp4",
+    "fertig_titelbild": "reels/fertig/2026-12-09-sketch-gehalt.jpg"
   }
 ]

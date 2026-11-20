@@ -54,7 +54,7 @@ def _asr():
     return _MODELL["asr"]
 
 
-def sprechen(e, st):
+def _sprechen_einmal(e, st):
     """Spricht den Satz (ElevenLabs v3, mit Regieanweisungen) und ermittelt Wortzeiten per Spracherkennung;
     schneidet nach dem letzten erkannten Wort ab. Gibt (Ton 48 kHz, Wortzeiten) zurück."""
     import json
@@ -76,6 +76,20 @@ def sprechen(e, st):
         ton = ton[: int((woerter[min(len(woerter), n) - 1].end + 0.2) * SR)]
     print("  erkannt:", " ".join(w.word.strip() for w in woerter))
     return ton, [(w.start, w.end) for w in woerter[:n]]
+
+
+def sprechen(e, st, versuche=3):
+    """Fordert neu an, wenn die Stimme Wörter auslässt (weniger als 85 % der Wörter erkannt)."""
+    n = len(e["text"].split())
+    beste = None
+    for v in range(versuche):
+        ton, zeiten = _sprechen_einmal(e, st)
+        if beste is None or len(zeiten) > len(beste[1]):
+            beste = (ton, zeiten)
+        if len(zeiten) >= 0.85 * n:
+            break
+        print("  Wörter fehlen, neuer Versuch")
+    return beste
 
 
 def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
@@ -118,7 +132,11 @@ def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
     return img
 
 
-def main(ziel):
+def main(ziel, sketch=None):
+    """sketch: dict mit titel, dialog (Liste wie DIALOG), abspann. Ohne Angabe: der Gen-Z-Sketch oben."""
+    global TITEL, DIALOG, ABSPANN_TEXT
+    if sketch:
+        TITEL, DIALOG, ABSPANN_TEXT = sketch["titel"], sketch["dialog"], sketch["abspann"]
     rnd = random.Random(3)
     tmp = tempfile.mkdtemp()
     spuren, takte = [], []
@@ -243,4 +261,10 @@ def main(ziel):
 
 
 if __name__ == "__main__":
-    main(sys.argv[1])
+    if len(sys.argv) > 2:        # python zeichentrick_video.py ziel.mp4 <sketch-id aus reels/warteschlange.json>
+        import json
+        q = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "reels", "warteschlange.json"),
+                           encoding="utf-8"))
+        main(sys.argv[1], next(r["sketch"] for r in q if r["id"] == sys.argv[2]))
+    else:
+        main(sys.argv[1])
