@@ -2,16 +2,17 @@ name: Reel der Woche
 
 on:
   schedule:
-    # Dienstag und Donnerstag 07:30, Sonntag 17:00 Uhr (Deutschland). GitHub rechnet in UTC,
-    # deshalb je zwei Zeiten für Winter- und Sommerzeit; reel_post.py prüft die Uhrzeit selbst.
-    - cron: "30 5,6 * * 2,4"
-    - cron: "0 15,16 * * 0"
-    # Nachhol-Läufe bei Verspätung von GitHub (veröffentlicht nur, wenn heute noch kein Reel erschienen ist)
-    - cron: "30 8,9 * * 2,4"
-    - cron: "0 18,19 * * 0"
-    # Sonder-Reels mit fester Uhrzeit (z. B. 10:00 Uhr): stündlich am Vormittag prüfen, veröffentlicht wird nur,
-    # wenn in reels/warteschlange.json ein freigegebenes Sonder-Reel für heute im Zeitfenster liegt
-    - cron: "0 8,9,10,11 * * *"
+    # Pünktlich: Di/Do 07:30, So 17:00 Uhr und Sonder-Reels (z. B. Sketche 11:00/12:00) genau zur Uhrzeit.
+    # GitHub startet geplante Läufe oft 30–60 Minuten zu spät, deshalb mehrere Starts bis 50 Minuten vorher:
+    # der erste bereitet alles vor und veröffentlicht exakt zur Planzeit. Zwei UTC-Stunden je Zeit (Sommer/Winter).
+    - cron: "40,50 4,5 * * 2,4"
+    - cron: "0,10,20 5,6 * * 2,4"
+    - cron: "10,20,30,40,50 14,15 * * 0"
+    - cron: "10,20,30,40,50 7,8,9,10 * * *"
+    # Nachhol-Läufe (veröffentlichen nur, wenn das Reel noch nicht erschienen ist)
+    - cron: "0 7,8 * * 2,4"
+    - cron: "0 16,17,18 * * 0"
+    - cron: "0 11,12,13 * * *"
   workflow_dispatch:
     inputs:
       probelauf:
@@ -33,7 +34,7 @@ concurrency:
 jobs:
   reel:
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 80
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

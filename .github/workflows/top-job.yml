@@ -2,12 +2,12 @@ name: Top Job des Tages
 
 on:
   schedule:
-    # GitHub rechnet in Weltzeit (UTC). Zwei Zeiten, damit es im Winter (17:50 UTC) und im Sommer
-    # (16:50 UTC) jeweils 18:50 Uhr in Deutschland ist. Das Programm prüft die Uhrzeit selbst.
-    - cron: "50 16 * * *"
-    - cron: "50 17 * * *"
-    # Nachhol-Läufe, falls GitHub die Läufe oben stark verspätet oder auslässt (postet nur, wenn noch nichts da ist)
-    - cron: "20 19,20 * * *"
+    # Pünktlich um 18:50 Uhr (Deutschland): GitHub startet geplante Läufe oft 30–60 Minuten zu spät. Deshalb
+    # mehrere Starts ab 18:00 Uhr; der erste bereitet alles vor und veröffentlicht genau um 18:50 Uhr.
+    # GitHub rechnet in UTC: 16:xx = Sommerzeit, 17:xx = Winterzeit. Doppelt gepostet wird nie (Protokoll).
+    - cron: "0,10,20,30,40 16,17 * * *"
+    # Nachhol-Läufe, falls GitHub alle Läufe oben stark verspätet oder auslässt
+    - cron: "10,40 18,19,20 * * *"
   workflow_dispatch:
     inputs:
       probelauf:
@@ -42,7 +42,7 @@ concurrency:
 jobs:
   posten:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 75
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

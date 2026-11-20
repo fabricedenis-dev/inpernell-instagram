@@ -16,13 +16,13 @@ Hinweise: Alle Videos haben bereits Ton (Sprecher bzw. eigene Musik): in TikTok 
 | 03 | 27.11. 17:00 | Job der Woche: Softwareentwickler Testsysteme und Automatisierung (m/w/d) | 03_2026-11-27.mp4 |
 | 04 | 29.11. 18:00 | 3 Job-Mythen, die fast jeder glaubt | 04_2026-11-29.mp4 |
 | 05 | 30.11. 18:00 | Zeitarbeit oder Direktvermittlung? | 05_2026-11-30.mp4 |
-| 06 | 02.12. 18:00 | Sketch: Runde 6 (erst nach Freigabe posten) | 06_2026-12-02.mp4 |
+| 06 | 02.12. 18:00 | Sketch: Runde 6 | 06_2026-12-02.mp4 |
 | 07 | 04.12. 17:00 | Job der Woche: Zerspanungsmechaniker (m/w/d) | 07_2026-12-04.mp4 |
 | 08 | 06.12. 18:00 | 3 Fehler im Lebenslauf, die jeder sieht | 08_2026-12-06.mp4 |
-| 09 | 07.12. 18:00 | Sketch: Gleitzeit im Schwarzwald (erst nach Freigabe posten) | 09_2026-12-07.mp4 |
-| 10 | 09.12. 18:00 | Sketch: Bewerbung 1995 vs. heute (erst nach Freigabe posten) | 10_2026-12-09.mp4 |
+| 09 | 07.12. 18:00 | Sketch: Gleitzeit im Schwarzwald | 09_2026-12-07.mp4 |
+| 10 | 09.12. 18:00 | Sketch: Bewerbung 1995 vs. heute | 10_2026-12-09.mp4 |
 | 11 | 11.12. 17:00 | Wusstest du, was Tuttlingen so besonders macht? | 11_2026-12-11.mp4 |
-| 12 | 13.12. 18:00 | Sketch: Laptop kommt Montag (erst nach Freigabe posten) | 12_2026-12-13.mp4 |
+| 12 | 13.12. 18:00 | Sketch: Laptop kommt Montag | 12_2026-12-13.mp4 |
 | 13 | 16.12. 18:00 | Neues Reel aus der Wochenplanung | wird nachgeliefert |
 | 14 | 18.12. 17:00 | Job der Woche (Stelle wird kurz vorher gewählt) | wird nachgeliefert |
 
