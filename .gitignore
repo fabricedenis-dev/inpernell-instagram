@@ -2,3 +2,4 @@ __pycache__/
 .piper/
 vorschau/reels/*eigene-stimme*
 vorschau/reels-neu/*.mp4
+tiktok/**/*.mp4
