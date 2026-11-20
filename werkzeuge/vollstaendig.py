@@ -12,14 +12,19 @@ from difflib import SequenceMatcher
 import numpy as np
 
 
+_ZAHLEN = dict(enumerate("null eins zwei drei vier fünf sechs sieben acht neun zehn elf zwölf".split()))
+
+
 def _woerter(text):
     text = text.lower().replace("-", " ").replace("ß", "ss")
     text = re.sub(r"(\d)([a-zäöü])|([a-zäöü])(\d)", r"\1\3 \2\4", text)
-    return [w for w in re.sub(r"[^\wäöü ]", " ", text).split() if w]
+    w_ = [w for w in re.sub(r"[^\wäöü ]", " ", text).split() if w]
+    return [_ZAHLEN.get(int(w), w) if w.isdigit() and int(w) in _ZAHLEN else w for w in w_]   # 3 = „drei“
 
 
 def _gleich(a, b):
-    return a == b or SequenceMatcher(None, a, b).ratio() >= 0.7
+    # auch zusammengeschrieben erkannt („Job-Mythen“ als „Jobmythen“)
+    return a == b or SequenceMatcher(None, a, b).ratio() >= 0.7 or (len(a) >= 3 and b.startswith(a))
 
 
 _M = {}
