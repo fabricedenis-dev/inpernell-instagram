@@ -40,7 +40,9 @@ def _kopf(d, cx, cy, r, haare, augen, mund, brille=False, bart=False):
     ey = cy - r * 0.05
     for ex in (cx - r * 0.36, cx + r * 0.36):
         er = r * 0.27
-        if augen == "muede":
+        if augen == "zu":
+            d.arc([ex - er, ey - er * 0.6, ex + er, ey + er * 0.8], 20, 160, fill=STRICH, width=6)
+        elif augen == "muede":
             d.ellipse([ex - er, ey - er, ex + er, ey + er], fill=WEISS, outline=STRICH, width=4)
             d.chord([ex - er, ey - er, ex + er, ey + er], 180, 360, fill=HAUT_S, outline=STRICH, width=4)  # halb geschlossen
             d.ellipse([ex - 7, ey + 2, ex + 9, ey + 18], fill=STRICH)
