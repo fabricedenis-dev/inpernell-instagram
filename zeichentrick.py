@@ -82,6 +82,15 @@ def haare_vorhang(d, cx, cy, r):
     d.line([(cx, cy - r - 12), (cx, cy - r * 0.55)], fill=(60, 38, 24), width=4)
 
 
+def haare_dutt(d, cx, cy, r):
+    """Dunkler Dutt mit Pony (Personalerin)."""
+    haar = (52, 36, 30)
+    d.ellipse([cx - 52, cy - r - 78, cx + 52, cy - r + 18], fill=haar, outline=STRICH, width=4)
+    d.chord([cx - r - 8, cy - r - 10, cx + r + 8, cy + r * 0.5], 180, 360, fill=haar)
+    d.polygon([(cx - r + 6, cy - r * 0.35), (cx - 20, cy - r * 0.6), (cx + r - 6, cy - r * 0.3), (cx + r - 4, cy - r * 0.75),
+               (cx - r + 4, cy - r * 0.75)], fill=haar)
+
+
 def haare_glatze(d, cx, cy, r):
     grau = (150, 146, 140)
     d.chord([cx - r - 6, cy - r * 0.3, cx - r * 0.55, cy + r * 0.3], 90, 270, fill=grau)
@@ -97,6 +106,8 @@ def figur(img, cx, fuss, art, augen="normal", mund="neutral", arm="unten", sitzt
     kopf_y = schulter - r + 10
     if art == "genz":
         farbe, schatten = (176, 160, 214), (146, 130, 186)        # lila Hoodie
+    elif art == "personalerin":
+        farbe, schatten = (64, 150, 150), (44, 120, 122)          # petrolfarbener Blazer
     else:
         farbe, schatten = (110, 116, 124), (86, 92, 100)          # grauer Anzug
     # Beine (dünne Striche)
@@ -116,6 +127,9 @@ def figur(img, cx, fuss, art, augen="normal", mund="neutral", arm="unten", sitzt
         d.rounded_rectangle([cx - 46, huefte - 110, cx + 46, huefte - 50], radius=14, outline=schatten, width=6)  # Bauchtasche
         d.line([(cx - 20, schulter + 6), (cx - 24, schulter + 90)], fill=WEISS, width=5)                          # Kordeln
         d.line([(cx + 20, schulter + 6), (cx + 24, schulter + 90)], fill=WEISS, width=5)
+    elif art == "personalerin":
+        d.polygon([(cx - 26, schulter), (cx + 26, schulter), (cx, schulter + 70)], fill=WEISS)
+        d.ellipse([cx - 10, schulter + 90, cx + 10, schulter + 110], fill=(240, 200, 90))                    # Brosche
     else:
         d.polygon([(cx - 24, schulter), (cx + 24, schulter), (cx, schulter + 60)], fill=WEISS)
         d.polygon([(cx - 9, schulter + 14), (cx + 9, schulter + 14), (cx + 12, schulter + 120), (cx, schulter + 140),
@@ -148,6 +162,10 @@ def figur(img, cx, fuss, art, augen="normal", mund="neutral", arm="unten", sitzt
     if art == "genz":
         _kopf(d, cx, kopf_y, r, haare_vorhang, augen, mund)
         d.ellipse([cx - r - 10, kopf_y + 10, cx - r + 12, kopf_y + 34], fill=WEISS, outline=STRICH, width=3)  # AirPod
+    elif art == "personalerin":
+        _kopf(d, cx, kopf_y, r, haare_dutt, augen, mund, brille=True)
+        for ox in (-r - 2, r - 8):
+            d.ellipse([cx + ox, kopf_y + 30, cx + ox + 12, kopf_y + 46], fill=(240, 200, 90))                 # Ohrringe
     else:
         _kopf(d, cx, kopf_y, r, haare_glatze, augen, mund, brille=True, bart=True)
     return img

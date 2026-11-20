@@ -19,32 +19,50 @@ from bild import ORANGE, WEISS, font, wrap
 
 W, H, FPS, SR = z.W, z.H, 30, 48000
 TITEL = "Wie es sich anfühlt, als Gen Z einen Job zu suchen"
-STIMMEN = {  # eigene Auswahl aus Azure-Standardstimmen, keine nachgeahmten Personen
-    "personaler": dict(stimme="de-DE-ConradNeural", tempo="-4%", tonhoehe="-4%"),
-    "genz": dict(stimme="de-DE-FlorianMultilingualNeural", tempo="-12%", tonhoehe="-2%"),
+# Stimmen: Chatterbox Multilingual (Open Source, MIT). Gen Z = eigene Stimme des Inhabers (Referenzaufnahme,
+# liegt NICHT im Repository, Pfad über STIMME_GENZ), Personalerin = eingebaute Standardstimme des Modells.
+STIMMEN = {
+    "personalerin": dict(referenz=None, ausdruck=0.55, cfg=0.45),
+    "genz": dict(referenz=os.environ.get("STIMME_GENZ"), ausdruck=0.35, cfg=0.3),
 }
+_MODELL = {}
 DIALOG = [
-    dict(wer="personaler", text="Warum möchtest du bei uns arbeiten?", augen="normal", ruhe="neutral", arm="tisch"),
+    dict(wer="personalerin", text="Warum möchtest du bei uns arbeiten?", augen="normal", ruhe="neutral", arm="tisch"),
     dict(wer="genz", text="Ehrlich gesagt? Ich möchte gar nicht arbeiten.", augen="muede", ruhe="neutral", arm="handy"),
-    dict(wer="personaler", text="Und warum hast du dich dann beworben?", augen="gross", ruhe="schief", arm="tisch"),
+    dict(wer="personalerin", text="Und warum hast du dich dann beworben?", augen="gross", ruhe="schief", arm="tisch"),
     dict(wer="genz", text="Weil man Miete leider nicht kündigen kann wie ein Abo.", augen="normal", ruhe="grinsen",
          arm="achselzucken", pointe=True),
 ]
 VOR, NACH, ABSPANN = 0.35, 0.45, 3.0
 
 
-def sprechen(text, ziel, stimme, tempo, tonhoehe):
-    ssml = ('<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="de-DE">'
-            f'<voice name="{stimme}"><prosody rate="{tempo}" pitch="{tonhoehe}">{escape(text)}</prosody></voice></speak>')
-    req = urllib.request.Request(
-        "https://germanywestcentral.tts.speech.microsoft.com/cognitiveservices/v1", data=ssml.encode("utf-8"),
-        headers={"Ocp-Apim-Subscription-Key": os.environ.get("AZURE_SPEECH_KEY", "proxy-injected"),
-                 "Content-Type": "application/ssml+xml", "User-Agent": "inpernell-reels",
-                 "X-Microsoft-OutputFormat": "riff-48khz-16bit-mono-pcm"})
-    with urllib.request.urlopen(req, timeout=60) as r, open(ziel, "wb") as f:
-        f.write(r.read())
-    with wave.open(ziel) as w:
-        return np.frombuffer(w.readframes(w.getnframes()), np.int16).astype(np.float32) / 32768
+def sprechen(text, ziel, referenz, ausdruck, cfg):
+    """Spricht den Satz mit Chatterbox und schneidet nach dem letzten erkannten Wort ab (gegen Nachgeräusche).
+    Gibt (Ton 48 kHz, Wortzeiten [(start, ende)]) zurück."""
+    import torch
+    if "tts" not in _MODELL:
+        torch.set_num_threads(4)
+        from chatterbox.mtl_tts import ChatterboxMultilingualTTS
+        from faster_whisper import WhisperModel
+        _MODELL["tts"] = ChatterboxMultilingualTTS.from_pretrained(device="cpu")
+        _MODELL["asr"] = WhisperModel("small", device="cpu", compute_type="int8")
+    m = _MODELL["tts"]
+    kw = dict(language_id="de", exaggeration=ausdruck, cfg_weight=cfg)
+    if referenz:
+        kw["audio_prompt_path"] = referenz
+    roh = m.generate(text, **kw).squeeze().numpy()
+    ton = np.interp(np.arange(int(len(roh) * SR / m.sr)) * m.sr / SR, np.arange(len(roh)), roh).astype(np.float32)
+    a16 = np.interp(np.arange(int(len(ton) * 16000 / SR)) * SR / 16000, np.arange(len(ton)), ton).astype(np.float32)
+    segs, _ = _MODELL["asr"].transcribe(a16, language="de", word_timestamps=True)
+    woerter = [w for s in segs for w in s.words]
+    n = len(text.split())
+    if woerter:
+        ende = woerter[min(len(woerter), n) - 1].end + 0.18
+        ton = ton[: int(ende * SR)]
+    zeiten = [(w.start, w.end) for w in woerter[:n]]
+    erkannt = " ".join(w.word.strip() for w in woerter)
+    print(f"  erkannt: {erkannt}")
+    return ton, zeiten
 
 
 def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None):
@@ -90,12 +108,13 @@ def main(ziel):
     t = 0.0
     for i, e in enumerate(DIALOG):
         st = STIMMEN[e["wer"]]
-        ton = sprechen(e["text"], os.path.join(tmp, f"{i}.wav"), st["stimme"], st["tempo"], st["tonhoehe"])
-        # Stille am Anfang/Ende der Azure-Datei abschneiden
+        ton, zeiten = sprechen(e["text"], os.path.join(tmp, f"{i}.wav"), st["referenz"], st["ausdruck"], st["cfg"])
         laut = np.where(np.abs(ton) > 0.02)[0]
-        ton = ton[max(0, laut[0] - 800):laut[-1] + 2400] if len(laut) else ton
+        vorne = max(0, laut[0] - 800) if len(laut) else 0
+        ton = ton[vorne:]
+        zeiten = [(a - vorne / SR, b - vorne / SR) for a, b in zeiten]
         dauer = VOR + len(ton) / SR + NACH + (0.5 if e.get("pointe") else 0)
-        takte.append(dict(e=e, start=t, ton=ton, dauer=dauer))
+        takte.append(dict(e=e, start=t, ton=ton, dauer=dauer, zeiten=zeiten))
         t += dauer
     gesamt = t + ABSPANN
     # Tonspur: Stimmen + leise eigene Musik (im Abspann lauter)
@@ -141,7 +160,12 @@ def main(ziel):
                 rms = float(np.sqrt(np.mean(tk["ton"][i0:i0 + SR // FPS] ** 2) + 1e-9))
                 offen = rms > 0.035 and (k % 4 < 3)
             worte = len(e["text"].split())
-            aktiv = min(worte - 1, int(max(0, rel) / max(0.1, sprech_dauer) * worte)) if 0 <= rel < sprech_dauer else None
+            aktiv = None
+            if 0 <= rel < sprech_dauer:
+                if len(tk["zeiten"]) == worte:      # echte Wortzeiten aus der Spracherkennung
+                    aktiv = max([j for j, (a, b) in enumerate(tk["zeiten"]) if a <= rel] or [0])
+                else:
+                    aktiv = min(worte - 1, int(rel / max(0.1, sprech_dauer) * worte))
             augen = "zu" if k in blinzeln and e["augen"] not in ("muede",) else e["augen"]
             zoom = 1.0 + 0.12 * min(1, max(0, rel) / max(0.1, sprech_dauer)) if e.get("pointe") else 1.0
             frame = szene(e, offen, augen, zoom=zoom, aktiv=aktiv)
