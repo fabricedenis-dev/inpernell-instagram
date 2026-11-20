@@ -1,23 +1,52 @@
 {
  "titel": "Wenn der Personaler sagt: Wir haben Gleitzeit",
- "musik_datei": "assets/musik/fluffing_a_duck_kevin_macleod.mp3",
+ "musik_datei": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
  "musik_start": 0,
  "dialog": [
-  {"wer": "personaler", "text": "Ich hab einen Top-Job für dich. Nur eine Stunde Fahrt!",
+  {
+   "wer": "personaler",
+   "text": "Ich hab einen Top-Job für dich. Nur eine Stunde Fahrt!",
    "sprich": "[excited] Ich hab einen Top-Job für dich. Nur eine Stunde Fahrt!",
-   "augen": "normal", "ruhe": "grinsen", "arm": "tisch_hoch"},
-  {"wer": "genz", "text": "Eine Stunde? Im Januar?",
+   "augen": "normal",
+   "ruhe": "grinsen",
+   "arm": "tisch_hoch"
+  },
+  {
+   "wer": "genz",
+   "text": "Eine Stunde? Im Januar?",
    "sprich": "[skeptical] Eine Stunde? [pause] Im Januar?",
-   "augen": "genervt", "ruhe": "schief", "arm": "achselzucken", "brauen": "skeptisch", "fx": "fragezeichen"},
-  {"wer": "personaler", "text": "Kein Problem. Wir haben Gleitzeit!",
+   "augen": "genervt",
+   "ruhe": "schief",
+   "arm": "achselzucken",
+   "brauen": "skeptisch",
+   "fx": "fragezeichen"
+  },
+  {
+   "wer": "personaler",
+   "text": "Kein Problem. Wir haben Gleitzeit!",
    "sprich": "[proud] Kein Problem. Wir haben Gleitzeit!",
-   "augen": "gross", "ruhe": "grinsen", "arm": "zeigen", "fx": "speedlines"},
-  {"wer": "genz", "text": "Gleiten tu ich auf der B 500 auch.",
+   "augen": "gross",
+   "ruhe": "grinsen",
+   "arm": "zeigen",
+   "fx": "speedlines"
+  },
+  {
+   "wer": "genz",
+   "text": "Gleiten tu ich auf der B 500 auch.",
    "sprich": "[deadpan] Gleiten tu ich auf der B fünfhundert auch.",
-   "augen": "muede", "ruhe": "neutral", "arm": "tisch", "fx": "schweiss",
-   "sfx_vor": "grillen", "vor": 1.3, "pointe": true,
-   "einspieler": "winter", "einspieler_text": "AM NÄCHSTEN MORGEN, 6:48 UHR:",
-   "sfx_nach": "badumtss", "badumtss_nach": 2.4, "nach": 3.6}
+   "augen": "muede",
+   "ruhe": "neutral",
+   "arm": "tisch",
+   "fx": "schweiss",
+   "sfx_vor": "grillen",
+   "vor": 1.3,
+   "pointe": true,
+   "einspieler": "winter",
+   "einspieler_text": "AM NÄCHSTEN MORGEN, 6:48 UHR:",
+   "sfx_nach": "badumtss",
+   "badumtss_nach": 2.4,
+   "nach": 3.6
+  }
  ],
  "abspann": "Gute Jobs gibt es auch hier im Schwarzwald. Ganz ohne Rutschpartie."
 }

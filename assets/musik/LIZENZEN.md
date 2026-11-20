@@ -14,7 +14,7 @@
 
 ## Weitere Stücke von Kevin MacLeod (incompetech.com), alle geladen am 20.11.2026
 Lizenz jeweils Creative Commons Namensnennung 4.0 (CC BY 4.0), gewerbliche Nutzung erlaubt, Namensnennung im Bildtext Pflicht:
-- monkeys_spinning_monkeys_kevin_macleod.mp3: „Monkeys Spinning Monkeys“ (Sketch WLAN)
+- monkeys_spinning_monkeys_kevin_macleod.mp3: „Monkeys Spinning Monkeys“ (einheitliche Musik aller Comic-Sketche, vom Inhaber gewählt)
 - local_forecast_elevator_kevin_macleod.mp3: „Local Forecast - Elevator“ (Sketch Bewerbung 1995)
 - sneaky_snitch_kevin_macleod.mp3: „Sneaky Snitch“ (Sketch Runde 6)
 - carefree_kevin_macleod.mp3: „Carefree“ (Sketch Laptop kommt Montag)
