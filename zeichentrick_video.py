@@ -121,6 +121,10 @@ def szene(e, offen, augen, zoom=1.0, worte_bis=None, aktiv=None, ohne_ut=False):
         x, y = int(cx - cw / 2), int(1020 - ch * 0.45)
         x, y = max(0, min(W - cw, x)), max(0, min(H - ch, y))
         img = img.crop((x, y, x + cw, y + ch)).resize((W, H), Image.LANCZOS)
+    if e.get("sepia"):        # Rückblende (z. B. 1995) in Sepia
+        from PIL import ImageEnhance, ImageOps
+        g = ImageEnhance.Contrast(ImageOps.grayscale(img)).enhance(1.05)
+        img = ImageOps.colorize(g, (60, 40, 20), (250, 232, 200))
     z.titel(img, TITEL)
     if e.get("tag"):          # Einordnung über dem Untertitel, z. B. „STELLENANZEIGE“ oder „ÜBERSETZUNG“
         z_ = ImageDraw.Draw(img)
