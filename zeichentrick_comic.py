@@ -51,14 +51,14 @@ def hintergrund(stuhl=None):
     """Büro im Comic-Stil (doppelt aufgelöst). stuhl: "buero" (Schreibtisch + Bürostuhl) oder "hocker"."""
     if stuhl in _CACHE:
         return _CACHE[stuhl].copy()
-    img = _verlauf(W * K, H * K, (238, 229, 216), (214, 203, 190))
+    img = _verlauf(W * K, H * K, (26, 52, 94), (12, 30, 60))            # Inpernell-Navy
     d = ImageDraw.Draw(img)
     # Comic-Rasterpunkte oben an der Wand
     for y in range(0, 1100, 26):
         for x in range((y // 26 % 2) * 13, W, 26):
             r = 2.6 * (1 - y / 1100)
             if r > 0.4:
-                d.ellipse(_box(x - r, y - r, x + r, y + r), fill=(226, 214, 200))
+                d.ellipse(_box(x - r, y - r, x + r, y + r), fill=(36, 66, 112))
     # Fenster mit Skyline
     fx0, fy0, fx1, fy1 = 70, 520, 470, 990
     img.paste(_verlauf((fx1 - fx0) * K, (fy1 - fy0) * K, (126, 186, 236), (252, 214, 176)), (fx0 * K, fy0 * K))
@@ -77,20 +77,24 @@ def hintergrund(stuhl=None):
     d.line(_p((fx0 + fx1) / 2, fy0, (fx0 + fx1) / 2, fy1), fill=STRICH, width=8 * K)
     d.line(_p(fx0, (fy0 + fy1) / 2, fx1, (fy0 + fy1) / 2), fill=STRICH, width=8 * K)
     d.rectangle(_box(fx0 - 16, fy1, fx1 + 16, fy1 + 22), fill=(250, 246, 240), outline=STRICH, width=5 * K)
-    # Poster "TEAMGEIST" (Büro-Ironie)
-    px0, py0, px1, py1 = 700, 540, 980, 860
-    d.rectangle(_box(px0 + 10, py0 + 12, px1 + 10, py1 + 12), fill=(190, 178, 164))
-    d.rectangle(_box(px0, py0, px1, py1), fill=NAVY, outline=STRICH, width=6 * K)
-    d.polygon(_p(px0 + 30, py1 - 110, px0 + 120, py0 + 90, px0 + 170, py0 + 150, px0 + 210, py0 + 110, px1 - 30, py1 - 110),
+    # Motivationsposter (Büro-Ironie) im orangefarbenen Rahmen – bewusst ohne Inpernell-Logo:
+    # das Büro gehört in den Sketchen dem Arbeitgeber, Inpernell erscheint erst als Lösung
+    px0, py0, px1, py1 = 680, 540, 980, 850
+    d.rectangle(_box(px0 + 10, py0 + 12, px1 + 10, py1 + 12), fill=(8, 18, 38))
+    d.rectangle(_box(px0, py0, px1, py1), fill=ORANGE, outline=STRICH, width=6 * K)
+    d.rectangle(_box(px0 + 16, py0 + 16, px1 - 16, py1 - 16), fill=(20, 44, 84), outline=STRICH, width=4 * K)
+    d.polygon(_p(px0 + 40, py1 - 110, px0 + 120, py0 + 80, px0 + 160, py0 + 140, px0 + 200, py0 + 100, px1 - 40, py1 - 110),
               fill=(70, 110, 170))
-    d.polygon(_p(px0 + 92, py0 + 130, px0 + 120, py0 + 90, px0 + 146, py0 + 126), fill=WEISS)
-    d.text(_p((px0 + px1) / 2, py1 - 70), "TEAMGEIST", font=font("h800", 34 * K), fill=ORANGE, anchor="mm")
+    d.polygon(_p(px0 + 98, py0 + 116, px0 + 120, py0 + 80, px0 + 142, py0 + 112), fill=WEISS)
+    d.text(_p((px0 + px1) / 2, py1 - 60), "TEAMGEIST", font=font("h800", 32 * K), fill=ORANGE, anchor="mm")
+    # orange Akzentleiste an der Wand
+    d.rectangle(_box(0, 1168, W, 1190), fill=ORANGE)
     # Boden mit Dielen
     boden = 1250
-    img.paste(_verlauf(W * K, (H - boden) * K, (186, 150, 116), (150, 116, 88)), (0, boden * K))
+    img.paste(_verlauf(W * K, (H - boden) * K, (54, 66, 92), (30, 40, 62)), (0, boden * K))
     d.line(_p(0, boden, W, boden), fill=STRICH, width=6 * K)
     for i in range(-8, 9):
-        d.line(_p(W / 2 + i * 70, boden, W / 2 + i * 260, H), fill=(140, 106, 80), width=3 * K)
+        d.line(_p(W / 2 + i * 70, boden, W / 2 + i * 260, H), fill=(44, 56, 80), width=3 * K)
     # Pflanze
     d.polygon(_p(900, 1180, 1030, 1180, 1012, 1330, 918, 1330), fill=(200, 96, 70), outline=STRICH)
     d.line(_p(900, 1180, 1030, 1180, 1012, 1330, 918, 1330, 900, 1180), fill=STRICH, width=6 * K)
@@ -363,3 +367,145 @@ def abspann(text, knopf):
     img.paste(lg, ((W - lg.width) // 2, 1060), lg)
     d.text((W // 2, 1060 + lg.height + 30), "DIREKTVERMITTLUNG", font=font("h700", 30), fill=(255, 214, 180), anchor="ma")
     return img
+
+
+def abspann_ebenen(text, knopf):
+    """Abschluss in Ebenen für eine ruhige Animation: Hintergrund (Büro unter Navy-Schleier), Text, Knopf, Logo."""
+    hg = Image.blend(fertig(hintergrund()), Image.new("RGB", (W, H), NAVY), 0.82).convert("RGBA")
+    leer = lambda: Image.new("RGBA", (W, H), (0, 0, 0, 0))
+    t, k, l = leer(), leer(), leer()
+    d = ImageDraw.Draw(t)
+    zeilen = wrap(d, text, font("h800", 70), W - 200)
+    for i, z in enumerate(zeilen):
+        d.text((W // 2, 470 + i * 84), z, font=font("h800", 70), fill=WEISS, anchor="ma", stroke_width=6, stroke_fill=STRICH)
+    y = 470 + len(zeilen) * 84 + 60
+    d = ImageDraw.Draw(k)
+    fk = font("h800", 46)
+    kw = d.textlength(knopf, font=fk)
+    d.rounded_rectangle([W / 2 - kw / 2 - 50, y, W / 2 + kw / 2 + 50, y + 94], radius=47, fill=ORANGE, outline=STRICH, width=6)
+    d.text((W // 2, y + 47), knopf, font=fk, fill=KNOPFTEXT, anchor="mm")
+    lg = Image.open(os.path.join(HIER, "assets", "logo.png")).convert("RGBA")
+    lg = lg.resize((480, int(lg.height * 480 / lg.width)), Image.LANCZOS)
+    ly = y + 170
+    l.alpha_composite(lg, ((W - lg.width) // 2, ly))
+    ImageDraw.Draw(l).text((W // 2, ly + lg.height + 30), "DIREKTVERMITTLUNG", font=font("h700", 30),
+                           fill=(255, 214, 180), anchor="ma")
+    return hg, [t, k, l]
+
+
+def _alpaka(d, x, y, s=1.0, wolle=(246, 238, 226), schatten=(222, 210, 192), krawatte=False, blick=1):
+    """Comic-Alpaka (Fußpunkt x, y), Blickrichtung blick=1 rechts / -1 links."""
+    k = lambda v: v * s
+    # Beine
+    for dx in (-70, -30, 40, 80):
+        d.rounded_rectangle(_box(x + k(dx) - k(14), y - k(150), x + k(dx) + k(14), y), radius=10 * K, fill=schatten,
+                            outline=STRICH, width=5 * K)
+    # Körper aus Wollkugeln
+    for cx, cy, r in ((-60, -190, 70), (0, -205, 78), (60, -190, 70), (-20, -150, 70), (40, -150, 66)):
+        d.ellipse(_box(x + k(cx) - k(r), y + k(cy) - k(r), x + k(cx) + k(r), y + k(cy) + k(r)), fill=wolle,
+                  outline=STRICH, width=5 * K)
+    for cx, cy, r in ((-60, -190, 64), (0, -205, 72), (60, -190, 64), (-20, -150, 64), (40, -150, 60)):
+        d.ellipse(_box(x + k(cx) - k(r), y + k(cy) - k(r), x + k(cx) + k(r), y + k(cy) + k(r)), fill=wolle)
+    # Hals und Kopf
+    hx = x + blick * k(95)
+    d.rounded_rectangle(_box(hx - k(36), y - k(420), hx + k(36), y - k(200)), radius=30 * K, fill=wolle, outline=STRICH,
+                        width=5 * K)
+    d.ellipse(_box(hx - k(60), y - k(500), hx + k(60), y - k(390)), fill=wolle, outline=STRICH, width=5 * K)
+    for ox in (-34, 34):
+        d.polygon(_p(hx + k(ox) - k(12), y - k(480), hx + k(ox), y - k(545), hx + k(ox) + k(12), y - k(480)), fill=wolle,
+                  outline=STRICH)
+    d.ellipse(_box(hx + blick * k(20) - k(34), y - k(445), hx + blick * k(20) + k(34), y - k(395)), fill=schatten,
+              outline=STRICH, width=4 * K)                                      # Schnauze
+    for ox in (-22, 22):
+        d.ellipse(_box(hx + k(ox) - k(9), y - k(470), hx + k(ox) + k(9), y - k(452)), fill=STRICH)
+        d.ellipse(_box(hx + k(ox) - k(3), y - k(468), hx + k(ox) + k(2), y - k(463)), fill=WEISS)
+    d.arc(_box(hx + blick * k(20) - k(16), y - k(428), hx + blick * k(20) + k(16), y - k(404)), 20, 160, fill=STRICH,
+          width=4 * K)                                                           # Lächeln
+    if krawatte:
+        d.polygon(_p(hx - k(12), y - k(390), hx + k(12), y - k(390), hx + k(18), y - k(300), hx, y - k(270),
+                     hx - k(18), y - k(300)), fill=(184, 44, 54), outline=STRICH)
+
+
+def einspieler_alpaka(text="INZWISCHEN BEIM VORGÄNGER:"):
+    """Kurzer Einspieler wie in Sitcoms: sonnige Alpaka-Weide, ein Alpaka trägt die alte rote Krawatte."""
+    img = _verlauf(W * K, H * K, (150, 206, 246), (226, 242, 252))
+    d = ImageDraw.Draw(img)
+    d.ellipse(_box(760, 300, 960, 500), fill=(255, 214, 90), outline=STRICH, width=6 * K)          # Sonne
+    for i in range(12):
+        a = i * math.pi / 6
+        d.line(_p(860 + math.cos(a) * 125, 400 + math.sin(a) * 125, 860 + math.cos(a) * 165, 400 + math.sin(a) * 165),
+               fill=(255, 214, 90), width=8 * K)
+    for cx, cy, r in ((200, 520, 60), (270, 500, 75), (340, 525, 55)):                              # Wolke
+        d.ellipse(_box(cx - r, cy - r, cx + r, cy + r), fill=WEISS, outline=STRICH, width=5 * K)
+    d.polygon(_p(0, 1000, 300, 880, 620, 960, 1080, 860, 1080, 1100, 0, 1100), fill=(96, 170, 96), outline=STRICH)
+    d.rectangle(_box(0, 1060, W, H), fill=(120, 192, 104))
+    d.line(_p(0, 1060, W, 1060), fill=STRICH, width=6 * K)
+    for x in range(40, W, 160):                                                                    # Zaun
+        d.rectangle(_box(x, 1000, x + 22, 1180), fill=(196, 150, 104), outline=STRICH, width=4 * K)
+    for yy in (1030, 1110):
+        d.rectangle(_box(0, yy, W, yy + 18), fill=(206, 160, 112), outline=STRICH, width=4 * K)
+    for x, y in ((120, 1700), (500, 1760), (880, 1690), (300, 1840), (760, 1860)):                  # Blumen
+        for a in range(5):
+            w_ = a * math.pi * 2 / 5
+            d.ellipse(_box(x + math.cos(w_) * 14 - 10, y + math.sin(w_) * 14 - 10, x + math.cos(w_) * 14 + 10,
+                           y + math.sin(w_) * 14 + 10), fill=WEISS)
+        d.ellipse(_box(x - 8, y - 8, x + 8, y + 8), fill=(255, 196, 64))
+    _alpaka(d, 300, 1560, 1.0, wolle=(214, 168, 120), schatten=(190, 144, 98), blick=1)
+    _alpaka(d, 700, 1640, 1.25, krawatte=True, blick=-1)
+    img = fertig(img)
+    rd_sticker = __import__("reel_design").sticker
+    rgba = img.convert("RGBA")
+    rd_sticker(rgba, text, (W // 2 - 300, 640), winkel=-3, fuell=(255, 196, 64), schrift=STRICH, groesse=38)
+    return rgba.convert("RGB")
+
+
+def einspieler_winter(text="AM NÄCHSTEN MORGEN, 6:48 UHR:", schild="B 500"):
+    """Einspieler für die Gleitzeit-Pointe: verschneite Schwarzwaldstraße bei Nacht.
+    Gibt (Hintergrund RGB, Auto als RGBA-Sprite) zurück; das Auto wird im Video quer über die Straße gerutscht."""
+    img = _verlauf(W * K, H * K, (12, 26, 58), (40, 66, 110))
+    d = ImageDraw.Draw(img)
+    d.ellipse(_box(120, 250, 240, 370), fill=(240, 236, 214), outline=STRICH, width=5 * K)           # Mond
+    for x, h in ((40, 560), (210, 700), (390, 520), (720, 600), (900, 740), (1070, 540)):            # Tannen
+        d.rectangle(_box(x - 14, 1120, x + 14, 1170), fill=(70, 50, 40), outline=STRICH, width=4 * K)
+        for k in range(4):
+            yy = 1150 - k * h * 0.22
+            b = h * 0.58 * (1 - k * 0.2)
+            d.polygon(_p(x - b / 2, yy, x, yy - h * 0.38, x + b / 2, yy), fill=(22, 66, 60), outline=STRICH, width=5 * K)
+            th = h * 0.38
+            d.polygon(_p(x - b * 0.17, yy - th * 0.66, x, yy - th + 6, x + b * 0.17, yy - th * 0.66, x + b * 0.07,
+                         yy - th * 0.58, x - b * 0.05, yy - th * 0.68), fill=(236, 242, 250))       # Schneehaube
+            d.line(_p(x - b / 2 + 14, yy - 8, x + b / 2 - 14, yy - 8), fill=(236, 242, 250), width=9 * K)
+    d.rectangle(_box(0, 1150, W, H), fill=(226, 234, 246))
+    d.line(_p(0, 1150, W, 1150), fill=STRICH, width=6 * K)
+    d.polygon(_p(330, 1150, 750, 1150, 1080, H, 0, H), fill=(84, 92, 112), outline=STRICH, width=6 * K)
+    for k in range(6):                                                                                # Mittellinie
+        y0 = 1180 + k * 125
+        d.polygon(_p(536 - k * 4, y0, 544 + k * 4, y0, 547 + k * 6, y0 + 66, 533 - k * 6, y0 + 66), fill=WEISS_)
+    for x0, x1 in ((330, 0), (750, 1080)):                                                            # Schneewall
+        d.line(_p(x0, 1150, x1, H), fill=(246, 250, 255), width=40 * K)
+    d.rectangle(_box(870, 980, 892, 1290), fill=(150, 150, 160), outline=STRICH, width=4 * K)          # Schild
+    d.rounded_rectangle(_box(770, 880, 992, 994), radius=14 * K, fill=(250, 200, 40), outline=STRICH, width=6 * K)
+    from bild import font
+    d.text(_p(881, 937), schild, font=font("h800", 60 * K), fill=STRICH, anchor="mm")
+    hg = fertig(img)
+    rgba = hg.convert("RGBA")
+    __import__("reel_design").sticker(rgba, text, (W // 2 - 310, 300), winkel=-3, fuell=(255, 196, 64),
+                                      schrift=STRICH, groesse=38)
+    # Auto (Inpernell-Orange), seitlich
+    a = Image.new("RGBA", (560 * K, 330 * K), (0, 0, 0, 0))
+    ad = ImageDraw.Draw(a)
+    from bild import ORANGE
+    ad.rounded_rectangle(_box(20, 120, 540, 250), radius=44 * K, fill=ORANGE, outline=STRICH, width=8 * K)
+    ad.polygon(_p(120, 124, 190, 40, 390, 40, 450, 124), fill=ORANGE, outline=STRICH, width=8 * K)
+    ad.polygon(_p(152, 120, 202, 60, 282, 60, 282, 120), fill=(170, 210, 240), outline=STRICH, width=5 * K)
+    ad.polygon(_p(298, 120, 298, 60, 372, 60, 420, 120), fill=(170, 210, 240), outline=STRICH, width=5 * K)
+    ad.rectangle(_box(190, 34, 390, 46), fill=WEISS_, outline=STRICH, width=4 * K)                     # Schnee auf dem Dach
+    ad.ellipse(_box(500, 150, 534, 184), fill=(255, 240, 170), outline=STRICH, width=4 * K)            # Scheinwerfer
+    for wx in (130, 430):
+        ad.ellipse(_box(wx - 54, 196, wx + 54, 304), fill=STRICH)
+        ad.ellipse(_box(wx - 24, 226, wx + 24, 274), fill=(150, 150, 160))
+    auto = a.resize((560, 330), Image.LANCZOS)
+    return rgba.convert("RGB"), auto
+
+
+WEISS_ = (255, 255, 255)

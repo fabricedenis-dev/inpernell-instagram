@@ -34,13 +34,13 @@ PLAN = [
     ("2026-11-27", "17:00", "job", "2833534"),
     ("2026-11-29", "18:00", "reel", "2026-11-22-mythos-arbeitsrecht-1"),
     ("2026-11-30", "18:00", "reel", "2026-11-24-zeitarbeit-direktvermittlung"),
-    ("2026-12-02", "18:00", "sketch", "2026-12-02-sketch-staerken"),
+    ("2026-12-02", "18:00", "sketch", "2026-12-02-sketch-runde-6"),
     ("2026-12-04", "17:00", "job", "2771089"),
     ("2026-12-06", "18:00", "reel", "2026-11-26-lebenslauf-1"),
-    ("2026-12-07", "18:00", "sketch", "2026-11-28-sketch-bewerbung-1995"),
-    ("2026-12-09", "18:00", "sketch", "2026-12-09-sketch-gehalt"),
+    ("2026-12-07", "18:00", "sketch", "2026-11-28-sketch-gleitzeit"),
+    ("2026-12-09", "18:00", "sketch", "2026-12-09-sketch-bewerbung-1995"),
     ("2026-12-11", "17:00", "reel", "2026-11-29-medizintechnik-tuttlingen"),
-    ("2026-12-13", "18:00", "sketch", "2026-12-05-sketch-faxgeraet"),
+    ("2026-12-13", "18:00", "sketch", "2026-12-05-sketch-laptop"),
     ("2026-12-16", "18:00", "folgt", "Neues Reel aus der Wochenplanung"),
     ("2026-12-18", "17:00", "folgt", "Job der Woche (Stelle wird kurz vorher gewählt)"),
 ]
@@ -131,7 +131,11 @@ def tiktok_text(ig_caption, extra_tags=()):
     vergleiche = [z for z in zeilen[1:] if "❌" in z]
     punkte = vergleiche or [z for z in zeilen[1:] if z != frage][:3]
     teile = [zeilen[0], ""] + punkte + (["", frage] if frage else [])
-    teile += ["", "Top Jobs aus der Region: Link im Profil.", "", _hashtags(ig_caption, extra_tags)]
+    teile += ["", "Top Jobs aus der Region: Link im Profil."]
+    musik = next((z for z in ig_caption.split("\n") if z.strip().startswith("Musik:")), None)
+    if musik:                       # Namensnennung ist Lizenzpflicht (CC BY), auch auf TikTok
+        teile += ["", musik.strip()]
+    teile += ["", _hashtags(ig_caption, extra_tags)]
     return "\n".join(teile).strip() + "\n"
 
 
@@ -144,6 +148,8 @@ Die Crew: Fabrice (Industrie und IT), Pascal (Bank und Finanzen), Waldemar (Masc
 Welche Mission würdest du in deinem Job als Nächstes freischalten?
 
 Top Jobs aus der Region: Link im Profil.
+
+Musik: Vice Police von Tausdei (CC BY 3.0)
 
 #jobtok #jobsuche #schwarzwald #personalvermittlung #gaming
 """

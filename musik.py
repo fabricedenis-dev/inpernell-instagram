@@ -333,3 +333,66 @@ def erzeuge_chill(sekunden, ziel_wav, stil="sunset_drive", seed=11):
         w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
         w.writeframes((stereo * 32767).astype(np.int16).tobytes())
     return ziel_wav
+
+
+# ---------------------------------------------------------------- Comedy-Untermalung (Sitcom-Stil, eigene Komposition)
+
+def _zupf(f, dauer, helligkeit=0.5, abkling=0.996):
+    """Gezupfte Saite (Karplus-Strong) – klingt wie Pizzicato / Ukulele."""
+    from scipy.signal import lfilter
+    n = int(dauer * SR)
+    p = max(2, int(SR / f))
+    rng = np.random.default_rng(int(f * 10))
+    x = np.zeros(n)
+    x[:p] = rng.uniform(-1, 1, p) * np.hanning(p)
+    a = np.zeros(p + 2)
+    a[0] = 1.0
+    a[p] = -abkling * (1 - helligkeit / 2)
+    a[p + 1] = -abkling * helligkeit / 2
+    y = lfilter([1.0], a, x)
+    return y * np.minimum(1, (n - np.arange(n)) / (0.02 * SR))
+
+
+def erzeuge_comedy(sekunden, ziel_wav, bpm=108, seed=5):
+    """Verspielte Büro-Comedy-Musik: Pizzicato-Melodie mit Pausen, Zupfbass auf 1 und 3, Holzblock auf den Nachschlägen.
+    F – Dm – B – C. Bewusst leicht und luftig, damit Stimmen darüber gut verständlich bleiben."""
+    rng = np.random.default_rng(seed)
+    beat = 60.0 / bpm
+    n = int((sekunden + 1) * SR)
+    mel, bass, klack = np.zeros(n), np.zeros(n), np.zeros(n)
+
+    def setze(spur, sig, t, g=1.0):
+        i = int(t * SR)
+        if i < n:
+            sig = sig[: n - i]
+            spur[i:i + len(sig)] += sig * g
+
+    folge = [(53, [0, 4, 7]), (50, [0, 3, 7]), (46, [0, 4, 7]), (48, [0, 4, 7])]      # F Dm B C
+    # Melodie-Muster in Achteln (None = Pause): Tonstufen relativ zum Akkord-Grundton
+    muster = [[12, None, 16, 19, None, 16, 12, None], [14, None, 12, None, 7, 9, 12, None],
+              [12, 16, None, 19, 21, None, 19, None], [16, None, 14, 12, None, None, 7, None]]
+    takt = 4 * beat
+    for tk in range(int(np.ceil(sekunden / takt)) + 1):
+        t0 = tk * takt
+        grund, akk = folge[tk % 4]
+        for b in (0, 2):
+            ton = grund - 12 + (0 if b == 0 else 7)
+            setze(bass, _zupf(_hz(ton), beat * 0.9, 0.3, 0.993), t0 + b * beat, 0.9)
+        for b in (1, 3):
+            t = np.arange(int(0.05 * SR)) / SR
+            setze(klack, np.sin(2 * np.pi * 900 * t) * np.exp(-t * 90) * 0.5, t0 + b * beat + 0.5 * beat * (tk % 2))
+        for i, st in enumerate(muster[(tk // 1) % 4]):
+            if st is None:
+                continue
+            setze(mel, _zupf(_hz(grund + st), beat * 0.45, 0.65, 0.990), t0 + i * beat / 2 + rng.uniform(0, 0.006), 0.55)
+    mix = mel + bass * 0.8 + klack * 0.5
+    n2 = int(sekunden * SR)
+    mix = mix[:n2]
+    aus = int(1.2 * SR)
+    mix[-aus:] *= np.linspace(1, 0, aus)
+    mix = mix / max(1e-6, np.abs(mix).max()) * 0.9
+    stereo = np.stack([mix, np.concatenate([np.zeros(int(0.01 * SR)), mix])[:n2]], axis=1)
+    with wave.open(ziel_wav, "wb") as w:
+        w.setnchannels(2); w.setsampwidth(2); w.setframerate(SR)
+        w.writeframes((stereo * 32767).astype(np.int16).tobytes())
+    return ziel_wav
