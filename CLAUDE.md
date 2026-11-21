@@ -36,6 +36,8 @@ Diese Regeln gelten für alle Beiträge, Stories, Reels und die Top-Job-Seite.
   hochgeladene Vorlagen).
 - Pflicht dabei: Instagram-Schalter „KI-Info“ setzen und im Bildtext kurz nennen, was KI ist (EU-KI-Verordnung
   Art. 50, Meta-Regeln). Nie als echte Aufnahme ausgeben.
+- Gilt ausdrücklich auch für Memes (Wunsch des Inhabers): Meme-Formate wie „Erwartung vs. Realität“ bevorzugt mit
+  KI-Darstellungen der Inhaber bauen, ergänzt durch lizenzfreie Stock-Clips; KI-Hinweis wie oben.
 - Fremde Logos/Marken (z. B. GTA) nur nach Rückfrage im Einzelfall mit Hinweis auf das Markenrisiko. Fremde
   Videos/Fotos anderer Personen oder Konten nie neu veröffentlichen (Urheber- und Persönlichkeitsrecht), stattdessen
   lizenzfreie Clips oder die Remix-Funktion in der App.
