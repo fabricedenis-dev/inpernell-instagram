@@ -29,3 +29,13 @@ Diese Regeln gelten für alle Beiträge, Stories, Reels und die Top-Job-Seite.
   (ab heute 14 Tage, mit Status und Vorschaubildern). Nach jeder Planänderung neu erzeugen und mitschicken.
 - Veröffentlichen nur über die Workflows; Löschen geht nicht über die Schnittstelle (Inhaber löscht in der App).
 - Keine bekannten oder fremden Stimmen nachahmen/klonen.
+
+## KI-Darstellungen der Inhaber (Freigabe des Inhabers vom 21.11.2026)
+- Fabrice, Pascal und Waldemar dürfen mit KI dargestellt werden: als Comic- oder Stil-Porträt (z. B. GTA-Stil
+  wie bei Finanzfluss), animiert oder mit Bibliotheksstimmen vertont. Grundlage: eigene Fotos (Website-Porträts,
+  hochgeladene Vorlagen).
+- Pflicht dabei: Instagram-Schalter „KI-Info“ setzen und im Bildtext kurz nennen, was KI ist (EU-KI-Verordnung
+  Art. 50, Meta-Regeln). Nie als echte Aufnahme ausgeben.
+- Fremde Logos/Marken (z. B. GTA) nur nach Rückfrage im Einzelfall mit Hinweis auf das Markenrisiko. Fremde
+  Videos/Fotos anderer Personen oder Konten nie neu veröffentlichen (Urheber- und Persönlichkeitsrecht), stattdessen
+  lizenzfreie Clips oder die Remix-Funktion in der App.
