@@ -60,8 +60,11 @@ def glatt(p):
 def beschriften(im, oben, zeilen, t):
     img = im.convert("RGBA")
     s = 1.0 + 0.35 * (1 - glatt(t / 0.25))                  # Etikett springt rein
-    if t > 0.0:
-        f = font("h800", int(110 * s))
+    if t > 0.0 and oben:
+        groesse = 110
+        while groesse > 50 and ImageDraw.Draw(img).textlength(oben, font=font("h800", groesse)) > W - 140:
+            groesse -= 4
+        f = font("h800", int(groesse * s))
         sch = Image.new("RGBA", (W, H), (0, 0, 0, 0))
         ImageDraw.Draw(sch).text((W // 2 + 4, 486), oben, font=f, fill=(0, 0, 0, 170), anchor="mm")
         img.alpha_composite(sch.filter(ImageFilter.GaussianBlur(6)))
