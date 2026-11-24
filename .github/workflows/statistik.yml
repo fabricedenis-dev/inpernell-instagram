@@ -1,33 +1,48 @@
 name: Instagram-Statistik
 
-# Nur von Hand: liest Kennzahlen (nichts wird veröffentlicht). Die Ausgabe wird mit dem öffentlichen Schlüssel
-# werkzeuge/statistik_public.pem verschlüsselt, weil Protokolle dieses öffentlichen Repositorys einsehbar sind.
+# Täglich früh (und von Hand): liest Kennzahlen (nichts wird veröffentlicht). Rohdaten werden mit dem öffentlichen
+# Schlüssel werkzeuge/statistik_public.pem verschlüsselt. Die Auswertung (Zusammenfassung, Verlauf je Beitrag,
+# Grafik) liegt offen in data/statistik/ (Freigabe des Inhabers, Variante a) und wird montags von Claude gelesen.
+# Bei Warnungen (Post fehlt, verspätet, Reichweiten-Einbruch) schlägt der Lauf fehl -> GitHub meldet es per Mail.
 on:
+  schedule:
+    - cron: "17 5 * * *"
   workflow_dispatch:
 
 permissions:
   contents: write
 
+concurrency:
+  group: statistik
+  cancel-in-progress: false
+
 jobs:
   statistik:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
       - run: pip install --quiet -r requirements.txt
-      - name: Kennzahlen lesen und verschlüsseln
+      - name: Kennzahlen lesen, auswerten, Rohdaten verschlüsseln
+        id: lauf
         env:
           IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
           IG_USER_ID: ${{ secrets.IG_USER_ID }}
         run: |
           python statistik.py > s.json 2> fehler.txt || { echo "Fehler beim Lesen"; tail -c 300 fehler.txt | sed 's/EAA[A-Za-z0-9]*/***/g'; exit 1; }
+          set +e; python auswertung.py s.json; echo "code=$?" >> "$GITHUB_OUTPUT"; set -e
           openssl rand -out k.bin 32
           openssl enc -aes-256-cbc -pbkdf2 -salt -in s.json -out s.enc -pass file:k.bin
           openssl pkeyutl -encrypt -pubin -inkey werkzeuge/statistik_public.pem -pkeyopt rsa_padding_mode:oaep -in k.bin -out k.enc
-          rm -f s.json k.bin
-          mkdir -p data/statistik && mv k.enc data/statistik/schluessel.enc && mv s.enc data/statistik/daten.enc
+          rm -f s.json k.bin fehler.txt
+          mv k.enc data/statistik/schluessel.enc && mv s.enc data/statistik/daten.enc
           git config user.name "inpernell-bot" && git config user.email "bot@users.noreply.github.com"
-          git add data/statistik && git commit -q -m "Statistik: verschlüsselter Stand" && git push -q
+          git add data/statistik && git commit -q -m "Statistik: Auswertung $(date -u +%F)" && git pull -q --rebase && git push -q
+      - name: Warnungen melden
+        if: steps.lauf.outputs.code == '3'
+        run: |
+          echo "::error::Auffälligkeit bei Instagram – siehe data/statistik/zusammenfassung.md (Abschnitt Warnungen)."
+          exit 1
