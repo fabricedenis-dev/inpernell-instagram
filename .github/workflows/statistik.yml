@@ -40,7 +40,8 @@ jobs:
           rm -f s.json k.bin fehler.txt
           mv k.enc data/statistik/schluessel.enc && mv s.enc data/statistik/daten.enc
           git config user.name "inpernell-bot" && git config user.email "bot@users.noreply.github.com"
-          git add data/statistik && git commit -q -m "Statistik: Auswertung $(date -u +%F)" && git pull -q --rebase && git push -q
+          git add data/statistik && git commit -q -m "Statistik: Auswertung $(date -u +%F)"
+          for i in 1 2 3 4 5; do git pull -q --rebase && git push -q && break; sleep $((i * 5)); done
       - name: Warnungen melden
         if: steps.lauf.outputs.code == '3'
         run: |
