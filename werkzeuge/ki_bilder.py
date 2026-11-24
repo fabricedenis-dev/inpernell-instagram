@@ -30,7 +30,7 @@ def main(ordner, auftrag):
         if os.path.exists(ziel):
             continue
         t = time.time()
-        img = pipe(STIL + a["prompt"], negative_prompt=NEG, num_inference_steps=a.get("schritte", 7),
+        img = pipe(STIL + a["prompt"], negative_prompt=NEG + a.get("neg", ""), num_inference_steps=a.get("schritte", 7),
                    guidance_scale=1.6, width=a.get("breite", 512), height=a.get("hoehe", 896),
                    generator=torch.Generator().manual_seed(a.get("seed", 1))).images[0]
         img.save(os.path.join(ordner, a["name"] + "_roh.png"))
