@@ -27,12 +27,13 @@ def _linie(d, pts, farbe=L, breite=14):
         d.ellipse([x * K - r, y * K - r, x * K + r, y * K + r], fill=farbe)
 
 
-def figur(haar="huang", brille=True, jacke="leder", gesicht="laecheln", pose="steht", arm="unten", w=520, h=1000):
+def figur(haar="huang", brille=True, jacke="leder", gesicht="laecheln", pose="steht", arm="unten", w=520, h=1040,
+          mund_offen=False, blinzeln=False):
     img = Image.new("RGBA", (w * K, h * K), (0, 0, 0, 0))
     d = ImageDraw.Draw(img)
     cx = w // 2
     kopf_r = 150
-    ky = 190
+    ky = 230
     sitzt = pose == "sitzt"
     # --- Körper (Oberteil)
     t0, t1 = ky + kopf_r - 10, ky + kopf_r + (250 if not sitzt else 220)
@@ -74,10 +75,13 @@ def figur(haar="huang", brille=True, jacke="leder", gesicht="laecheln", pose="st
         for bx, col in ((48, (230, 70, 70)), (68, (70, 190, 100))):
             d.ellipse(_b(cx + bx - 8, t0 + 168, cx + bx + 8, t0 + 184), fill=col)
         d.ellipse(_b(cx - 70, t0 + 164, cx - 44, t0 + 190), fill=(30, 30, 34))
-    elif arm == "jubel":
+    elif arm in ("jubel", "jubel2"):
+        hoch = -80 if arm == "jubel" else -20
+        weit = 190 if arm == "jubel" else 215
         for s in (-1, 1):
-            _linie(d, (cx + s * 110, t0 + 50, cx + s * 190, t0 - 80), L, 14)
-            d.ellipse(_b(cx + s * 190 - 24, t0 - 110, cx + s * 190 + 24, t0 - 62), fill=HAUT, outline=L, width=5 * K)
+            _linie(d, (cx + s * 110, t0 + 50, cx + s * weit, t0 + hoch), L, 14)
+            d.ellipse(_b(cx + s * weit - 24, t0 + hoch - 30, cx + s * weit + 24, t0 + hoch + 18), fill=HAUT, outline=L,
+                      width=5 * K)
     elif arm == "zeigen":
         _linie(d, (cx - 110, t0 + 50, cx - 150, t0 + 200), L, 14)
         d.ellipse(_b(cx - 172, t0 + 186, cx - 128, t0 + 230), fill=HAUT, outline=L, width=5 * K)
@@ -112,7 +116,7 @@ def figur(haar="huang", brille=True, jacke="leder", gesicht="laecheln", pose="st
     # Augen (groß, weiß, kleine Pupillen)
     for s in (-1, 1):
         ax = cx + s * 55
-        if gesicht == "geschlossen":
+        if gesicht == "geschlossen" or blinzeln:
             d.arc(_b(ax - 32, ky - 5, ax + 32, ky + 35), 200, 340, fill=L, width=8 * K)
             continue
         gr = 40 if gesicht == "schock" else 34
@@ -136,7 +140,10 @@ def figur(haar="huang", brille=True, jacke="leder", gesicht="laecheln", pose="st
             d.line(_p(ax - 30, ky - 46, ax + 30, ky - 50), fill=L, width=8 * K)
     # Mund
     my = ky + 85
-    if gesicht in ("laecheln", "geschlossen", "seitenblick"):
+    if mund_offen:
+        d.ellipse(_b(cx - 40, my - 22, cx + 40, my + 46), fill=(120, 30, 40), outline=L, width=6 * K)
+        d.chord(_b(cx - 26, my + 12, cx + 26, my + 42), 180, 360, fill=(220, 90, 100))
+    elif gesicht in ("laecheln", "geschlossen", "seitenblick"):
         d.chord(_b(cx - 55, my - 30, cx + 55, my + 38), 0, 180, fill=(120, 30, 40), outline=L, width=6 * K)
         d.chord(_b(cx - 46, my - 24, cx + 46, my + 6), 0, 180, fill=(255, 255, 255))
     elif gesicht == "schock":
