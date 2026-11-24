@@ -1,0 +1,43 @@
+name: Vorbilder lesen
+
+# Liest öffentliche Beiträge anderer Business-/Creator-Konten (Instagram Business Discovery), nur lesend.
+# Kennzahlen und Bildtexte -> data/vorbilder/<konto>.json; Vorschaubilder nur als Artefakt (3 Tage), nicht im Repo.
+on:
+  workflow_dispatch:
+    inputs:
+      konten:
+        description: "Konten, durch Leerzeichen getrennt (leer = data/vorbilder/konten.txt)"
+        type: string
+        default: ""
+  schedule:
+    - cron: "41 4 * * 1"
+
+permissions:
+  contents: write
+
+jobs:
+  lesen:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install --quiet -r requirements.txt
+      - name: Konten lesen
+        env:
+          IG_ACCESS_TOKEN: ${{ secrets.IG_ACCESS_TOKEN }}
+          IG_USER_ID: ${{ secrets.IG_USER_ID }}
+        run: python vorbilder.py ${{ inputs.konten }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: vorbilder-bilder
+          path: vorbilder_bilder
+          retention-days: 3
+          if-no-files-found: ignore
+      - name: Speichern
+        run: |
+          git config user.name "inpernell-bot" && git config user.email "bot@users.noreply.github.com"
+          git add data/vorbilder && (git diff --cached --quiet || (git commit -q -m "Vorbilder: Stand $(date -u +%F)" && git pull -q --rebase && git push -q))
