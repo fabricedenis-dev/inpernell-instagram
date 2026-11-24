@@ -131,7 +131,7 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
           oberteil="tshirt", farbe=(60, 160, 90),
           augen="normal", brauen=(0, 0), mund="neutral", blick=(0, 0),
           arm_l=(15, 5), arm_r=(15, 5), faust=(False, False), bein="stehen", kopf_neigung=0,
-          halt=None):
+          halt=None, ruecken=False):
     """arm_l/arm_r: (Oberarm-, Unterarm-Winkel) in Grad, 0 = hängt, 90 = waagerecht nach außen, 170 = hoch.
     bein: 'stehen' | 'sitzen'. halt: 'controller' für Gamepad in beiden Händen."""
     w, h = img.size
@@ -175,15 +175,22 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
             st.linie([(sx * 30, t_oben + 2), (sx * 4, t_oben + 170)], 5, tuple(max(0, c - 50) for c in farbe))
     elif oberteil == "hoodie":
         st.poly(rumpf, farbe, SCHWARZ, 7)
-        st.bogen(0, t_oben + 6, 52, 30, 0, 180, b=5, f=tuple(max(0, c - 40) for c in farbe))
-        for sx in (-1, 1):
+        dunkel = tuple(max(0, c - 40) for c in farbe)
+        if ruecken:
+            st.poly([(-70, t_oben + 4), (70, t_oben + 4), (54, t_oben + 110), (0, t_oben + 140), (-54, t_oben + 110)],
+                    dunkel, SCHWARZ, 5)
+        else:
+            st.bogen(0, t_oben + 6, 52, 30, 0, 180, b=5, f=dunkel)
+        for sx in (() if ruecken else (-1, 1)):
             st.linie([(sx * 14, t_oben + 30), (sx * 16, t_oben + 110)], 4, (240, 240, 240))
-        st.poly([(-52, huefte - 90), (52, huefte - 90), (60, huefte - 20), (-60, huefte - 20)], None,
-                tuple(max(0, c - 40) for c in farbe), 4)
+        if not ruecken:
+            st.poly([(-52, huefte - 90), (52, huefte - 90), (60, huefte - 20), (-60, huefte - 20)], None, dunkel, 4)
     else:
         st.poly(rumpf, farbe, SCHWARZ, 7)
     # Hände
-    if halt == "controller":
+    if ruecken and halt == "controller":
+        pass
+    elif halt == "controller":
         cx, cy = 0, t_oben + 200
         st.poly([(-70, cy - 22), (70, cy - 22), (84, cy + 26), (40, cy + 30), (0, cy + 12), (-40, cy + 30),
                  (-84, cy + 26)], (45, 45, 52), SCHWARZ, 5)
@@ -209,7 +216,17 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
             st.linie(list(pts), 5, (120, 122, 130))
     elif haar == "glatze":
         st.bogen(-60, hy - 60, 30, 26, 200, 260, b=5, f=(255, 255, 255))
-    _gesicht(st, hy, haut, augen, brauen, mund, blick, brille)
+    if ruecken:
+        st.poly([(-134, hy + 30), (-138, hy - 70), (-110, hy - 150), (-50, hy - 196), (20, hy - 210), (90, hy - 190),
+                 (132, hy - 130), (140, hy - 40), (134, hy + 50), (96, hy + 116), (0, hy + 140), (-96, hy + 116), (-134, hy + 50)],
+                haar_farbe, SCHWARZ, 7)
+        for k in (-70, -25, 20, 65):
+            st.linie([(k * 0.8, hy - 190), (k, hy - 60), (k * 0.9, hy + 70)], 5, (120, 122, 130))
+        if brille:
+            st.linie([(-134, hy - 20), (-112, hy - 14)], 8)
+            st.linie([(134, hy - 20), (112, hy - 14)], 8)
+    else:
+        _gesicht(st, hy, haut, augen, brauen, mund, blick, brille)
 
     klein = ebene.resize((w, h), Image.LANCZOS)
     if img.mode == "RGBA":

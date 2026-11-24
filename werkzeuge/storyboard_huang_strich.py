@@ -53,11 +53,61 @@ def buero(chef, jensen, oben=None, b_chef=None, b_jensen=None):
     return img
 
 
-def sofa(jensen, zeilen):
-    img = hg("bg_wohnzimmer", oben=0.04)
-    sm.figur(img, 540, 1860, groesse=1.2, bein="sitzen", **HOODIE, **jensen)
+def spielbild(name, auftrag, erfuellt=False):
+    """Spielszene im Open-World-Look (KI-Bild) mit selbst gezeichnetem HUD: Minikarte, Fahndungssterne, Geld."""
+    g = Image.open(os.path.join(ORDNER, name + ".png")).convert("RGB").resize((860, 484), Image.LANCZOS)
+    d = ImageDraw.Draw(g)
+    d.ellipse([22, 340, 142, 460], fill=(30, 40, 50), outline=(255, 255, 255), width=4)
+    for k in range(4):
+        d.line([(40 + k * 24, 350), (60 + k * 20, 450)], fill=(90, 110, 130), width=3)
+    d.polygon([(82, 392), (74, 412), (90, 412)], fill=(255, 255, 255))
+    f = font("h800", 34)
+    d.text((838, 20), "$ 1.250.000", font=f, fill=(110, 220, 110), anchor="ra", stroke_width=3, stroke_fill=(0, 0, 0))
+    for k in range(5):
+        cx, cy, r = 838 - 34 - k * 40, 84, 15
+        import math
+        pts = [(cx + (r if i % 2 == 0 else r * 0.45) * math.sin(math.radians(i * 36)),
+                cy - (r if i % 2 == 0 else r * 0.45) * math.cos(math.radians(i * 36))) for i in range(10)]
+        d.polygon(pts, fill=(255, 255, 255) if k < 3 else None, outline=(0, 0, 0), width=2)
+    d.text((24, 20), auftrag, font=font("h800", 30), fill=(255, 255, 255), stroke_width=3,
+           stroke_fill=(0, 0, 0))
+    if erfuellt:
+        d.rectangle([0, 170, 860, 300], fill=(0, 0, 0, 0))
+        ov = Image.new("RGBA", g.size, (0, 0, 0, 0))
+        ImageDraw.Draw(ov).rectangle([0, 172, 860, 300], fill=(0, 0, 0, 150))
+        g = Image.alpha_composite(g.convert("RGBA"), ov).convert("RGB")
+        d = ImageDraw.Draw(g)
+        d.text((430, 180), "AUFTRAG ERFÜLLT", font=font("h800", 64), fill=(255, 196, 40), anchor="ma",
+               stroke_width=4, stroke_fill=(0, 0, 0))
+        d.text((430, 256), "100 % abgeschlossen", font=font("h800", 32), fill=(255, 255, 255), anchor="ma",
+               stroke_width=3, stroke_fill=(0, 0, 0))
+    return g
+
+
+def sofa(jensen, spiel, tag, auftrag, erfuellt=False):
+    im = Image.open(os.path.join(ORDNER, "bg_wohnzimmer.png")).convert("RGB")
+    hh = int(im.height * 0.62)
+    bw = int(hh * 9 / 16)
+    img = im.crop(((im.width - bw) // 2, int(im.height * 0.03), (im.width + bw) // 2, hh)).resize((W, H), Image.LANCZOS)
+    d = ImageDraw.Draw(img)
+    # Fernseher an der Wand mit Lichtschein
+    glow = Image.new("RGBA", img.size, (0, 0, 0, 0))
+    ImageDraw.Draw(glow).rounded_rectangle([40, 470, 1040, 1100], radius=60, fill=(255, 120, 200, 60))
+    img.paste(glow, (0, 0), glow)
+    d.rounded_rectangle([88, 520, 992, 1050], radius=16, fill=(16, 16, 20), outline=(5, 5, 8), width=8)
+    img.paste(spielbild(spiel, auftrag, erfuellt), (110, 542))
+    d.rectangle([500, 1050, 580, 1090], fill=(30, 30, 36))
+    d.rounded_rectangle([380, 1086, 700, 1104], radius=8, fill=(30, 30, 36))
+    # Jensen von hinten auf dem Sofa
+    sm.figur(img, 540, 1920, groesse=0.9, bein="sitzen", ruecken=True, **HOODIE, **jensen)
+    # Sofalehne im Vordergrund
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle([60, 1560, 1020, 1990], radius=70, fill=(170, 40, 60), outline=(20, 20, 24), width=8)
+    d.rounded_rectangle([20, 1500, 170, 1990], radius=60, fill=(150, 34, 52), outline=(20, 20, 24), width=8)
+    d.rounded_rectangle([910, 1500, 1060, 1990], radius=60, fill=(150, 34, 52), outline=(20, 20, 24), width=8)
     fc.text_oben(img, "Was er wirklich gemacht hat:")
-    hud(img, zeilen)
+    d.rounded_rectangle([340, 400, 740, 470], radius=14, fill=(20, 22, 34), outline=(255, 200, 60), width=4)
+    d.text((540, 435), tag, font=font("h800", 40), fill=(255, 200, 60), anchor="mm")
     satire(img)
     return img
 
@@ -73,11 +123,10 @@ def main():
                dict(augen="zu", mund="laecheln", brauen=(-12, 4), arm_l=(10, -40), arm_r=(10, -40)),
                None, None, "Reflektiert. An mir gearbeitet. Viel nachgedacht."),
          "3–6 s", "Jensen ganz seriös, Augen zu."),
-        (sofa(dict(augen="gross", brauen=(14, 0), mund="zaehne", arm_l=(20, -40), arm_r=(20, -40),
-                   halt="controller"), [("GTA VI", (255, 200, 60)), ("Tag 1", (255, 255, 255))]),
+        (sofa(dict(arm_l=(30, 10), arm_r=(30, 10), halt="controller"), "spiel_1", "GTA VI · Tag 1",
+              "Auftrag: Entkomme der Polizei"),
          "6–8 s", "Plattenkratzer. Nachts auf dem Sofa mit Controller."),
-        (sofa(dict(mund="lachen", brauen=(-12, 10), **jubel),
-              [("Tag 11", (255, 255, 255)), ("100 % abgeschlossen", (120, 230, 120))]),
+        (sofa(dict(**jubel), "spiel_2", "GTA VI · Tag 11", "Letzter Auftrag", erfuellt=True),
          "8–10 s", "Tag 11: alles durchgespielt, Jensen jubelt. Siegessound."),
         (buero(dict(mund="skeptisch", brauen=(10, 4), blick=(1, 0)),
                dict(augen="genervt", mund="grinsen", brauen=(-6, 0), arm_l=(15, 5), arm_r=(60, 150), faust=(False, True)),
