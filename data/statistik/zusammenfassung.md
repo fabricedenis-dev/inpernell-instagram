@@ -44,4 +44,4 @@ Hinweis: Reichweite/Aufrufe/Speichern/Teilen fehlen (Berechtigung instagram_mana
 
 Mo: 4.0 · Di: 3.0 · Mi: 2.0 · Do: 11.3 · Fr: 17.0 · Sa: 4.0 · So: 3.0
 
-Rohdaten verschlüsselt in data/statistik/daten.enc · Abruf 2026-11-24 08:03 UTC
+Rohdaten verschlüsselt in data/statistik/daten.enc · Abruf 2026-11-24 09:55 UTC
