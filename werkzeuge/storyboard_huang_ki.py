@@ -70,14 +70,14 @@ def sofa(huang, tv, oben):
 
 def main():
     panels = [
-        (buero("chef_freundlich", "huang_jubel", "POV: Jensen nach 11 Tagen Pause zurück bei Nvidia",
-               "Willkommen zurück! Was hast du gemacht?"), "0–3 s", "Chef begrüßt ihn, Jensen jubelt."),
+        (buero("chef_freundlich", "huang_grinsen", "POV: Jensen nach 11 Tagen Pause zurück bei Nvidia",
+               "Willkommen zurück! Was hast du gemacht?"), "0–3 s", "Chef begrüßt ihn, Jensen grinst."),
         (buero("chef_fragend", "huang_ernst", None, None, "Reflektiert. An mir gearbeitet. Viel nachgedacht."),
-         "3–6 s", "Jensen ganz seriös, Augen zu."),
+         "3–6 s", "Jensen ganz seriös, nachdenklich."),
         (sofa("huang_sofa", [("GTA VI", (255, 200, 60)), ("Tag 1", (255, 255, 255))], "Was er wirklich gemacht hat:"),
          "6–8 s", "Plattenkratzer. Nachts mit Controller."),
-        (sofa("huang_sofa_jubel", [("Tag 11", (255, 255, 255)), ("100 % abgeschlossen", (120, 230, 120))],
-              "Was er wirklich gemacht hat:"), "8–10 s", "„Ja! 100 Prozent!“ Siegessound."),
+        (sofa("huang_sofa", [("Tag 11", (255, 255, 255)), ("100 % abgeschlossen", (120, 230, 120))],
+              "Was er wirklich gemacht hat:"), "8–10 s", "Tag 11, alles durchgespielt. Siegessound."),
         (buero("chef_fragend", "huang_grinsen", None, "Und? Hast du was gelernt?",
                "Ja. Fluchtwagen fahren ist auch Führungserfahrung."), "10–14 s", "Pointe."),
         (buero("chef_schock", "huang_grinsen", None, "Okay. Du bist eingestellt."), "14–16 s",
