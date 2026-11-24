@@ -45,7 +45,7 @@ def protokoll_schreiben(zeile):
         w.writerows(zeilen)
 
 
-def _im_fenster(jetzt, stunde, minute, vorher=50):
+def _im_fenster(jetzt, stunde, minute, vorher=110):
     """Ab `vorher` Minuten vor der Planzeit bis 4 Stunden danach. Vor der Planzeit wird nur vorbereitet;
     veröffentlicht wird genau zur Planzeit (agent.NICHT_VOR)."""
     m = jetzt.hour * 60 + jetzt.minute
@@ -74,7 +74,7 @@ def sonder_reel(jetzt):
     for r in json.load(open(WARTESCHLANGE, encoding="utf-8")):
         if r.get("zeit") and r.get("datum") == heute and r["id"] not in erledigt:
             stunde, minute = (int(x) for x in r["zeit"].split(":"))
-            if _im_fenster(jetzt, stunde, minute, vorher=50):     # Vorlauf; veröffentlicht wird genau zur Uhrzeit
+            if _im_fenster(jetzt, stunde, minute, vorher=110):     # Vorlauf; veröffentlicht wird genau zur Uhrzeit
                 if not r.get("freigegeben"):
                     print(f"::warning::Sonder-Reel {r['id']} ist fällig, aber noch nicht freigegeben – nichts veröffentlicht.")
                     return None
@@ -105,7 +105,7 @@ def main():
     if sonder:
         print("Sonder-Reel mit fester Uhrzeit:", sonder["id"])
     elif not agent.wahr("ERZWINGEN"):
-        # Fenster ab 50 Minuten vor der Planzeit (nur vorbereiten) bis 4 Stunden danach
+        # Fenster ab 110 Minuten vor der Planzeit (nur vorbereiten) bis 4 Stunden danach
         if not plan or not _im_fenster(jetzt, *plan):
             print(f"Heute/jetzt ({jetzt:%a %H:%M}) ist kein Reel geplant. Ende.")
             return

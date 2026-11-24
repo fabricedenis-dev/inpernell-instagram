@@ -580,9 +580,9 @@ def main():
     # Zeitfenster 18:45–22:59 statt nur der Stunde 18: GitHub startet geplante Läufe oft 30–60 Minuten
     # verspätet. Ein Nachhol-Lauf am Abend postet dann noch; doppelt wird nicht gepostet (Protokoll-Prüfung).
     minute_jetzt = jetzt.hour * 60 + jetzt.minute
-    # Pünktlich: Läufe starten ab 18:00 (GitHub verspätet geplante Läufe oft), bereiten alles vor und
+    # Pünktlich: Läufe zählen ab 17:00 (GitHub verspätet geplante Läufe oft), bereiten alles vor und
     # veröffentlichen erst um 18:50 (NICHT_VOR). Spätere Läufe bis 22:59 holen nach, falls nichts erschienen ist.
-    im_fenster = stunde is not None and stunde * 60 <= minute_jetzt <= 22 * 60 + 59
+    im_fenster = stunde is not None and (stunde - 1) * 60 <= minute_jetzt <= 22 * 60 + 59   # ab 17:00 vorbereiten
     global NICHT_VOR
     if stunde is not None and minute_jetzt < stunde * 60 + 50 and not wahr("ERZWINGEN"):
         NICHT_VOR = jetzt.replace(hour=stunde, minute=50, second=0, microsecond=0)
@@ -590,7 +590,7 @@ def main():
         if stunde is None:
             print("Heute (Samstag) ist laut Zeitplan Pause. Ende.")
         else:
-            print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – Läufe zählen zwischen {stunde}:00 und 22:59 Uhr (Post um {stunde}:50). Ende.")
+            print(f"Es ist {jetzt:%H:%M} Uhr in Berlin – Läufe zählen zwischen {stunde - 1}:00 und 22:59 Uhr (Post um {stunde}:50). Ende.")
         return
     protokoll = protokoll_lesen()
     mit_story = os.environ.get("STORY", "true").strip().lower() not in ("0", "false", "nein", "no")
