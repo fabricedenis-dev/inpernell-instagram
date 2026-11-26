@@ -476,7 +476,7 @@
   "datum": "2026-11-28",
   "zeit": "11:00",
   "thema": "Sketch: Gleitzeit im Schwarzwald",
-  "caption": "Pendeln im Schwarzwald-Winter: Wenn der Recruiter Gleitzeit verspricht ❄️\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWie lang ist dein Arbeitsweg im Winter?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
+  "caption": "Wenn der Personaler mit „Gleitzeit“ lockt ❄️\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWelches Jobversprechen hat sich bei dir als Mogelpackung entpuppt?\n\nÜbrigens: Bei mehr als 9 Stunden Arbeit sind mindestens 45 Minuten Pause Pflicht (§ 4 Arbeitszeitgesetz, gesetze-im-internet.de, Stand 26.11.2026).\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
   "sketch": {
    "titel": "Wenn der Personaler sagt: Wir haben Gleitzeit",
    "musik_datei": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
@@ -531,7 +531,8 @@
   },
   "freigegeben": true,
   "fertig_video": "reels/fertig/2026-11-28-sketch-gleitzeit.mp4",
-  "fertig_titelbild": "reels/fertig/2026-11-28-sketch-gleitzeit.jpg"
+  "fertig_titelbild": "reels/fertig/2026-11-28-sketch-gleitzeit.jpg",
+  "sketch_quelle": "reels/sketch_gleitzeit_dialog.json"
  },
  {
   "id": "2026-11-29-medizintechnik-tuttlingen",
