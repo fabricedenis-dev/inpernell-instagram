@@ -6,13 +6,13 @@
    "titel": "Zeitarbeit oder Direktvermittlung – wo ist der Unterschied? ",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 264,
-    "views": 328,
+    "reach": 265,
+    "views": 336,
     "likes": 5,
     "comments": 0,
     "saved": 3,
     "shares": 7,
-    "ig_reels_avg_watch_time": 4569
+    "ig_reels_avg_watch_time": 4500
    },
    "tag1": {
     "reach": 264,
@@ -30,11 +30,11 @@
    "titel": "Teamleitung Buchhaltung (m/w/d) in Titisee – 60.000 – 76.000",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 70,
-    "views": 162,
-    "likes": 4,
+    "reach": 72,
+    "views": 170,
+    "likes": 5,
     "comments": 0,
-    "saved": 1,
+    "saved": 2,
     "shares": 0,
     "ig_reels_avg_watch_time": null
    },
@@ -54,8 +54,8 @@
    "titel": "Fertigungsauftragsplaner Logistik (m/w/d) in Tuttlingen – 45",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 68,
-    "views": 179,
+    "reach": 74,
+    "views": 185,
     "likes": 3,
     "comments": 0,
     "saved": 3,
@@ -69,6 +69,15 @@
     "comments": 0,
     "saved": null,
     "shares": null,
+    "ig_reels_avg_watch_time": null
+   },
+   "tag3": {
+    "reach": 74,
+    "views": 185,
+    "likes": 3,
+    "comments": 0,
+    "saved": 3,
+    "shares": 0,
     "ig_reels_avg_watch_time": null
    }
   },
@@ -79,12 +88,12 @@
    "sonderzeit": null,
    "aktuell": {
     "reach": 281,
-    "views": 370,
+    "views": 375,
     "likes": 4,
     "comments": 0,
     "saved": 3,
     "shares": 0,
-    "ig_reels_avg_watch_time": 5125
+    "ig_reels_avg_watch_time": 5209
    },
    "tag1": {
     "reach": null,
@@ -95,7 +104,16 @@
     "shares": null,
     "ig_reels_avg_watch_time": null
    },
-   "warnung_einbruch": true
+   "warnung_einbruch": true,
+   "tag3": {
+    "reach": 281,
+    "views": 375,
+    "likes": 4,
+    "comments": 0,
+    "saved": 3,
+    "shares": 0,
+    "ig_reels_avg_watch_time": 5209
+   }
   },
   "18214774408369113": {
    "zeit": "2026-11-21 18:50",
@@ -103,8 +121,8 @@
    "titel": "Manager Arbeitsschutz & Fachkraft für Arbeitssicherheit (m/w",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 96,
-    "views": 245,
+    "reach": 98,
+    "views": 249,
     "likes": 4,
     "comments": 0,
     "saved": 2,
@@ -136,7 +154,7 @@
    "titel": "Konstrukteur & Entwickler (m/w/d) in Tuttlingen – 65.000 – 8",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 75,
+    "reach": 76,
     "views": 202,
     "likes": 4,
     "comments": 0,
@@ -169,8 +187,8 @@
    "titel": "Softwareentwickler Testsysteme und Automatisierung (m/w/d) i",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 78,
-    "views": 198,
+    "reach": 80,
+    "views": 200,
     "likes": 4,
     "comments": 0,
     "saved": 0,
@@ -202,13 +220,13 @@
    "titel": "Personalvermittlung im Game-Modus: Mission Traumjob im Schwa",
    "sonderzeit": "10:00",
    "aktuell": {
-    "reach": 1001,
-    "views": 1696,
+    "reach": 1006,
+    "views": 1706,
     "likes": 25,
     "comments": 1,
     "saved": 2,
     "shares": 3,
-    "ig_reels_avg_watch_time": 10225
+    "ig_reels_avg_watch_time": 10206
    },
    "tag1": {
     "reach": null,
@@ -227,6 +245,15 @@
     "saved": null,
     "shares": null,
     "ig_reels_avg_watch_time": null
+   },
+   "tag7": {
+    "reach": 1006,
+    "views": 1706,
+    "likes": 25,
+    "comments": 1,
+    "saved": 2,
+    "shares": 3,
+    "ig_reels_avg_watch_time": 10206
    }
   },
   "18083823542347867": {
@@ -235,13 +262,13 @@
    "titel": "Jobmarkt Region: Wo Fachkräfte gerade die besten Karten habe",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 238,
-    "views": 371,
+    "reach": 239,
+    "views": 377,
     "likes": 5,
     "comments": 0,
     "saved": 3,
     "shares": 1,
-    "ig_reels_avg_watch_time": 4302
+    "ig_reels_avg_watch_time": 4312
    },
    "tag1": {
     "reach": null,
@@ -260,6 +287,15 @@
     "saved": null,
     "shares": null,
     "ig_reels_avg_watch_time": null
+   },
+   "tag7": {
+    "reach": 239,
+    "views": 377,
+    "likes": 5,
+    "comments": 0,
+    "saved": 3,
+    "shares": 1,
+    "ig_reels_avg_watch_time": 4312
    }
   },
   "17995467774119210": {
@@ -268,13 +304,13 @@
    "titel": "Gehaltsverhandlung: 3 Fehler, die dich Geld kosten – und wie",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 273,
-    "views": 424,
+    "reach": 275,
+    "views": 425,
     "likes": 3,
     "comments": 0,
     "saved": 0,
     "shares": 0,
-    "ig_reels_avg_watch_time": 5685
+    "ig_reels_avg_watch_time": 5675
    },
    "tag1": {
     "reach": null,
@@ -293,6 +329,15 @@
     "saved": null,
     "shares": null,
     "ig_reels_avg_watch_time": null
+   },
+   "tag7": {
+    "reach": 275,
+    "views": 425,
+    "likes": 3,
+    "comments": 0,
+    "saved": 0,
+    "shares": 0,
+    "ig_reels_avg_watch_time": 5675
    }
   },
   "18156607045552166": {
@@ -326,6 +371,15 @@
     "saved": null,
     "shares": null,
     "ig_reels_avg_watch_time": null
+   },
+   "tag7": {
+    "reach": 108,
+    "views": 293,
+    "likes": 1,
+    "comments": 0,
+    "saved": 0,
+    "shares": 0,
+    "ig_reels_avg_watch_time": null
    }
   },
   "17968653705238860": {
@@ -334,13 +388,13 @@
    "titel": "Unsere neue Website ist Live. Schaut auf jeden Fall mal vorb",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 896,
-    "views": 1597,
+    "reach": 900,
+    "views": 1598,
     "likes": 30,
     "comments": 0,
     "saved": 0,
     "shares": 4,
-    "ig_reels_avg_watch_time": 12279
+    "ig_reels_avg_watch_time": 12269
    },
    "tag1": {
     "reach": null,
@@ -377,12 +431,12 @@
    "sonderzeit": null,
    "aktuell": {
     "reach": 1041,
-    "views": 1960,
+    "views": 1963,
     "likes": 22,
     "comments": 2,
     "saved": 0,
     "shares": 0,
-    "ig_reels_avg_watch_time": 10296
+    "ig_reels_avg_watch_time": 10297
    },
    "tag1": {
     "reach": null,
@@ -419,12 +473,12 @@
    "sonderzeit": null,
    "aktuell": {
     "reach": 630,
-    "views": 2630,
+    "views": 2633,
     "likes": 35,
     "comments": 0,
     "saved": 1,
     "shares": 0,
-    "ig_reels_avg_watch_time": 11677
+    "ig_reels_avg_watch_time": 11694
    },
    "tag1": {
     "reach": null,
@@ -544,7 +598,7 @@
    "titel": "Du willst raus und rein in was neues? Dann melde dich jetzt ",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 424,
+    "reach": 425,
     "views": 4070,
     "likes": 64,
     "comments": 8,
@@ -586,13 +640,13 @@
    "titel": "Schaut gerne vorbei und schreibt uns. Wir freuen uns auf euc",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 379,
-    "views": 3993,
+    "reach": 380,
+    "views": 3996,
     "likes": 58,
     "comments": 1,
     "saved": 12,
     "shares": 0,
-    "ig_reels_avg_watch_time": 9256
+    "ig_reels_avg_watch_time": 9261
    },
    "tag1": {
     "reach": null,
@@ -670,8 +724,8 @@
    "titel": "„🌴🌞 Urlaubstage verdreifachen: wir enthüllen unsere Urlaubs-",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 209,
-    "views": 2250,
+    "reach": 211,
+    "views": 2253,
     "likes": 32,
     "comments": 5,
     "saved": 7,
@@ -754,13 +808,22 @@
    "titel": "Jensen Huang kehrt zu NVIDIA zurück. Aber nur weil GTA eine ",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 317,
-    "views": 419,
+    "reach": 398,
+    "views": 524,
     "likes": 9,
     "comments": 1,
-    "saved": 1,
+    "saved": 2,
     "shares": 1,
-    "ig_reels_avg_watch_time": 8557
+    "ig_reels_avg_watch_time": 8238
+   },
+   "tag1": {
+    "reach": 398,
+    "views": 524,
+    "likes": 9,
+    "comments": 1,
+    "saved": 2,
+    "shares": 1,
+    "ig_reels_avg_watch_time": 8238
    }
   },
   "18140857198658410": {
@@ -769,18 +832,58 @@
    "titel": "Zerspanungsmechaniker (m/w/d) in Titisee – 50.000 – 60.000 €",
    "sonderzeit": null,
    "aktuell": {
-    "reach": 36,
-    "views": 99,
+    "reach": 49,
+    "views": 147,
     "likes": 1,
     "comments": 0,
-    "saved": 0,
+    "saved": 1,
     "shares": 0,
     "ig_reels_avg_watch_time": null
+   },
+   "tag1": {
+    "reach": 49,
+    "views": 147,
+    "likes": 1,
+    "comments": 0,
+    "saved": 1,
+    "shares": 0,
+    "ig_reels_avg_watch_time": null
+   }
+  },
+  "17961759915017024": {
+   "zeit": "2026-11-25 18:50",
+   "art": "Top Job",
+   "titel": "Messtechniker (m/w/d) in Donaueschingen – 55.000 – 70.000 € ",
+   "sonderzeit": null,
+   "aktuell": {
+    "reach": 27,
+    "views": 70,
+    "likes": 3,
+    "comments": 0,
+    "saved": 1,
+    "shares": 0,
+    "ig_reels_avg_watch_time": null
+   }
+  },
+  "18100288262443315": {
+   "zeit": "2026-11-25 12:00",
+   "art": "Sketch",
+   "titel": "Wie es sich anfühlt, als Gen Z einen Job zu suchen 😅",
+   "sonderzeit": "12:00",
+   "aktuell": {
+    "reach": 507,
+    "views": 626,
+    "likes": 2,
+    "comments": 0,
+    "saved": 1,
+    "shares": 1,
+    "ig_reels_avg_watch_time": 7136
    }
   }
  },
  "follower": {
   "2026-11-24": 934,
-  "2026-11-25": 933
+  "2026-11-25": 933,
+  "2026-11-26": 932
  }
 }
