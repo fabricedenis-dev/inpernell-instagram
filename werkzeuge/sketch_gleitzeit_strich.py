@@ -44,7 +44,7 @@ SZENEN = [
                     ("bewerber", "[confused] Und was genau gleitet da?", None, 0.5)], 0.3, "kernzeit"),
     ("buero", POV, [("personaler", "[cheerful] Na, du. Eine Stunde über die B fünfhundert. Im Januar.",
                      "Na, du. Eine Stunde über die B 500. Im Januar.", 0.3)], 0.5, "pointe"),
-    ("winter", "Am nächsten Morgen, 6:48 Uhr:", [("bewerber", "[deadpan] Ah. Deshalb Gleitzeit.", None, 2.0)],
+    ("winter", "Am nächsten Morgen, 6:48 Uhr:", [("bewerber", "[deadpan] Aha. Deshalb Gleitzeit.", None, 2.0)],
      1.6, "winter"),
     ("abspann", None, [], 3.2, "abspann"),
 ]
@@ -107,7 +107,7 @@ def auto_sprite():
     return sp.resize((640, 380), Image.LANCZOS)
 
 
-AUTO = auto_sprite()
+AUTO = auto_sprite().resize((920, 546), Image.LANCZOS)
 SCHNEE = [(random.Random(i).randint(0, W), random.Random(i * 3).randint(0, H), random.Random(i * 7).randint(4, 11))
           for i in range(140)]
 
@@ -200,21 +200,21 @@ def winter(sz, rel, k):
         yy = (y + k * (r * 1.6)) % H
         xx = (x + 30 * math.sin((k + y) * 0.03)) % W
         d.ellipse([xx - r, yy - r, xx + r, yy + r], fill=(255, 255, 255, 230))
-    # Auto rutscht quer über die Straße und dreht sich
+    # Auto rutscht seitlich über die glatte Straße, schlingert und landet in der Schneewehe
     p = min(1.0, rel / 2.4)
-    x = -520 + p * 1080
-    w = 0 if rel < 0.6 else -28 * math.sin((rel - 0.6) * 4.0) * (1 if rel < 2.4 else 0.4)
+    x = -980 + (1 - (1 - p) ** 2) * 1240
+    w = 10 * math.sin(rel * 5.5) if rel < 2.4 else -6
+    dy = 0
     if rel > 2.4:
-        x = 560 + 18 * math.sin(rel * 30) * math.exp(-(rel - 2.4) * 4)
-        w = -14
+        x = 260 + 14 * math.sin(rel * 32) * math.exp(-(rel - 2.4) * 4)
+        dy = 30
     a = AUTO.rotate(w, expand=True, resample=Image.BICUBIC)
-    img.alpha_composite(a, (int(x), 1180 - a.height // 2 + 140))
+    img.alpha_composite(a, (int(x), 1330 - a.height // 2 + dy + 200))
     if rel > 2.4:                                                     # Schneewolke beim Einschlag
-        dd = ImageDraw.Draw(img)
-        r = int(60 + 220 * min(1, (rel - 2.4) / 0.5))
-        al = int(200 * max(0, 1 - (rel - 2.4) / 1.2))
+        r = int(80 + 260 * min(1, (rel - 2.4) / 0.5))
+        al = int(220 * max(0, 1 - (rel - 2.4) / 1.4))
         ov = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-        ImageDraw.Draw(ov).ellipse([1020 - r, 1360 - r // 2, 1020 + r, 1360 + r // 2], fill=(255, 255, 255, al))
+        ImageDraw.Draw(ov).ellipse([1080 - r, 1500 - r // 2, 1080 + r, 1500 + r // 2], fill=(255, 255, 255, al))
         img.alpha_composite(ov)
     img = img.convert("RGB")
     fc.text_oben(img, sz["oben"])
