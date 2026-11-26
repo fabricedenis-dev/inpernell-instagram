@@ -17,7 +17,7 @@ HIER = os.path.dirname(os.path.abspath(__file__))
 ZIEL = os.path.join(HIER, "data", "vorbilder")
 BILDER = os.path.join(HIER, "vorbilder_bilder")
 FELDER = ("username,name,biography,followers_count,media_count,"
-          "media.limit(30){id,caption,media_type,media_product_type,timestamp,like_count,comments_count,permalink,"
+          "media.limit(50){id,caption,media_type,media_product_type,timestamp,like_count,comments_count,permalink,"
           "media_url,thumbnail_url}")
 
 
@@ -51,6 +51,21 @@ def main(konten):
                         open(os.path.join(BILDER, konto, f"{i:02d}.jpg"), "wb").write(r.read())
                 except Exception:
                     pass
+        # Optional: die beliebtesten Videos zum Ansehen/Analysieren laden (nur Artefakt, nie veröffentlichen)
+        n_vid = int(os.environ.get("VIDEOS", "0") or 0)
+        if n_vid:
+            vids = [m for m in bd.get("media", {}).get("data", []) if m.get("media_type") == "VIDEO" and m.get("media_url")]
+            vids.sort(key=lambda m: m.get("like_count") or 0, reverse=True)
+            for j, m in enumerate(vids[:n_vid]):
+                try:
+                    with urllib.request.urlopen(urllib.request.Request(m["media_url"],
+                                                                       headers={"User-Agent": "inpernell/1.0"}),
+                                                timeout=120) as r:
+                        open(os.path.join(BILDER, konto, f"video_{j:02d}_{m.get('like_count') or 0}likes.mp4"),
+                             "wb").write(r.read())
+                except Exception as e:
+                    print(f"::warning::{konto}: Video {j} nicht ladbar: {str(e)[:120]}")
+            print(f"{konto}: {min(n_vid, len(vids))} Videos geladen ({len(vids)} mit Video-Adresse)")
         aus = {"konto": bd.get("username"), "name": bd.get("name"), "bio": bd.get("biography"),
                "follower": bd.get("followers_count"), "beitraege_gesamt": bd.get("media_count"),
                "abgerufen": time.strftime("%Y-%m-%d %H:%M UTC", time.gmtime()), "beitraege": beitraege}
