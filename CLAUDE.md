@@ -23,6 +23,11 @@ Diese Regeln gelten für alle Beiträge, Stories, Reels und die Top-Job-Seite.
   Feed-Ausschnitt zwischen y ≈ 285 und 1635.
 - Keine Weichzeichner (Instagram empfiehlt unscharfe Videos seltener); Reels immer mit Ton (eigene Musik).
 - Vor jeder Änderung am Layout eine Vorschau als Bild zeigen; veröffentlicht wird erst nach Freigabe.
+- Sketche (vom Inhaber freigegeben am 26.11.2026, „beibehalten“): Dialog-Stil wie erfolgreiche Meme-Cartoons,
+  gebaut mit `werkzeuge/sketch_dialog.py` + JSON (Vorlage `reels/sketch_gleitzeit_dialog.json`). Strichmännchen
+  (`werkzeuge/strichmann.py`), feste Hook-Zeile oben, schnelles Hin und Her mit sehr kurzen Sätzen, alle 5–8 s
+  eine kleine Pointe, logisch und aus dem echten Arbeitsalltag, am Ende ein Nachklapp. Nahaufnahme der
+  sprechenden Figur, Untertitel in Häppchen unten mittig, keine Sprechblasen. Musik Monkeys Spinning Monkeys.
 
 ## Abläufe
 - Redaktionsplan immer bildlich zeigen: `python redaktionsplan.py` erzeugt `vorschau/redaktionsplan.png`
