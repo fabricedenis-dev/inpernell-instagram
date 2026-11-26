@@ -214,6 +214,12 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
                     ((-60, hy - 126), (0, hy - 166), (80, hy - 180)),
                     ((-10, hy - 132), (60, hy - 150), (112, hy - 128))):
             st.linie(list(pts), 5, (120, 122, 130))
+    elif haar == "kurz":
+        # kurze, strubbelige Haare mit Stirnfransen (junger Bewerber)
+        st.poly([(-136, hy - 20), (-140, hy - 90), (-110, hy - 146), (-60, hy - 170), (-40, hy - 198), (-6, hy - 172),
+                 (30, hy - 204), (52, hy - 168), (96, hy - 176), (100, hy - 140), (134, hy - 120), (140, hy - 40),
+                 (124, hy - 60), (110, hy - 96), (70, hy - 92), (40, hy - 110), (10, hy - 86), (-30, hy - 108),
+                 (-70, hy - 90), (-110, hy - 90), (-120, hy - 30)], haar_farbe, SCHWARZ, 7)
     elif haar == "glatze":
         st.bogen(-60, hy - 60, 30, 26, 200, 260, b=5, f=(255, 255, 255))
     if ruecken:
@@ -237,4 +243,6 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
 
 
 JENSEN = dict(haut=(240, 214, 184), haar="jensen", brille=True, oberteil="lederjacke")
+BEWERBER = dict(haut=(240, 214, 184), haar="kurz", haar_farbe=(120, 78, 40), oberteil="hoodie", farbe=(60, 160, 90))
+PERSONALER = dict(haut=(236, 236, 236), haar="glatze", oberteil="anzug", farbe=(90, 92, 100))
 CHEF = dict(haut=(236, 236, 236), haar="glatze", oberteil="anzug", farbe=(40, 70, 150))
