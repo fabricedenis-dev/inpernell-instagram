@@ -625,5 +625,38 @@
   "fertig_video": "reels/fertig/2026-12-09-sketch-bewerbung-schoenschreiben.mp4",
   "fertig_titelbild": "reels/fertig/2026-12-09-sketch-bewerbung-schoenschreiben.jpg",
   "sketch_quelle": "reels/sketch_bewerbung_dialog.json"
+ },
+ {
+  "id": "2026-12-12-sketch-stellenanzeige",
+  "datum": "2026-12-12",
+  "zeit": "11:00",
+  "thema": "Sketch: Wenn die Stellenanzeige zu gut klingt",
+  "caption": "Wenn die Stellenanzeige zu gut klingt 👀\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWelche Floskel aus Stellenanzeigen lässt bei dir sofort die Alarmglocken klingeln?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#stellenanzeige #jobsuche #arbeitsleben #schwarzwald #personalvermittlung",
+  "sketch_quelle": "reels/sketch_stellenanzeige_dialog.json",
+  "fertig_video": "reels/fertig/2026-12-12-sketch-stellenanzeige.mp4",
+  "fertig_titelbild": "reels/fertig/2026-12-12-sketch-stellenanzeige.jpg",
+  "freigegeben": false
+ },
+ {
+  "id": "2026-12-16-sketch-opa",
+  "datum": "2026-12-16",
+  "zeit": "12:00",
+  "thema": "Sketch: Wenn dein Opa fragt, was du beruflich machst",
+  "caption": "Wenn dein Opa fragt, was du beruflich machst 👴\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWie erklärst du deiner Familie, was du beruflich machst?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#recruiting #arbeitsleben #familie #schwarzwald #personalvermittlung",
+  "sketch_quelle": "reels/sketch_opa_dialog.json",
+  "fertig_video": "reels/fertig/2026-12-16-sketch-opa.mp4",
+  "fertig_titelbild": "reels/fertig/2026-12-16-sketch-opa.jpg",
+  "freigegeben": false
+ },
+ {
+  "id": "2026-12-19-sketch-rollentausch",
+  "datum": "2026-12-19",
+  "zeit": "11:00",
+  "thema": "Sketch: Wenn der Bewerber das Vorstellungsgespräch führt",
+  "caption": "Wenn der Bewerber das Vorstellungsgespräch führt 😎\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWelche Frage stellst du im Vorstellungsgespräch immer selbst?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#vorstellungsgespräch #bewerbung #fachkräfte #schwarzwald #personalvermittlung",
+  "sketch_quelle": "reels/sketch_rollentausch_dialog.json",
+  "fertig_video": "reels/fertig/2026-12-19-sketch-rollentausch.mp4",
+  "fertig_titelbild": "reels/fertig/2026-12-19-sketch-rollentausch.jpg",
+  "freigegeben": false
  }
 ]
