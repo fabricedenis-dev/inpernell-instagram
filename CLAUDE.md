@@ -28,6 +28,14 @@ Diese Regeln gelten für alle Beiträge, Stories, Reels und die Top-Job-Seite.
   (`werkzeuge/strichmann.py`), feste Hook-Zeile oben, schnelles Hin und Her mit sehr kurzen Sätzen, alle 5–8 s
   eine kleine Pointe, logisch und aus dem echten Arbeitsalltag, am Ende ein Nachklapp. Nahaufnahme der
   sprechenden Figur, Untertitel in Häppchen unten mittig, keine Sprechblasen. Musik Monkeys Spinning Monkeys.
+- So sollen Sketche künftig aufgebaut sein (Inhaber, 27.11.2026: „so ist geil, merk dir das“). Vorbilder sind
+  `reels/sketch_bewerbung_dialog.json` (ehrlich gesagt → schöngeredet, Steigerung bis zum Rauswurf),
+  `reels/sketch_zeugnis_dialog.json` (wütender Chef ↔ ruhige Übersetzung ins Zeugnis-Deutsch) und
+  `reels/sketch_funkloch_dialog.json` (Missverständnis-Kreisel, Funkloch verschluckt Wörter, SMS als Nachklapp).
+  Muster: eine Formel, die jeder sofort versteht, Zeile für Zeile wiederholt und gesteigert; jede Antwort eine
+  Pointe; am Ende ein trockener Nachklapp. Muster und Machart erfolgreicher Meme-Cartoons nachbauen ist gewollt,
+  die Sätze aber immer selbst formulieren (fremde Texte/Tonspuren nicht wörtlich übernehmen). Keine Einwände
+  zum Humor: Der Inhaber entscheidet, was lustig ist.
 
 ## Abläufe
 - Redaktionsplan immer bildlich zeigen: `python redaktionsplan.py` erzeugt `vorschau/redaktionsplan.png`
