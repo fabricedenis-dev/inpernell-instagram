@@ -204,7 +204,14 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
             _hand(st, xh, yh, wh, fa)
     # Kopf
     hy = t_oben - 130
+    if haar == "lang" and not ruecken:                     # lange Haare hinter dem Kopf
+        st.poly([(-150, hy - 60), (-120, hy - 160), (0, hy - 196), (120, hy - 160), (150, hy - 60), (168, hy + 150),
+                 (110, hy + 190), (-110, hy + 190), (-168, hy + 150)], haar_farbe, SCHWARZ, 7)
     st.ellipse(0, hy, 132, 152, haut, b=7)
+    if haar == "lang" and not ruecken:                     # Pony
+        st.poly([(-136, hy - 20), (-130, hy - 100), (-80, hy - 150), (0, hy - 160), (80, hy - 150), (130, hy - 100),
+                 (136, hy - 20), (110, hy - 70), (60, hy - 100), (10, hy - 112), (-10, hy - 80), (-60, hy - 96),
+                 (-110, hy - 66)], haar_farbe, SCHWARZ, 6)
     if haar == "jensen":
         # voluminöse, nach hinten gekämmte graue Tolle
         st.poly([(-134, hy - 6), (-136, hy - 70), (-112, hy - 150), (-60, hy - 200), (10, hy - 222), (80, hy - 212),
@@ -233,6 +240,9 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
             st.linie([(134, hy - 20), (112, hy - 14)], 8)
     else:
         _gesicht(st, hy, haut, augen, brauen, mund, blick, brille)
+    if halt == "handy":                                     # Handy am Ohr (rechte Seite)
+        st.poly([(132, hy - 70), (176, hy - 74), (182, hy + 40), (138, hy + 44)], (30, 30, 36), SCHWARZ, 5)
+        st.ellipse(180, hy - 6, 24, 26, HAND, b=4)
 
     klein = ebene.resize((w, h), Image.LANCZOS)
     if img.mode == "RGBA":
@@ -244,5 +254,7 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
 
 JENSEN = dict(haut=(240, 214, 184), haar="jensen", brille=True, oberteil="lederjacke")
 BEWERBER = dict(haut=(240, 214, 184), haar="kurz", haar_farbe=(120, 78, 40), oberteil="hoodie", farbe=(60, 160, 90))
+PERSONALERIN = dict(haut=(244, 220, 196), haar="lang", haar_farbe=(200, 150, 70), oberteil="tshirt",
+                    farbe=(200, 70, 110))
 PERSONALER = dict(haut=(236, 236, 236), haar="glatze", oberteil="anzug", farbe=(90, 92, 100))
 CHEF = dict(haut=(236, 236, 236), haar="glatze", oberteil="anzug", farbe=(40, 70, 150))
