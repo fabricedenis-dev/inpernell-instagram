@@ -1,0 +1,218 @@
+{
+ "hook": "Wenn dein Opa fragt, was du beruflich machst",
+ "hintergrund": "assets/sketche/bg_wohnzimmer.png",
+ "musik": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
+ "links": "opa",
+ "figuren": {
+  "opa": {
+   "typ": "OPA",
+   "stimme": "gGjaVIGkCSfKUIBYtNT2",
+   "extra": {
+    "bein": "sitzen"
+   }
+  },
+  "enkel": {
+   "typ": "BEWERBER",
+   "stimme": "JNpQqni9iUx1Jxy9h0P1",
+   "extra": {
+    "bein": "sitzen"
+   }
+  }
+ },
+ "dialog": [
+  {
+   "wer": "opa",
+   "sprich": "[warm] Und, was machst du jetzt beruflich?",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   },
+   "einst": "total",
+   "gegen": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "enkel",
+   "sprich": "[proud] Ich bin Recruiter.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "opa",
+   "sprich": "[confused] Rekrut? Bei der Bundeswehr?",
+   "pose": {
+    "augen": "gross",
+    "mund": "offen",
+    "brauen": [
+     -14,
+     18
+    ]
+   }
+  },
+  {
+   "wer": "enkel",
+   "sprich": "[patient] Nein, Opa. Ich suche Leute für Firmen.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "opa",
+   "sprich": "[impressed] Ah. Detektiv.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -10,
+     12
+    ]
+   }
+  },
+  {
+   "wer": "enkel",
+   "sprich": "[patient] Nein. Ich schreibe Leute auf LinkedIn an.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "opa",
+   "sprich": "[confused] Lindt? Die Schokolade?",
+   "pose": {
+    "augen": "gross",
+    "mund": "offen",
+    "brauen": [
+     -14,
+     18
+    ]
+   }
+  },
+  {
+   "wer": "enkel",
+   "sprich": "[slowly] Linked. In. Das ist wie Facebook, nur für Arbeit.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     10,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "opa",
+   "sprich": "[happy] Facebook kenn ich. Da ist deine Tante.",
+   "pose": {
+    "mund": "lachen",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "enkel",
+   "sprich": "[tired] Genau. Und ich frage Leute, ob sie den Job wechseln wollen.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     10,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "opa",
+   "sprich": "[suspicious] Und dafür kriegst du Geld?",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "enkel",
+   "sprich": "[proud] Ja.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "opa",
+   "sprich": "[deadpan] Ich frag dich seit zehn Jahren, ob du mal den Rasen mähst.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   },
+   "text": "Ich frag dich seit 10 Jahren, ob du mal den Rasen mähst.",
+   "zoom": true,
+   "grillen_nach": 1.2,
+   "nach": 1.2
+  },
+  {
+   "wer": "enkel",
+   "sprich": "[defensive] Das ist was anderes.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "opa",
+   "sprich": "[deadpan] Stimmt. Ich krieg auch jedes Mal eine Absage.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   },
+   "badumtss": 0.3
+  }
+ ],
+ "ausklang": 1.0,
+ "abspann": [
+  "Wir fragen nicht nur.",
+  "Wir finden den Job, der passt.",
+  "Top Jobs aus der Region."
+ ],
+ "abspann_dauer": 3.0
+}

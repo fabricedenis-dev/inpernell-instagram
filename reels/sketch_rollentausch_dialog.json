@@ -1,0 +1,231 @@
+{
+ "hook": "Wenn der Bewerber das Vorstellungsgespräch führt",
+ "hintergrund": "assets/sketche/bg_buero.png",
+ "musik": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
+ "links": "chef",
+ "figuren": {
+  "chef": {
+   "typ": "CHEF",
+   "stimme": "IWm8DnJ4NGjFI7QAM5lM"
+  },
+  "bewerber": {
+   "typ": "BEWERBER",
+   "stimme": "JNpQqni9iUx1Jxy9h0P1"
+  }
+ },
+ "dialog": [
+  {
+   "wer": "chef",
+   "sprich": "[friendly] So, dann erzähl mal was über dich.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ],
+    "arm_l": [
+     40,
+     60
+    ]
+   },
+   "einst": "total",
+   "gegen": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[confident] Gleich. Erst mal: Warum ist die Stelle frei?",
+   "pose": {
+    "augen": "genervt",
+    "mund": "grinsen",
+    "brauen": [
+     10,
+     0
+    ],
+    "arm_r": [
+     150,
+     175
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[uncomfortable] Der Vorgänger hat sich verändert.",
+   "pose": {
+    "mund": "zaehne",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[curious] Wohin?",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[quietly] Weg von uns.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     -12,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[taking notes] Notiert. Wie sieht's mit Homeoffice aus?",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[proud] Einmal im Monat.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[surprised] Einmal im Monat darf ich ins Büro? Perfekt.",
+   "pose": {
+    "mund": "lachen",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[annoyed] Nein. Andersrum.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     10,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[skeptical] Und wie würden dich deine Mitarbeiter beschreiben?",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[proud] Fordernd, aber fair.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[deadpan] Und ehrlich?",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[sad] Die reden nicht mehr mit mir.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     -14,
+     14
+    ]
+   },
+   "zoom": true,
+   "grillen_nach": 1.2,
+   "nach": 1.2
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[professional] Okay. Wir melden uns.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -6,
+     6
+    ],
+    "arm_r": [
+     60,
+     150
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[confused] Wir? Moment, wer stellt hier eigentlich wen ein?",
+   "pose": {
+    "augen": "gross",
+    "mund": "offen",
+    "brauen": [
+     -14,
+     18
+    ]
+   },
+   "badumtss": 0.3,
+   "einst": "total",
+   "gegen": {
+    "augen": "genervt",
+    "mund": "grinsen",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  }
+ ],
+ "ausklang": 1.0,
+ "abspann": [
+  "Heute suchen sich Fachkräfte",
+  "ihren Arbeitgeber aus.",
+  "Wir bringen euch zusammen."
+ ],
+ "abspann_dauer": 3.0
+}
