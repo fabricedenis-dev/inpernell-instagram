@@ -1,0 +1,283 @@
+{
+ "hook": "Wenn der Chef dein Arbeitszeugnis schreibt",
+ "hintergrund": "assets/sketche/bg_buero.png",
+ "musik": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
+ "links": "chef",
+ "figuren": {
+  "chef": {
+   "typ": "CHEF",
+   "stimme": "IWm8DnJ4NGjFI7QAM5lM"
+  },
+  "personalerin": {
+   "typ": "PERSONALERIN",
+   "stimme": "zKHQdbB8oaQ7roNTiDTK"
+  }
+ },
+ "dialog": [
+  {
+   "wer": "chef",
+   "sprich": "[annoyed] Schreib mal sein Zeugnis. Aber ehrlich.",
+   "einst": "total",
+   "pose": {
+    "mund": "neutral",
+    "brauen": [
+     12,
+     0
+    ],
+    "arm_l": [
+     40,
+     60
+    ]
+   },
+   "gegen": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[professional] Klar. Was hat er so gemacht?",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[grumpy] Er hat nie die Kaffeemaschine entkalkt.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[formal] Er übernahm die Versorgung des Teams.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -8,
+     8
+    ],
+    "arm_l": [
+     60,
+     150
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[grumpy] Hat in jedem Meeting nur genickt.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     10,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[formal] Er trug Entscheidungen stets mit.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[annoyed] Hat jede Mail mit Allen antworten beantwortet.",
+   "text": "Hat jede Mail mit „Allen antworten“ beantwortet.",
+   "pose": {
+    "augen": "gross",
+    "mund": "zaehne",
+    "brauen": [
+     14,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[formal] Er informierte stets alle Beteiligten.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[angry] Zweimal den Drucker geschrottet!",
+   "pose": {
+    "augen": "gross",
+    "mund": "zaehne",
+    "brauen": [
+     18,
+     0
+    ],
+    "arm_l": [
+     120,
+     170
+    ],
+    "faust": [
+     true,
+     false
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[formal] Er setzte sich intensiv mit unserer Technik auseinander.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -8,
+     8
+    ],
+    "arm_l": [
+     60,
+     150
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[grumpy] War zwei Wochen weg, und keiner hat's gemerkt.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     10,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[formal] Er arbeitete äußerst selbstständig.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[angry] Die Weihnachtsfeier hat er mit dem Feuerlöscher beendet!",
+   "pose": {
+    "augen": "gross",
+    "mund": "zaehne",
+    "brauen": [
+     18,
+     0
+    ],
+    "arm_l": [
+     120,
+     170
+    ],
+    "faust": [
+     true,
+     false
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[calm] Er trug zur Verbesserung des Betriebsklimas bei.",
+   "zoom": true,
+   "grillen_nach": 1.2,
+   "nach": 1.2,
+   "pose": {
+    "augen": "genervt",
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[exasperated] Und jetzt kündigt er auch noch selbst.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[formal] Er verlässt uns auf eigenen Wunsch. Wir bedauern das sehr.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "chef",
+   "sprich": "[confused] Tun wir?",
+   "pose": {
+    "augen": "gross",
+    "mund": "offen",
+    "brauen": [
+     -14,
+     18
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[deadpan] Nein. Aber das muss da so rein.",
+   "einst": "total",
+   "badumtss": 0.3,
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   },
+   "gegen": {
+    "augen": "gross",
+    "mund": "schock",
+    "brauen": [
+     -14,
+     20
+    ]
+   }
+  }
+ ],
+ "ausklang": 1.0,
+ "abspann": [
+  "Wir lesen zwischen den Zeilen.",
+  "Und finden den Job,",
+  "der wirklich zu dir passt."
+ ],
+ "abspann_dauer": 3.0
+}

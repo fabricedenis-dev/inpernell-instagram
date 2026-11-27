@@ -594,206 +594,36 @@
   "fertig_titelbild": "reels/fertig/2026-11-29-medizintechnik-tuttlingen.jpg"
  },
  {
-  "id": "2026-12-02-sketch-runde-6",
+  "id": "2026-12-02-sketch-funkloch",
   "datum": "2026-12-02",
   "zeit": "12:00",
-  "thema": "Sketch: Runde 6",
-  "caption": "Bewerbungsgespräch Runde 6: Wenn das Auswahlverfahren kein Ende nimmt 😅\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWie viele Gesprächsrunden hattest du schon für einen einzigen Job?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
-  "sketch": {
-   "titel": "Wenn das Bewerbungsgespräch in Runde 6 geht",
-   "musik_datei": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
-   "abspann": "Keine Lust auf Runde 6? Unsere Top Jobs aus der Region findest du hier.",
-   "dialog": [
-    {
-     "wer": "personaler",
-     "text": "Glückwunsch! Du bist in Runde 6!",
-     "sprich": "[excited] Glückwunsch! Du bist in Runde sechs!",
-     "augen": "gross",
-     "ruhe": "grinsen",
-     "arm": "tisch_hoch",
-     "tag": "RUNDE 6"
-    },
-    {
-     "wer": "genz",
-     "text": "Nach Telefoninterview, Fallstudie, Teamessen und Assessment-Center?",
-     "sprich": "[exhausted] Nach Telefoninterview, Fallstudie, Teamessen und Assessment-Center?",
-     "augen": "muede",
-     "ruhe": "neutral",
-     "arm": "handy",
-     "tag": "RUNDE 1 BIS 5"
-    },
-    {
-     "wer": "personaler",
-     "text": "Leider haben wir die Stelle intern besetzt.",
-     "sprich": "[apologetic] Leider haben wir die Stelle intern besetzt.",
-     "augen": "normal",
-     "ruhe": "neutral",
-     "arm": "tisch",
-     "brauen": "sorge"
-    },
-    {
-     "wer": "genz",
-     "text": "Mit wem?",
-     "sprich": "[shocked] Mit wem?",
-     "augen": "gross",
-     "ruhe": "schief",
-     "arm": "achselzucken",
-     "brauen": "skeptisch",
-     "fx": "fragezeichen"
-    },
-    {
-     "wer": "personaler",
-     "text": "Mit dem aus Runde 3. Der hat dich interviewt.",
-     "sprich": "[awkward] Mit dem aus Runde drei. [pause] Der hat dich interviewt.",
-     "augen": "normal",
-     "ruhe": "schief",
-     "arm": "tisch",
-     "fx": "schweiss",
-     "sfx_vor": "grillen",
-     "vor": 1.3,
-     "pointe": true,
-     "sfx_nach": "badumtss",
-     "nach": 1.8
-    }
-   ]
-  },
+  "thema": "Sketch: Telefoninterview mit Funkloch",
+  "caption": "Telefoninterview, wenn du im Schwarzwald wohnst 📵\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWo hattest du schon mal ein Vorstellungsgespräch mit miesem Empfang?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#vorstellungsgespräch #bewerbung #schwarzwald #jobsuche #personalvermittlung",
   "freigegeben": true,
-  "fertig_video": "reels/fertig/2026-12-02-sketch-runde-6.mp4",
-  "fertig_titelbild": "reels/fertig/2026-12-02-sketch-runde-6.jpg"
+  "fertig_video": "reels/fertig/2026-12-02-sketch-funkloch.mp4",
+  "fertig_titelbild": "reels/fertig/2026-12-02-sketch-funkloch.jpg",
+  "sketch_quelle": "reels/sketch_funkloch_dialog.json"
  },
  {
-  "id": "2026-12-05-sketch-laptop",
+  "id": "2026-12-05-sketch-arbeitszeugnis",
   "datum": "2026-12-05",
   "zeit": "11:00",
-  "thema": "Sketch: Laptop kommt Montag",
-  "caption": "Erster Arbeitstag ohne Laptop: Onboarding, wie es jeder kennt 💻\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWas war das Chaotischste an deinem ersten Arbeitstag?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
-  "sketch": {
-   "titel": "Erster Arbeitstag. Wo ist mein Laptop?",
-   "musik_datei": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
-   "abspann": "Dein nächster Job startet hoffentlich mit Laptop. Top Jobs aus der Region findest du bei uns.",
-   "dialog": [
-    {
-     "wer": "genz",
-     "text": "Erster Tag! Wo ist mein Laptop?",
-     "sprich": "[excited] Erster Tag! Wo ist mein Laptop?",
-     "augen": "gross",
-     "ruhe": "grinsen",
-     "arm": "achselzucken",
-     "tag": "TAG 1"
-    },
-    {
-     "wer": "personaler",
-     "text": "Kommt Montag.",
-     "sprich": "[cheerful] Kommt Montag.",
-     "augen": "normal",
-     "ruhe": "grinsen",
-     "arm": "tisch"
-    },
-    {
-     "wer": "genz",
-     "text": "Und? Mein Laptop?",
-     "sprich": "[impatient] Und? Mein Laptop?",
-     "augen": "muede",
-     "ruhe": "neutral",
-     "arm": "handy",
-     "tag": "TAG 8"
-    },
-    {
-     "wer": "personaler",
-     "text": "Kommt Montag.",
-     "sprich": "[cheerful] Kommt Montag.",
-     "augen": "normal",
-     "ruhe": "grinsen",
-     "arm": "tisch"
-    },
-    {
-     "wer": "genz",
-     "text": "Laptop? Kommt Montag.",
-     "sprich": "[deadpan] [cheerful] Laptop? Kommt Montag.",
-     "augen": "genervt",
-     "ruhe": "grinsen",
-     "arm": "tisch",
-     "tag": "TAG 61: ER ZUM NEUEN",
-     "sfx_vor": "grillen",
-     "vor": 1.3,
-     "pointe": true,
-     "sfx_nach": "badumtss",
-     "nach": 1.8
-    }
-   ]
-  },
+  "thema": "Sketch: Wenn der Chef dein Arbeitszeugnis schreibt",
+  "caption": "Wenn der Chef dein Arbeitszeugnis schreibt 📝\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWelche Formulierung aus deinem Arbeitszeugnis hat dich am meisten gewundert?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#arbeitszeugnis #jobwechsel #arbeitsleben #schwarzwald #personalvermittlung",
   "freigegeben": true,
-  "fertig_video": "reels/fertig/2026-12-05-sketch-laptop.mp4",
-  "fertig_titelbild": "reels/fertig/2026-12-05-sketch-laptop.jpg"
+  "fertig_video": "reels/fertig/2026-12-05-sketch-arbeitszeugnis.mp4",
+  "fertig_titelbild": "reels/fertig/2026-12-05-sketch-arbeitszeugnis.jpg",
+  "sketch_quelle": "reels/sketch_zeugnis_dialog.json"
  },
  {
-  "id": "2026-12-09-sketch-bewerbung-1995",
+  "id": "2026-12-09-sketch-bewerbung-schoenschreiben",
   "datum": "2026-12-09",
   "zeit": "12:00",
-  "thema": "Sketch: Bewerbung 1995 vs. heute",
-  "caption": "Bewerbung 1995 vs. heute: Was hat sich wirklich verändert? 📮\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWie lange hast du schon mal auf eine Antwort auf deine Bewerbung gewartet?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#jobwechsel #bewerbung #arbeitsleben #schwarzwald #personalvermittlung",
-  "sketch": {
-   "titel": "Bewerbung 1995 vs. heute",
-   "musik_datei": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
-   "abspann": "Bewerben geht heute auch einfacher. Schreib uns einfach eine Nachricht.",
-   "dialog": [
-    {
-     "wer": "personaler",
-     "text": "Mappe, Passfoto, Briefmarke. Fertig.",
-     "sprich": "[proud] Mappe, Passfoto, Briefmarke. Fertig.",
-     "augen": "normal",
-     "ruhe": "grinsen",
-     "arm": "tisch",
-     "sepia": true,
-     "tag": "1995"
-    },
-    {
-     "wer": "genz",
-     "text": "45 Minuten Portal. Lebenslauf hochgeladen.",
-     "sprich": "[tired] Fünfundvierzig Minuten Portal. Lebenslauf hochgeladen.",
-     "augen": "muede",
-     "ruhe": "neutral",
-     "arm": "handy",
-     "tag": "HEUTE"
-    },
-    {
-     "wer": "genz",
-     "text": "Und dann: Bitte alle Daten noch mal manuell eingeben.",
-     "sprich": "[outraged] Und dann: Bitte alle Daten noch mal manuell eingeben.",
-     "augen": "gross",
-     "ruhe": "schief",
-     "arm": "handy",
-     "brauen": "skeptisch",
-     "tag": "HEUTE"
-    },
-    {
-     "wer": "personaler",
-     "text": "Und wann kam die Antwort?",
-     "sprich": "[curious] Und wann kam die Antwort?",
-     "augen": "normal",
-     "ruhe": "neutral",
-     "arm": "tisch",
-     "sepia": true,
-     "tag": "1995"
-    },
-    {
-     "wer": "genz",
-     "text": "Nach drei Wochen. Wie bei dir. Nur automatisch.",
-     "sprich": "[deadpan] Nach drei Wochen. Wie bei dir. [pause] Nur automatisch.",
-     "augen": "genervt",
-     "ruhe": "schief",
-     "arm": "achselzucken",
-     "tag": "HEUTE",
-     "sfx_vor": "grillen",
-     "vor": 1.3,
-     "pointe": true,
-     "sfx_nach": "badumtss",
-     "nach": 1.8
-    }
-   ]
-  },
+  "thema": "Sketch: Wenn dein Kumpel deine Bewerbung schönschreibt",
+  "caption": "Wenn dein Kumpel deine Bewerbung schönschreibt 😅\n\nEin Zeichentrick-Sketch von Inpernell, deiner Personalvermittlung im Schwarzwald. Direktvermittlung in Festanstellung, für dich kostenlos.\n\nWelche Floskel aus Bewerbungen kannst du nicht mehr hören?\n\nTop Jobs aus der Region: Link in der Bio.\n\nMusik: Monkeys Spinning Monkeys von Kevin MacLeod (incompetech.com), CC BY 4.0\n\n#bewerbung #lebenslauf #jobsuche #schwarzwald #personalvermittlung",
   "freigegeben": true,
-  "fertig_video": "reels/fertig/2026-12-09-sketch-bewerbung-1995.mp4",
-  "fertig_titelbild": "reels/fertig/2026-12-09-sketch-bewerbung-1995.jpg"
+  "fertig_video": "reels/fertig/2026-12-09-sketch-bewerbung-schoenschreiben.mp4",
+  "fertig_titelbild": "reels/fertig/2026-12-09-sketch-bewerbung-schoenschreiben.jpg",
+  "sketch_quelle": "reels/sketch_bewerbung_dialog.json"
  }
 ]

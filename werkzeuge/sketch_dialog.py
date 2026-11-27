@@ -39,13 +39,22 @@ class Sketch:
         self.figuren = {k: {**getattr(sm, v["typ"]), **v.get("extra", {})} for k, v in c["figuren"].items()}
         self.stimmen = {k: v["stimme"] for k, v in c["figuren"].items()}
         self.links = c["links"]
-        bg = Image.open(os.path.join(HIER, c["hintergrund"])).convert("RGB").resize((W, H), Image.LANCZOS)
+        bg = Image.open(os.path.join(HIER, c["hintergrund"])).convert("RGB")
+        bg = bg.crop((0, int(bg.height * 0.04), bg.width, bg.height)).resize((W, H), Image.LANCZOS)
         self.bg = bg.convert("RGBA")
         z = 1.35                                                # Nahaufnahme: Hintergrund vergrößert, je Seite versetzt
         g = bg.resize((int(W * z), int(H * z)), Image.LANCZOS)
         oy = int((H * z - H) * 0.35)
         self.bg_nah = {"links": g.crop((0, oy, W, oy + H)).convert("RGBA"),
                        "rechts": g.crop((g.width - W, oy, g.width, oy + H)).convert("RGBA")}
+        self.bg_figur = {}
+        for k, v in c["figuren"].items():
+            if v.get("hintergrund"):
+                b = Image.open(os.path.join(HIER, v["hintergrund"])).convert("RGB")
+                bw = min(b.width, int(b.height * 9 / 16))
+                oben = int(b.height * 0.04)                      # Rand oben abschneiden (KI-Bilder haben dort oft Artefakte)
+                b = b.crop(((b.width - bw) // 2, oben, (b.width + bw) // 2, b.height)).resize((W, H), Image.LANCZOS)
+                self.bg_figur[k] = b.convert("RGBA")
         self.cache = {}
 
     def ebene(self, wer, x, y, gr, **kw):
@@ -82,29 +91,87 @@ def bauen(sk):
 
 
 def haeppchen(zl, rel):
-    """Aktuelles Untertitel-Häppchen (bis 3 Wörter) passend zur gesprochenen Stelle."""
+    """Aktuelles Untertitel-Häppchen (bis 3 Wörter) passend zur gesprochenen Stelle: Liste (Wort, stumm?)."""
+    stumm = set(zl["z"].get("stumm", []))
     w = []
-    for t in zl["text"].split():                       # „B 500“ o. ä. zusammenhalten
-        if w and len(w[-1]) == 1 and w[-1].isupper() and t[:1].isdigit():
-            w[-1] += " " + t
+    for i, t in enumerate(zl["text"].split()):          # „B 500“ o. ä. zusammenhalten
+        if w and len(w[-1][0]) == 1 and w[-1][0].isupper() and t[:1].isdigit():
+            w[-1] = (w[-1][0] + " " + t, w[-1][1])
         else:
-            w.append(t)
+            w.append((t, i in stumm))
     n = max(1, len(zl["zeiten"]))
     k = sum(1 for a, _ in zl["zeiten"] if a <= rel + 0.05)
     if k <= 0:
-        return ""
+        return []
     i = min(len(w) - 1, int((k - 1) * len(w) / n))
-    g = i // 3
-    return " ".join(w[g * 3:g * 3 + 3])
+    # Häppchen: höchstens 3 Wörter und höchstens 940 px breit
+    d = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+    f = font("h800", 74)
+    gruppen, akt = [], []
+    for j, (t, _) in enumerate(w):
+        test = " ".join(w[x][0] for x in akt + [j])
+        if akt and (len(akt) >= 3 or d.textlength(test, font=f) > 940):
+            gruppen.append(akt)
+            akt = []
+        akt.append(j)
+    gruppen.append(akt)
+    g = next(gr for gr in gruppen if i in gr)
+    return [w[x] for x in g]
 
 
-def untertitel(img, text):
-    if not text:
+def untertitel(img, teile):
+    if not teile:
         return
     d = ImageDraw.Draw(img)
-    f = font("h800", 74)
-    d.text((W // 2, SUB_Y), text, font=f, fill=(255, 255, 255), anchor="mm", stroke_width=8,
-           stroke_fill=(10, 10, 14))
+    gr = 74
+    while gr > 40 and d.textlength(" ".join(t for t, _ in teile), font=font("h800", gr)) > 980:
+        gr -= 4
+    f = font("h800", gr)
+    breiten = [d.textlength(t + " ", font=f) for t, _ in teile]
+    x = W // 2 - (sum(breiten) - d.textlength(" ", font=f)) / 2
+    for (t, st), bw in zip(teile, breiten):
+        d.text((x, SUB_Y), t, font=f, fill=(255, 70, 70) if st else (255, 255, 255), anchor="lm", stroke_width=8,
+               stroke_fill=(10, 10, 14))
+        x += bw
+
+
+def stoerung_jetzt(zl, rel):
+    for i in zl["z"].get("stumm", []):
+        if i < len(zl["zeiten"]):
+            a, b = zl["zeiten"][i]
+            if a - 0.05 <= rel <= b + 0.1:
+                return True
+    return False
+
+
+def stoer_bild(img, k):
+    """Funkloch: Farbversatz, verschobene Streifen, Rauschen."""
+    r, g, b = img.split()
+    img = Image.merge("RGB", (r.transform(img.size, Image.AFFINE, (1, 0, -14, 0, 1, 0)), g,
+                              b.transform(img.size, Image.AFFINE, (1, 0, 14, 0, 1, 0))))
+    rr = random.Random(k)
+    for _ in range(5):
+        y0 = rr.randint(200, H - 200)
+        h = rr.randint(20, 70)
+        img.paste(img.crop((0, y0, W, y0 + h)), (rr.randint(-60, 60), y0))
+    d = ImageDraw.Draw(img)
+    for _ in range(900):
+        x, y = rr.randint(0, W - 1), rr.randint(0, H - 1)
+        c = rr.randint(150, 255)
+        d.rectangle([x, y, x + 3, y + 3], fill=(c, c, c))
+    return img
+
+
+def sms_karte(img, text, rel):
+    """Benachrichtigung wie auf dem Handy, gleitet von oben herein."""
+    d = ImageDraw.Draw(img)
+    y = int(420 - max(0, 1 - rel / 0.3) * 300)
+    d.rounded_rectangle([70, y, W - 70, y + 300], radius=36, fill=(250, 250, 252), outline=(40, 40, 48), width=5)
+    d.rounded_rectangle([100, y + 30, 160, y + 90], radius=14, fill=(60, 200, 90))
+    d.text((180, y + 42), "Nachrichten · jetzt", font=font("t400", 34), fill=(90, 90, 100))
+    from bild import wrap
+    for i, z in enumerate(wrap(d, text, font("h800", 46), W - 220)[:3]):
+        d.text((110, y + 110 + i * 56), z, font=font("h800", 46), fill=(20, 20, 26))
 
 
 def mund_offen(zl, rel):
@@ -144,19 +211,23 @@ def frame(sk, zeilen, zeit, k, blinz, gesamt):
                 r = rel - len(akt["ton"]) / SR - 0.2
                 dx = (1 if f != sk.links else -1) * (r ** 1.6) * 900
                 p = {**p, "arm_l": (95, 100), "arm_r": (95, 100), "mund": "laecheln", "augen": "zu"}
-            setze(img, sk.ebene(f, x, 1790, 1.2, **p), dx=dx, dy=wip if f == wer else -wip)
+            setze(img, sk.ebene(f, x, 1836 if sk.figuren[f].get("bein") == "sitzen" else 1790, 1.2, **p), dx=dx, dy=wip if f == wer else -wip)
     else:
         seite = "links" if wer == sk.links else "rechts"
-        img = sk.bg_nah[seite].copy()
+        img = (sk.bg_figur.get(wer) or sk.bg_nah[seite]).copy()
         x = 470 if wer == sk.links else 610
-        setze(img, sk.ebene(wer, x, 2330, 1.85, **pose), dy=wip)
+        setze(img, sk.ebene(wer, x, 2052 if sk.figuren[wer].get("bein") == "sitzen" else 2330, 1.85, **pose), dy=wip)
     img = img.convert("RGB")
     if z.get("zoom") and rel > 0:
         zz = 1 + 0.22 * min(1, rel / max(0.3, akt["ende"] - akt["start"] + z.get("nach", 0)))
         cw, ch = int(W / zz), int(H / zz)
         img = img.crop(((W - cw) // 2, int(760 - ch / 2) if 760 - ch / 2 > 0 else 0,
                         (W - cw) // 2 + cw, (int(760 - ch / 2) if 760 - ch / 2 > 0 else 0) + ch)).resize((W, H))
+    if stoerung_jetzt(akt, rel):
+        img = stoer_bild(img, k)
     fc.text_oben(img, sk.cfg["hook"], y=210)
+    if z.get("sms") and rel > -z.get("vor", 0.12):
+        sms_karte(img, z["sms"], rel + z.get("vor", 0.12))
     untertitel(img, haeppchen(akt, rel))
     img = img.convert("RGBA")
     rd.logo_marke(img)
@@ -225,9 +296,33 @@ def tonspur(sk, zeilen, gesamt):
         b_, a_ = butter(2, [700 / (SR / 2), 4500 / (SR / 2)], "band")
         return (lfilter(b_, a_, rng.standard_normal(len(t))) * np.sin(np.pi * t / d) ** 2 * 0.6).astype(np.float32)
 
+    def rauschen(d):
+        t = np.arange(int(d * SR)) / SR
+        b_, a_ = butter(2, [300 / (SR / 2), 6000 / (SR / 2)], "band")
+        x = lfilter(b_, a_, rng.standard_normal(len(t))) * (0.6 + 0.4 * np.sign(np.sin(2 * np.pi * 23 * t)))
+        return (x * 0.35).astype(np.float32)
+
+    def tuten():
+        t = np.arange(int(0.35 * SR)) / SR
+        ton_ = (np.sin(2 * np.pi * 425 * t) * 0.3).astype(np.float32)
+        out = np.zeros(int(1.6 * SR), np.float32)
+        for k0 in (0.0, 0.55, 1.1):
+            i = int(k0 * SR)
+            out[i:i + len(ton_)] += ton_[: len(out) - i]
+        return out
+
     pegel = np.full(n, 0.32, np.float32)
     for zl in zeilen:
-        leg(zl["ton"], zl["start"], 0.95)
+        ton_z = zl["ton"].copy()
+        for i in zl["z"].get("stumm", []):
+            if i < len(zl["zeiten"]):
+                a, b = zl["zeiten"][i]
+                ia, ib = int(max(0, a - 0.03) * SR), int(min(len(ton_z) / SR, b + 0.08) * SR)
+                ton_z[ia:ib] = rauschen((ib - ia) / SR)[: ib - ia]
+        zl["ton_mix"] = ton_z
+        leg(ton_z, zl["start"], 0.95)
+        if zl["z"].get("tuten_nach"):
+            leg(tuten(), zl["ende"] + 0.3, 0.9)
         pegel[max(0, int((zl["start"] - 0.2) * SR)):int(zl["ende"] * SR)] = 0.1
         z = zl["z"]
         if z.get("grillen_nach"):
@@ -280,7 +375,10 @@ def main(pfad, ziel):
         raise RuntimeError("ffmpeg-Fehler")
     print(ziel, round(gesamt, 1), "s")
     import vollstaendig
-    vollstaendig.pruefe(ziel, [zl["text"] for zl in zeilen], streng=True)
+    # Wörter im Funkloch sind absichtlich nicht zu hören
+    texte = [" ".join(w for i, w in enumerate(zl["text"].split()) if i not in set(zl["z"].get("stumm", [])))
+             for zl in zeilen]
+    vollstaendig.pruefe(ziel, texte, streng=True)
 
 
 if __name__ == "__main__":

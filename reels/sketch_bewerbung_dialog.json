@@ -1,0 +1,278 @@
+{
+ "hook": "Wenn dein Kumpel deine Bewerbung schönschreibt",
+ "hintergrund": "assets/sketche/bg_wohnzimmer.png",
+ "musik": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
+ "links": "bewerber",
+ "figuren": {
+  "bewerber": {
+   "typ": "BEWERBER",
+   "stimme": "JNpQqni9iUx1Jxy9h0P1",
+   "extra": {
+    "bein": "sitzen"
+   }
+  },
+  "kumpel": {
+   "typ": "KUMPEL",
+   "stimme": "aTTiK3YzK3dXETpuDE2h",
+   "extra": {
+    "bein": "sitzen"
+   }
+  }
+ },
+ "dialog": [
+  {
+   "wer": "bewerber",
+   "sprich": "[pleading] Hilfst du mir bei der Bewerbung? Es soll klingen, als könnte ich was.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -12,
+     10
+    ]
+   },
+   "einst": "total",
+   "gegen": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[relaxed] Klar. Was hast du im letzten Job gemacht?",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[honest] Ehrlich? Hauptsächlich Pause.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "grinsen",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[professional] Ausgeprägtes Gespür für Regeneration und Leistungsfähigkeit.",
+   "pose": {
+    "augen": "zu",
+    "mund": "laecheln",
+    "brauen": [
+     -8,
+     8
+    ],
+    "arm_r": [
+     60,
+     150
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[proud] Ich hab einmal den Drucker repariert. Mit einem Tritt.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[professional] Lösungsorientierter Umgang mit technischen Herausforderungen.",
+   "pose": {
+    "augen": "zu",
+    "mund": "laecheln",
+    "brauen": [
+     -8,
+     8
+    ],
+    "arm_r": [
+     60,
+     150
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[casual] In Meetings hatte ich immer die Kamera aus.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     0,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[professional] Erfahrung in ressourcenschonender digitaler Kommunikation.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[casual] Die meiste Arbeit hat der Azubi gemacht.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[professional] Führungserfahrung. Personalverantwortung für ein Teammitglied.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -8,
+     8
+    ],
+    "arm_r": [
+     60,
+     150
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[guilty] Ich hab aus Versehen den Kundenordner gelöscht.",
+   "pose": {
+    "augen": "gross",
+    "mund": "zaehne",
+    "brauen": [
+     -14,
+     16
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[professional] Konsequente Umsetzung von Datensparsamkeit.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[sheepish] Mein Chef hat sich dreimal über mich beschwert.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[professional] Regelmäßiger, intensiver Austausch mit der Geschäftsführung.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[sad] Und am Ende haben sie mich rausgeworfen.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     -12,
+     14
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[professional] Offen für neue Herausforderungen. Ab sofort verfügbar.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -10,
+     10
+    ],
+    "arm_l": [
+     40,
+     60
+    ],
+    "arm_r": [
+     40,
+     60
+    ]
+   },
+   "zoom": true
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[amazed] Boah. Ich würde mich sofort einstellen.",
+   "pose": {
+    "augen": "gross",
+    "mund": "lachen",
+    "brauen": [
+     -14,
+     18
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[deadpan] Ich nicht.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     8,
+     0
+    ]
+   },
+   "einst": "total",
+   "badumtss": 0.3,
+   "gegen": {
+    "augen": "gross",
+    "mund": "schock",
+    "brauen": [
+     -14,
+     20
+    ]
+   }
+  }
+ ],
+ "ausklang": 1.0,
+ "abspann": [
+  "Wir lesen jeden Lebenslauf.",
+  "Auch zwischen den Zeilen.",
+  "Top Jobs aus der Region."
+ ],
+ "abspann_dauer": 3.0
+}

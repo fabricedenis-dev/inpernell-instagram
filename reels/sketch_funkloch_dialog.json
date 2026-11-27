@@ -1,0 +1,242 @@
+{
+ "hook": "Telefoninterview, wenn du im Schwarzwald wohnst",
+ "hintergrund": "assets/sketche/bg_buero.png",
+ "musik": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
+ "links": "personalerin",
+ "figuren": {
+  "personalerin": {
+   "typ": "PERSONALERIN",
+   "stimme": "zKHQdbB8oaQ7roNTiDTK",
+   "hintergrund": "assets/sketche/bg_buero.png",
+   "extra": {
+    "halt": "handy",
+    "arm_r": [
+     115,
+     195
+    ]
+   }
+  },
+  "bewerber": {
+   "typ": "BEWERBER",
+   "stimme": "JNpQqni9iUx1Jxy9h0P1",
+   "hintergrund": "assets/sketche/bg_wohnzimmer.png",
+   "extra": {
+    "halt": "handy",
+    "arm_r": [
+     115,
+     195
+    ]
+   }
+  }
+ },
+ "dialog": [
+  {
+   "wer": "personalerin",
+   "sprich": "[friendly] Hallo, hörst du mich?",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[strained] Ja, aber nur, wenn ich auf dem Stuhl stehe.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "zaehne",
+    "brauen": [
+     14,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[friendly] Was stellst du dir beim Gehalt vor?",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[confident] Ich hätte gern fünfzigtausend. Weniger nicht.",
+   "text": "Ich hätte gern 50.000. Weniger nicht.",
+   "stumm": [
+    3,
+    5
+   ],
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[delighted] Weniger? Sehr bescheiden, notiert!",
+   "pose": {
+    "mund": "lachen",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[panicked] Nein! Mehr! Hallo?",
+   "pose": {
+    "augen": "gross",
+    "mund": "offen",
+    "brauen": [
+     -14,
+     18
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[friendly] Und wie sieht's mit Überstunden aus?",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[firm] Überstunden mach ich keine.",
+   "stumm": [
+    3
+   ],
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[happy] Überstunden machst du? Super, notiert!",
+   "pose": {
+    "mund": "lachen",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[desperate] Moment, ich geh auf den Dachboden!",
+   "pose": {
+    "augen": "gross",
+    "mund": "zaehne",
+    "brauen": [
+     -14,
+     18
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[out of breath] Hörst du mich jetzt?",
+   "vor": 0.9,
+   "pose": {
+    "augen": "genervt",
+    "mund": "offen",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[friendly] Perfekt. Ab wann kannst du anfangen?",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[firm] Ab Januar. Vorher nicht.",
+   "stumm": [
+    3
+   ],
+   "pose": {
+    "mund": "neutral",
+    "brauen": [
+     8,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "personalerin",
+   "sprich": "[cheerful] Vorher? Also ab sofort! Dann bis Montag!",
+   "tuten_nach": true,
+   "nach": 1.4,
+   "pose": {
+    "mund": "lachen",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[confused] Hallo? Hallo?",
+   "pose": {
+    "augen": "gross",
+    "mund": "offen",
+    "brauen": [
+     -14,
+     18
+    ]
+   },
+   "zoom": true
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[deadpan] Aber die SMS kommt an.",
+   "vor": 2.2,
+   "badumtss": 0.3,
+   "sms": "Willkommen im Team! Start: Montag. Gehalt: weniger. Überstunden: gerne.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     8,
+     0
+    ]
+   }
+  }
+ ],
+ "ausklang": 1.2,
+ "abspann": [
+  "Gute Jobs findest du bei uns",
+  "auch ohne Funkloch:",
+  "Top Jobs aus der Region."
+ ],
+ "abspann_dauer": 3.0
+}
