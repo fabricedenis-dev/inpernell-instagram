@@ -254,6 +254,7 @@ def figur(img, x, y_fuss, groesse=1.0, spiegeln=False,
 
 JENSEN = dict(haut=(240, 214, 184), haar="jensen", brille=True, oberteil="lederjacke")
 BEWERBER = dict(haut=(240, 214, 184), haar="kurz", haar_farbe=(120, 78, 40), oberteil="hoodie", farbe=(60, 160, 90))
+KUMPEL = dict(haut=(236, 236, 236), haar="kurz", haar_farbe=(40, 40, 44), oberteil="tshirt", farbe=(60, 110, 200))
 PERSONALERIN = dict(haut=(244, 220, 196), haar="lang", haar_farbe=(200, 150, 70), oberteil="tshirt",
                     farbe=(200, 70, 110))
 PERSONALER = dict(haut=(236, 236, 236), haar="glatze", oberteil="anzug", farbe=(90, 92, 100))

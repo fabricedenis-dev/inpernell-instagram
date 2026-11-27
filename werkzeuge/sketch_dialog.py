@@ -39,7 +39,8 @@ class Sketch:
         self.figuren = {k: {**getattr(sm, v["typ"]), **v.get("extra", {})} for k, v in c["figuren"].items()}
         self.stimmen = {k: v["stimme"] for k, v in c["figuren"].items()}
         self.links = c["links"]
-        bg = Image.open(os.path.join(HIER, c["hintergrund"])).convert("RGB").resize((W, H), Image.LANCZOS)
+        bg = Image.open(os.path.join(HIER, c["hintergrund"])).convert("RGB")
+        bg = bg.crop((0, int(bg.height * 0.04), bg.width, bg.height)).resize((W, H), Image.LANCZOS)
         self.bg = bg.convert("RGBA")
         z = 1.35                                                # Nahaufnahme: Hintergrund vergrößert, je Seite versetzt
         g = bg.resize((int(W * z), int(H * z)), Image.LANCZOS)
@@ -103,15 +104,29 @@ def haeppchen(zl, rel):
     if k <= 0:
         return []
     i = min(len(w) - 1, int((k - 1) * len(w) / n))
-    g = i // 3
-    return w[g * 3:g * 3 + 3]
+    # Häppchen: höchstens 3 Wörter und höchstens 940 px breit
+    d = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+    f = font("h800", 74)
+    gruppen, akt = [], []
+    for j, (t, _) in enumerate(w):
+        test = " ".join(w[x][0] for x in akt + [j])
+        if akt and (len(akt) >= 3 or d.textlength(test, font=f) > 940):
+            gruppen.append(akt)
+            akt = []
+        akt.append(j)
+    gruppen.append(akt)
+    g = next(gr for gr in gruppen if i in gr)
+    return [w[x] for x in g]
 
 
 def untertitel(img, teile):
     if not teile:
         return
     d = ImageDraw.Draw(img)
-    f = font("h800", 74)
+    gr = 74
+    while gr > 40 and d.textlength(" ".join(t for t, _ in teile), font=font("h800", gr)) > 980:
+        gr -= 4
+    f = font("h800", gr)
     breiten = [d.textlength(t + " ", font=f) for t, _ in teile]
     x = W // 2 - (sum(breiten) - d.textlength(" ", font=f)) / 2
     for (t, st), bw in zip(teile, breiten):
@@ -196,12 +211,12 @@ def frame(sk, zeilen, zeit, k, blinz, gesamt):
                 r = rel - len(akt["ton"]) / SR - 0.2
                 dx = (1 if f != sk.links else -1) * (r ** 1.6) * 900
                 p = {**p, "arm_l": (95, 100), "arm_r": (95, 100), "mund": "laecheln", "augen": "zu"}
-            setze(img, sk.ebene(f, x, 1790, 1.2, **p), dx=dx, dy=wip if f == wer else -wip)
+            setze(img, sk.ebene(f, x, 1836 if sk.figuren[f].get("bein") == "sitzen" else 1790, 1.2, **p), dx=dx, dy=wip if f == wer else -wip)
     else:
         seite = "links" if wer == sk.links else "rechts"
         img = (sk.bg_figur.get(wer) or sk.bg_nah[seite]).copy()
         x = 470 if wer == sk.links else 610
-        setze(img, sk.ebene(wer, x, 2330, 1.85, **pose), dy=wip)
+        setze(img, sk.ebene(wer, x, 2052 if sk.figuren[wer].get("bein") == "sitzen" else 2330, 1.85, **pose), dy=wip)
     img = img.convert("RGB")
     if z.get("zoom") and rel > 0:
         zz = 1 + 0.22 * min(1, rel / max(0.3, akt["ende"] - akt["start"] + z.get("nach", 0)))
