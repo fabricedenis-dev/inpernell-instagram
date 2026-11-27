@@ -1,0 +1,252 @@
+{
+ "hook": "Wenn die Stellenanzeige zu gut klingt",
+ "hintergrund": "assets/sketche/bg_wohnzimmer.png",
+ "musik": "assets/musik/monkeys_spinning_monkeys_kevin_macleod.mp3",
+ "links": "bewerber",
+ "figuren": {
+  "bewerber": {
+   "typ": "BEWERBER",
+   "stimme": "JNpQqni9iUx1Jxy9h0P1",
+   "extra": {
+    "bein": "sitzen"
+   }
+  },
+  "kumpel": {
+   "typ": "KUMPEL",
+   "stimme": "aTTiK3YzK3dXETpuDE2h",
+   "extra": {
+    "bein": "sitzen"
+   }
+  }
+ },
+ "dialog": [
+  {
+   "wer": "bewerber",
+   "sprich": "[excited] Hör mal, die Stellenanzeige klingt mega.",
+   "pose": {
+    "mund": "lachen",
+    "brauen": [
+     -10,
+     10
+    ]
+   },
+   "einst": "total",
+   "gegen": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[skeptical] Lies vor.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[reading] Junges, dynamisches Team.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[deadpan] Alle sind dreiundzwanzig und kündigen nach sechs Monaten.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   },
+   "text": "Alle sind 23 und kündigen nach 6 Monaten."
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[reading] Flache Hierarchien.",
+   "pose": {
+    "mund": "grinsen",
+    "brauen": [
+     -8,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[deadpan] Der Chef entscheidet alles. Allein.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[reading] Wir sind wie eine Familie.",
+   "pose": {
+    "mund": "laecheln",
+    "brauen": [
+     -6,
+     6
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[deadpan] Keiner redet übers Geld, und an Weihnachten gibt's Streit.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "skeptisch",
+    "brauen": [
+     12,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[reading] Hohe Belastbarkeit erwünscht.",
+   "pose": {
+    "mund": "neutral",
+    "brauen": [
+     -6,
+     8
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[deadpan] Du machst die Arbeit von drei Leuten.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[reading] Abwechslungsreiche Aufgaben.",
+   "pose": {
+    "mund": "neutral",
+    "brauen": [
+     -10,
+     12
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[deadpan] Du bist auch der IT-Support.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "grinsen",
+    "brauen": [
+     6,
+     0
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[hopeful] Aber hier: Kostenloses Obst!",
+   "pose": {
+    "mund": "lachen",
+    "brauen": [
+     -10,
+     10
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[deadpan] Das ist das Gehalt.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   },
+   "zoom": true,
+   "grillen_nach": 1.2,
+   "nach": 1.2
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[sad] Und ganz unten: Wir freuen uns auf deine Bewerbung.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     -12,
+     14
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[serious] Das stimmt sogar.",
+   "pose": {
+    "mund": "neutral",
+    "brauen": [
+     -4,
+     4
+    ]
+   }
+  },
+  {
+   "wer": "bewerber",
+   "sprich": "[surprised] Echt?",
+   "pose": {
+    "augen": "gross",
+    "mund": "offen",
+    "brauen": [
+     -14,
+     18
+    ]
+   }
+  },
+  {
+   "wer": "kumpel",
+   "sprich": "[deadpan] Ja. Die Letzten sind alle weg.",
+   "pose": {
+    "augen": "genervt",
+    "mund": "neutral",
+    "brauen": [
+     6,
+     0
+    ]
+   },
+   "badumtss": 0.3
+  }
+ ],
+ "ausklang": 1.0,
+ "abspann": [
+  "Wir sagen dir ehrlich,",
+  "was hinter der Anzeige steckt.",
+  "Top Jobs aus der Region."
+ ],
+ "abspann_dauer": 3.0
+}
