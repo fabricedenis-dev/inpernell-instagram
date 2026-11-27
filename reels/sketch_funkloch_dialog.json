@@ -66,11 +66,11 @@
   },
   {
    "wer": "bewerber",
-   "sprich": "[confident] Ich will fünfzigtausend. Weniger nicht.",
-   "text": "Ich will 50.000. Weniger nicht.",
+   "sprich": "[confident] Ich hätte gern fünfzigtausend. Weniger nicht.",
+   "text": "Ich hätte gern 50.000. Weniger nicht.",
    "stumm": [
-    2,
-    4
+    3,
+    5
    ],
    "pose": {
     "mund": "grinsen",
@@ -167,7 +167,7 @@
   },
   {
    "wer": "personalerin",
-   "sprich": "[friendly] Perfekt. Wann kannst du anfangen?",
+   "sprich": "[friendly] Perfekt. Ab wann kannst du anfangen?",
    "pose": {
     "mund": "laecheln",
     "brauen": [

@@ -51,7 +51,8 @@ class Sketch:
             if v.get("hintergrund"):
                 b = Image.open(os.path.join(HIER, v["hintergrund"])).convert("RGB")
                 bw = min(b.width, int(b.height * 9 / 16))
-                b = b.crop(((b.width - bw) // 2, 0, (b.width + bw) // 2, b.height)).resize((W, H), Image.LANCZOS)
+                oben = int(b.height * 0.04)                      # Rand oben abschneiden (KI-Bilder haben dort oft Artefakte)
+                b = b.crop(((b.width - bw) // 2, oben, (b.width + bw) // 2, b.height)).resize((W, H), Image.LANCZOS)
                 self.bg_figur[k] = b.convert("RGBA")
         self.cache = {}
 
