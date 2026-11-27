@@ -635,7 +635,7 @@
   "sketch_quelle": "reels/sketch_stellenanzeige_dialog.json",
   "fertig_video": "reels/fertig/2026-12-12-sketch-stellenanzeige.mp4",
   "fertig_titelbild": "reels/fertig/2026-12-12-sketch-stellenanzeige.jpg",
-  "freigegeben": false
+  "freigegeben": true
  },
  {
   "id": "2026-12-16-sketch-opa",
@@ -646,7 +646,7 @@
   "sketch_quelle": "reels/sketch_opa_dialog.json",
   "fertig_video": "reels/fertig/2026-12-16-sketch-opa.mp4",
   "fertig_titelbild": "reels/fertig/2026-12-16-sketch-opa.jpg",
-  "freigegeben": false
+  "freigegeben": true
  },
  {
   "id": "2026-12-19-sketch-rollentausch",
@@ -657,6 +657,6 @@
   "sketch_quelle": "reels/sketch_rollentausch_dialog.json",
   "fertig_video": "reels/fertig/2026-12-19-sketch-rollentausch.mp4",
   "fertig_titelbild": "reels/fertig/2026-12-19-sketch-rollentausch.jpg",
-  "freigegeben": false
+  "freigegeben": true
  }
 ]
